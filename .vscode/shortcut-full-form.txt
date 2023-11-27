@@ -1,0 +1,2 @@
+vsc = Vendor step change
+vcsc = Vendor checkout step circl

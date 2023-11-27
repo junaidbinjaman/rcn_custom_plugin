@@ -53,46 +53,44 @@ class Rcn_Public {
 	}
 
 	/**
-	 * Register the stylesheets for the public-facing side of the site.
+	 * The function enqueue public facing js code file.
 	 *
-	 * @since    1.0.0
+	 * @return void
 	 */
-	public function enqueue_styles() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Rcn_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Rcn_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rcn-public.css', array(), $this->version, 'all' );
+	public function enqueue_scripts() {
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rcn-public.js', array( 'jquery' ), $this->version, false );
 	}
 
 	/**
-	 * Register the JavaScript for the public-facing side of the site.
+	 * This function reads the contents of the WooCommerce (WC) cart and checks if any vendor packages exist in the cart.
+	 * It returns true if vendor packages exist, otherwise false.
 	 *
-	 * @since    1.0.0
+	 * @since 1.0.0
 	 */
-	public function enqueue_scripts() {
+	public function read_cart_contents() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Rcn_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Rcn_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+		// Include the vendor package handler class.
+		require_once plugin_dir_path( __DIR__ ) . 'public/partials/class-rcn-vendor-package-handler.php';
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rcn-public.js', array( 'jquery' ), $this->version, false );
+		// Access the cart contents.
+		$cart_items = WC()->cart->get_cart();
+
+		// Loop through the cart items and check if any vendor packages exist.
+		foreach ( $cart_items as $cart_item ) {
+			// Retrieve the product ID from the cart.
+			$product_id = $cart_item['product_id'];
+
+			// Initialize an instance of the Rcn_Vendor_Package_Handler class.
+			$vendor_package_handler = new Rcn_Vendor_Package_Handler();
+
+			// Pass the product ID to get associated category IDs.
+			$category_ids = $vendor_package_handler->get_product_information( $product_id )['categories'];
+
+			/**
+			 * Pass the category IDs to check if a vendor category is associated.
+			 * Returns true if a vendor package is associated; otherwise, it returns false.
+			 */
+			$result = $vendor_package_handler->is_vendor_package_in_cart( $category_ids );
+		}
 	}
 }
