@@ -1,35 +1,59 @@
-jQuery(function ($) {
-  $(document).ready(function () {
-    rcn_initializeVendorCheckoutStepStatus();
-    $('.rcn-vendor-checkout-next').on('click', () => handleRCNVscNext($));
+(function ($) {
+  'use strict';
 
-    $('.rcn-vendor-checkout-prev').on('click', () => rcn_handleRCNVscPrev($));
+  /**
+   * All of the code for your public-facing JavaScript source
+   * should reside in this file.
+   *
+   * Note: It has been assumed you will write jQuery code here, so the
+   * $ function reference has been prepared for usage within the scope
+   * of this function.
+   *
+   * This enables you to define handlers, for when the DOM is ready:
+   *
+   */
+  $(function () {
+    // Global variables for vendor checkout steps
+    const rcn_vcs = ['rcn-vcs1', 'rcn-vcs2', 'rcn-vcs3'];
 
-    rcnChangeVendorCheckoutSteps($);
+    // This function initializes the vendor checkout step status in the browser's local storage
+    rcn_initializeVendorCheckoutStepStatus(rcn_vcs);
+
+    // Handle the "Prev" button click on vendor package checkout steps
+    $('.rcn-vendor-checkout-prev').on('click', () =>
+      rcn_handleRCNVscPrev($, rcn_vcs)
+    );
+
+    // Handle the "Next" button click on vendor package checkout steps
+    $('.rcn-vendor-checkout-next').on('click', () =>
+      rcn_handleRCNVscNext($, rcn_vcs)
+    );
+
+    // Switching vendor package checkout steps on the screen and updating the step indicator circle at the top
+    rcn_changeVendorCheckoutSteps($, rcn_vcs);
   });
-});
+})(jQuery);
 
 /**
  * rcn_initializeVendorCheckoutStepStatus
  * This function initializes the vendor checkout step status in the browser's local storage.
  */
-function rcn_initializeVendorCheckoutStepStatus() {
+function rcn_initializeVendorCheckoutStepStatus(rcn_vcs) {
   // Get step statuses
-  const step1 = localStorage.getItem('rcn-vcsc1');
-  const step2 = localStorage.getItem('rcn-vcsc2');
-  const step3 = localStorage.getItem('rcn-vcsc3');
-
-  // Initialize statuses if not already initialized
-  if (step1 === null) {
-    localStorage.setItem('rcn-vcsc1', 'in progress');
+  for (let i = 0; i < rcn_vcs.length; i++) {
+    const element = rcn_vcs[i];
+    const step = localStorage.getItem(element);
+    if (step === null && i === 0) {
+      localStorage.setItem(element, 'in progress');
+    } else if (step === null) {
+      localStorage.setItem(element, 'not started');
+    }
   }
 
-  if (step2 === null) {
-    localStorage.setItem('rcn-vcsc2', 'not started');
-  }
+  const activeStep = localStorage.getItem('activeStep');
 
-  if (step3 === null) {
-    localStorage.setItem('rcn-vcsc3', 'not started');
+  if (activeStep === null) {
+    localStorage.setItem('activeStep', 0);
   }
 }
 
@@ -38,110 +62,119 @@ function rcn_initializeVendorCheckoutStepStatus() {
  *
  * @param {number} $ jQuery selector.
  */
-function rcn_handleRCNVscPrev($) {
-  // Get step statuses
-  const step1 = localStorage.getItem('rcn-vcsc1');
-  const step2 = localStorage.getItem('rcn-vcsc2');
-  const step3 = localStorage.getItem('rcn-vcsc3');
+function rcn_handleRCNVscPrev($, rcn_vcs) {
+  let activeStep = localStorage.getItem('activeStep');
+  activeStep = Number(activeStep);
+  localStorage.setItem('activeStep', activeStep - 1);
 
-  // Updating step's status in browser's local storage
-  if (step1 === 'in progress') {
-    /**
-     * Perform an action when users are on step 1.
-     *
-     * Since there are no previous steps, the "Prev" button is hidden on this step.
-     */
-  } else if (step2 === 'in progress') {
-    /**
-     * When the user interacts with the "prev" button on screen two:
-     *
-     * - Step 1's status changes from "completed" to "in progress."
-     * - Step 2 remains in progress.
-     * - The visual indication of the step circle background color at the top of the screen
-     *   remains unchanged, indicating that both step 1 and step 2 are currently in progress.
-     */
-    localStorage.setItem('rcn-vcsc1', 'in progress');
-  } else if (step3 === 'in progress') {
-    /**
-     * When the user interacts with the "prev" button on screen three:
-     *
-     * - Step 2's status changes from "completed" to "in progress."
-     * - Step 3 remains in progress.
-     * - The visual indication of the step circle background color at the top of the screen
-     *   remains unchanged, signifying that both step 2 and step 3 are currently in progress.
-     */
-    localStorage.setItem('rcn-vcsc3', 'in progress');
-    localStorage.setItem('rcn-vcsc2', 'in progress');
+  for (let i = 0; i < rcn_vcs.length; i++) {
+    const element = rcn_vcs[i];
+    const step = localStorage.getItem(element);
+
+    if (step === 'in progress' && i !== 0) {
+      localStorage.setItem(rcn_vcs[i - 1], 'in progress');
+    }
   }
 
-  rcnChangeVendorCheckoutSteps($);
+  /**
+   * Switch vendor package checkout steps on the screen
+   * and update the step indicator circle at the top.
+   */
+  rcn_changeVendorCheckoutSteps($, rcn_vcs);
 }
 
-function handleRCNVscNext($) {
-  const step1 = localStorage.getItem('rcn-vcsc1');
-  const step2 = localStorage.getItem('rcn-vcsc2');
-  const step3 = localStorage.getItem('rcn-vcsc3');
+/**
+ * The function switch from current status screen to next status screen
+ *
+ * @param {number} $ jQuery selector.
+ */
+function rcn_handleRCNVscNext($, rcn_vcs) {
+  let activeStep = localStorage.getItem('activeStep');
+  activeStep = Number(activeStep);
+  localStorage.setItem('activeStep', activeStep + 1);
 
-  if (step1 === 'in progress') {
-    console.log('Hello, World');
-    localStorage.setItem('rcn-vcsc1', 'completed');
-    localStorage.setItem('rcn-vcsc2', 'in progress');
-  } else if (step2 === 'in progress') {
-    localStorage.setItem('rcn-vcsc2', 'completed');
-    localStorage.setItem('rcn-vcsc3', 'in progress');
-  } else if (step3 === 'in progress') {
-    localStorage.setItem('rcn-vcsc3', 'completed');
-    location.replace('/checkout');
+  console.log(activeStep);
+
+  for (let i = 0; i < rcn_vcs.length; i++) {
+    if (i === activeStep) {
+      localStorage.setItem(rcn_vcs[i], 'completed');
+      localStorage.setItem(rcn_vcs[i + 1], 'in progress');
+    }
   }
 
-  rcnChangeVendorCheckoutSteps($);
+  /**
+   * Switch vendor package checkout steps on the screen
+   * and update the step indicator circle at the top.
+   */
+  rcn_changeVendorCheckoutSteps($, rcn_vcs);
 }
 
-function rcnChangeVendorCheckoutSteps($) {
-  const completeColor = '#0040E0';
-  const incompleteColor = '#515151';
+/**
+ * rcn_changeVendorCheckoutSteps
+ *
+ * This function is responsible for switching vendor package checkout steps on the screen
+ * and updating the step indicator circle at the top. It reads the vendor checkout step
+ * status set by the rcn_initializeVendorCheckoutStepStatus function.
+ *
+ * The function performs two key actions:
+ * 1. Changes the background color of the step indicator at the top to reflect the current step.
+ * 2. Manages the visibility of screens, hiding the current one and displaying the next or
+ *    previous one based on the step status.
+ *
+ * For a more detailed understanding of how this function works, please refer to its body.
+ *
+ * @param {string} $ - jQuery selector.
+ */
+function rcn_changeVendorCheckoutSteps($, rcn_vcs) {
+  // Initialize variables
+  const completeColor = '#0040E0'; // Color for completed steps
+  const incompleteColor = '#515151'; // Color for incomplete steps
 
-  const step1 = localStorage.getItem('rcn-vcsc1');
-  const step2 = localStorage.getItem('rcn-vcsc2');
-  const step3 = localStorage.getItem('rcn-vcsc3');
+  const totalSteps = rcn_vcs.length - 1;
+  let activeStep = localStorage.getItem('activeStep');
+  activeStep = Number(activeStep);
 
-  $('.rcn-vcs1').fadeOut('fast');
-  $('.rcn-vcs2').fadeOut('fast');
-  $('.rcn-vcs3').fadeOut('fast');
+  // Get step statuses from local storage
+  const step1 = localStorage.getItem('rcn-vcs1');
+  const step2 = localStorage.getItem('rcn-vcs2');
+  const step3 = localStorage.getItem('rcn-vcs3');
+
+  // Hide all the steps by default
+  for (let i = 0; i < rcn_vcs.length; i++) {
+    let element = rcn_vcs[i];
+    element = $('.' + element);
+
+    element.hide();
+
+    if (activeStep === i) {
+      element.fadeIn('fast');
+    }
+  }
+
+  // Display "Prev" and "Next" buttons by default
   $('.rcn-vendor-checkout-prev').fadeIn();
   $('.rcn-vendor-checkout-next').fadeIn();
 
-  if (step1 === 'in progress') {
+  // Hide the "Prev" button on Step 1, as there is no previous step.
+  if (activeStep === 0) {
     $('.rcn-vendor-checkout-prev').fadeOut();
   }
 
-  if (step2 === 'completed' && step3 === 'in progress') {
+  // Hide the "Next" button on Step 3 if Step 2 is completed and Step 3 is in progress.
+  if (activeStep === totalSteps) {
     $('.rcn-vendor-checkout-next').fadeOut();
   }
 
-  if (step1 === 'in progress' || step1 === 'completed') {
-    $('.rcn-vcsc1').css('background', completeColor);
-  } else {
-    $('.rcn-vcsc1').css('background', incompleteColor);
-  }
+  for (let i = 0; i < rcn_vcs.length; i++) {
+    const element = rcn_vcs[i];
+    const step = localStorage.getItem(element);
 
-  if (step2 === 'in progress' || step2 === 'completed') {
-    $('.rcn-vcsc2 .elementor-divider__text').css('background', completeColor);
-  } else {
-    $('.rcn-vcsc2 .elementor-divider__text').css('background', incompleteColor);
-  }
+    $('.rcn-vcsc' + i).css('border-radius', '100%');
 
-  if (step3 === 'in progress' || step3 === 'completed') {
-    $('.rcn-vcsc3').css('background', completeColor);
-  } else {
-    $('.rcn-vcsc3').css('background', incompleteColor);
-  }
-
-  if (step1 === 'in progress') {
-    $('.rcn-vcs1').fadeIn('slow');
-  } else if (step2 === 'in progress') {
-    $('.rcn-vcs2').fadeIn('slow');
-  } else if (step3 === 'in progress') {
-    $('.rcn-vcs3').fadeIn('slow');
+    if (step === 'in progress' || step === 'completed') {
+      $('.rcn-vcsc' + i).css('background', completeColor);
+    } else {
+      $('.rcn-vcsc' + i).css('background', incompleteColor);
+    }
   }
 }
