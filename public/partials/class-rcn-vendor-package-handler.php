@@ -60,4 +60,38 @@ class Rcn_Vendor_Package_Handler {
 		 */
 		return in_array( $vendor_category_id, $category_ids, true );
 	}
+
+	/**
+	 * Ajax action: rcn_vatatc
+	 *
+	 * This function is executed via Ajax.
+	 * It receives a product ID sent by jQuery Ajax and checks
+	 * whether the product exists in the shopping cart.
+	 * If the product exists, the function echoes 'true'; otherwise, it does nothing.
+	 *
+	 * @return void
+	 */
+	public function rcn_ajax_check_product_in_cart() {
+		// phpcs:disable
+		// Retrieve the product ID sent by jQuery.
+		$product_id = sanitize_text_field( $_REQUEST['product_id'] );
+		// phpcs:enable
+
+		// Get the cart contents.
+		$cart = WC()->cart->get_cart();
+
+		/**
+		 * Iterate through the cart contents and check
+		 * if the product associated with the provided ID exists in the cart or not.
+		 *
+		 * If it does, echo 'true'; otherwise, do nothing.
+		 */
+		foreach ( $cart as $item ) {
+			$product_id_in_cart = $item['data']->get_id();
+			if ( $product_id_in_cart == $product_id ) {
+				echo 'true';
+				return;
+			}
+		}
+	}
 }

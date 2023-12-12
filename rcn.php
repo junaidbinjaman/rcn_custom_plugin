@@ -79,3 +79,11 @@ function run_rcn() {
 	$plugin->run();
 }
 run_rcn();
+
+
+// Public Ajax codes.
+require_once plugin_dir_path( __FILE__ ) . 'public/partials/class-rcn-vendor-package-handler.php';
+$ajax_function = new Rcn_Vendor_Package_Handler();
+
+add_action( 'wp_ajax_rcn_vatatc', array( $ajax_function, 'rcn_ajax_check_product_in_cart' ) );
+add_action( 'wp_ajax_nopriv_rcn_vatatc', array( $ajax_function, 'rcn_ajax_check_product_in_cart' ) );

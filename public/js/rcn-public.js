@@ -32,10 +32,20 @@
     rcn_changeVendorCheckoutSteps($, rcn_vcs);
 
     // The ticket prices for vendors' attendees will be multiplied based on the quantity selected by vendor
-    const rcn_atfv_qsapces = $('#form-field-name');
-    $('#form-field-name').on('change', () =>
+    const rcn_atfv_qsapces = $('.rcn_vatatc form select');
+    $(rcn_atfv_qsapces).on('change', () =>
       rcn_calculate_attendee_ticket_prices_for_vendor($, rcn_atfv_qsapces)
     );
+
+    // Checks if the attendee tickets for vendors are added to the cart.
+    rcn_vatatc($, 14900);
+
+    // When the attendee ticket for vendor is added to cart, disable add to cart button
+    $('.rcn_vatatc a').on('click', () => {
+      setTimeout(() => {
+        rcn_vatatc($, 14900);
+      }, 1000);
+    });
   });
 })(jQuery);
 
@@ -165,19 +175,54 @@ function rcn_changeVendorCheckoutSteps($, rcn_vcs) {
     }
   }
 
-  // Display "Prev" and "Next" buttons by default
-  $('.rcn-vendor-checkout-prev').fadeIn();
-  $('.rcn-vendor-checkout-next').fadeIn();
+  // Hide overlay on "Prev" and "Next" buttons by default
+  $(
+    '.rcn-vendor-checkout-prev__overlay, .rcn-vendor-checkout-next__overlay'
+  ).hide();
 
-  // Hide the "Prev" button on Step 1, as there is no previous step
+  // Add overlay on prev button if active step is 0
   if (activeStep === 0) {
-    $('.rcn-vendor-checkout-prev').hide();
+    $('.rcn-vendor-checkout-prev__overlay').fadeIn();
   }
 
-  // Hide the "Next" button when a vendor is on the last step since there are no more steps after it
-  if (activeStep === totalSteps) {
-    $('.rcn-vendor-checkout-next').hide();
+   // Hide the "Next" button when a vendor is on the last step since there are no more steps after it
+   if (activeStep === totalSteps) {
+    $('.rcn-vendor-checkout-next__overlay').fadeIn();
   }
+
+  const rcn_vendorPackageIds = [9470, 9472, 9471];
+  let isPackageFound = false;
+  
+  function checkPackages(index) {
+    if (index < rcn_vendorPackageIds.length) {
+      const packageId = rcn_vendorPackageIds[index];
+  
+      product($, packageId).done(function (response) {
+        if (response === 'true0') {
+          isPackageFound = true;
+          console.log('Junaid');
+        }
+  
+        // Continue checking the next package
+        checkPackages(index + 1);
+      });
+    } else {
+      // All packages checked, handle the result
+      handlePackageCheckResult();
+    }
+  }
+  
+  function handlePackageCheckResult() {
+    if (isPackageFound) {
+      console.log(isPackageFound);
+    } else {
+      $('.rcn-vendor-checkout-next__overlay').fadeIn();
+    }
+  }
+  
+  // Start checking packages from index 0
+  checkPackages(0);
+  
 
   // Update the step indicator circles' appearance based on the step status
   for (let i = 0; i < rcn_vcs.length; i++) {
@@ -214,8 +259,7 @@ function rcn_calculate_attendee_ticket_prices_for_vendor($, selectField) {
   let quantity = selectField.val();
   quantity = Number(quantity);
 
-  $('a.product_type_simple.add_to_cart_button.ajax_add_to_cart.elementor-button.elementor-size-sm').data('quantity', 10)
-  console.log($('.rcn-atfvqsf-button a').data('quantity'));
+  $('a[data-product_id="14900"]').attr('data-quantity', quantity);
 
   // Format the price and place it in the price area
   totalTicketPrice.text(rcn_formatPrice(quantity * 500));
@@ -243,4 +287,40 @@ function rcn_formatPrice(price) {
   formattedPrice = '$' + formattedPrice;
 
   return formattedPrice;
+}
+
+/**
+ * Checks if the attendee tickets for vendors are added to the cart.
+ *
+ * This function uses Ajax to call the PHP function rcn_ajax_check_product_in_cart,
+ * which is responsible for checking if the attendee ticket for the vendor's product ID
+ * is present in the shopping cart.
+ *
+ * If the ticket is in the cart, the function returns true.
+ * In such case, it disables the "Add to Cart" button and the quantity selector.
+ *
+ * @param {number} productId The product ID of the attendee ticket for the vendor.
+ */
+function rcn_vatatc($, productId) {
+  // Hide the quantity update instruction message and overlay by default
+  $('.rcn_vatatc ul, .rcn_vatatc_section_overlay').hide();
+
+  // Perform the Ajax request
+  product($, productId).done(function (response) {
+    if (response === 'true0') {
+      $('.rcn_vatatc_section_overlay, .rcn_vatatc ul').show();
+    }
+  });
+}
+
+function product($, productId) {
+  // Return the Ajax promise
+  return $.ajax({
+    type: 'POST',
+    url: rcn_phpObject.ajax_url,
+    data: {
+      action: 'rcn_vatatc',
+      product_id: productId,
+    },
+  });
 }

@@ -3,3 +3,6 @@ vcsc = Vendor checkout step circle
 atfv = Attendee ticket for vendors 
 qsapces = Quantity select and price calculate elements selector
 atfvqsf = Attendee ticket for vendors quantity select form
+vatatc = Vendor attendee ticket add to cart
+vatatcb = Vendor attendee ticket add to cart button
+vatatcs = Vendor attendee ticket add to cart select

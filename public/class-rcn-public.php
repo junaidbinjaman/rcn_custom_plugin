@@ -48,8 +48,19 @@ class Rcn_Public {
 	 */
 	public function __construct( $plugin_name, $version ) {
 
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-rcn-utility.php';
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
+	}
+
+	/**
+	 * Register the stylesheets for the public facing area.
+	 *
+	 * @since    1.0.0
+	 */
+	public function enqueue_styles() {
+
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rcn-public.css', array(), $this->version, 'all' );
 	}
 
 	/**
@@ -59,6 +70,21 @@ class Rcn_Public {
 	 */
 	public function enqueue_scripts() {
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rcn-public.js', array( 'jquery' ), $this->version, false );
+		wp_localize_script( $this->plugin_name, 'rcn_phpObject', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+	}
+
+	/**
+	 * Undocumented function
+	 *
+	 * @return void
+	 */
+	public function foobar() {
+		$result = Rcn_Utility::is_product_in_cart( 9471 );
+		if ( $result ) {
+			echo 'Product exists in cart';
+		} else {
+			echo 'Product doesn\'t exists';
+		}
 	}
 
 	/**
@@ -92,5 +118,7 @@ class Rcn_Public {
 			 */
 			$result = $vendor_package_handler->is_vendor_package_in_cart( $category_ids );
 		}
+
+		echo 'Hello, World';
 	}
 }
