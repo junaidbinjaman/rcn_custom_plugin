@@ -79,12 +79,9 @@ class Rcn_Public {
 	 * @return void
 	 */
 	public function foobar() {
-		$result = Rcn_Utility::is_product_in_cart( 9471 );
-		if ( $result ) {
-			echo 'Product exists in cart';
-		} else {
-			echo 'Product doesn\'t exists';
-		}
+		// $result = Rcn_Utility::is_product_in_cart( 9471 );
+		$result = Rcn_Utility::add_to_cart( 1427, 5, 4501 );
+		echo esc_html( $result );
 	}
 
 	/**

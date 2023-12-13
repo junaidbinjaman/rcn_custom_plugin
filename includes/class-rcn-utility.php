@@ -58,4 +58,44 @@ class Rcn_Utility {
 		// If no matches found in the loop, return false, indicating that the product (with optional variation) is not in the cart.
 		return false;
 	}
+
+	/**
+	 * The function adds a product to cart
+	 *
+	 * The function first checks whether the provided parameters are numeric or not.
+	 * If all of them are numeric it calls is_product_in_cart function to check
+	 * whether a product exists in cart or not.
+	 * If exists, it calls the function to update the product
+	 * if doesn't exists, add the product to cart
+	 *
+	 * @param int      $product_id The ID of the product to add to the cart.
+	 * @param int|null $quantity (optional) Product quantity to add. Default 1.
+	 * @param int|null $variation_id (optional) The ID of the variation for variable products.
+	 * @return mixed Return update message if product already exists. Otherwise, it returns true or false
+	 */
+	public static function add_to_cart( $product_id, $quantity = 1, $variation_id = 0 ) {
+
+		if ( ! is_numeric( $product_id ) && ! is_numeric( $quantity ) && ! is_numeric( $variation_id ) ) {
+			return 'Sorry! an invalid product ID occurred.';
+		}
+
+		$result = self::is_product_in_cart( $product_id, $variation_id );
+
+		if ( $result ) {
+			return 'The product is updated successfully..';
+		}
+
+		if ( $variation_id ) {
+			WC()->cart->add_to_cart( $product_id, $quantity, $variation_id );
+			return 'Variable product is added to cart successfully..';
+		}
+
+		$result = WC()->cart->add_to_cart( $product_id, $quantity );
+
+		if ( ! $result ) {
+			return 'Sorry, The product doesn\'t exists on store';
+		}
+
+		return 'Product is added to cart successfully..';
+	}
 }
