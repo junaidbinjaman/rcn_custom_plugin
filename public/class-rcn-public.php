@@ -79,9 +79,14 @@ class Rcn_Public {
 	 * @return void
 	 */
 	public function foobar() {
-		// $result = Rcn_Utility::is_product_in_cart( 9471 );
-		$result = Rcn_Utility::add_to_cart( 1427, 5, 4501 );
-		echo esc_html( $result );
+		// $result = Rcn_Utility::is_product_in_cart( '9470' );
+		// $result = Rcn_Utility::add_to_cart( '1521', 2, '4491' );
+		// $result = Rcn_Utility::add_to_cart( '9470', 2 );
+		// $result = Rcn_Utility::get_product_quantity( '9470', 'stock' );
+		// $result = Rcn_Utility::get_product_quantity( 9470, 'stock' );
+		// $result = Rcn_Utility::remove_product_from_cart( '9470' );
+		$result = Rcn_Utility::update_cart_quantity( '9470', '1' );
+		echo esc_html( $result['message'] );
 	}
 
 	/**
