@@ -76,16 +76,17 @@ class Rcn_Public {
 	/**
 	 * Undocumented function
 	 *
+	 * Non variable product ID: 9470
+	 * Variable product and variation ID: 1521, 4491
+	 *
 	 * @return void
 	 */
 	public function foobar() {
-		// $result = Rcn_Utility::is_product_in_cart( '9470' );
-		// $result = Rcn_Utility::add_to_cart( '1521', 2, '4491' );
-		// $result = Rcn_Utility::add_to_cart( '9470', 2 );
-		// $result = Rcn_Utility::get_product_quantity( '9470', 'stock' );
-		// $result = Rcn_Utility::get_product_quantity( 9470, 'stock' );
+		// $result = Rcn_Utility::is_product_in_cart( 1521, 4491 );
+		// $result = Rcn_Utility::add_to_cart( 9470 );
+		// $result = Rcn_Utility::get_product_quantity( '9471', 'stock', );
 		// $result = Rcn_Utility::remove_product_from_cart( '9470' );
-		$result = Rcn_Utility::update_cart_quantity( '9470', '1' );
+		$result = Rcn_Utility::update_cart_quantity( '9470', '7' );
 		echo esc_html( $result['message'] );
 	}
 
