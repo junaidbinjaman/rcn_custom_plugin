@@ -80,10 +80,43 @@ function run_rcn() {
 }
 run_rcn();
 
+/**
+ * 'Undocumented function'
+ *
+ * @return void
+ */
+function is_product_in_cart_callback() {
+	// phpcs:ignore
+	$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0;
 
-// Public Ajax codes.
-require_once plugin_dir_path( __FILE__ ) . 'public/partials/class-rcn-vendor-package-handler.php';
-$ajax_function = new Rcn_Vendor_Package_Handler();
+	$in_cart    = false;
 
-add_action( 'wp_ajax_rcn_vatatc', array( $ajax_function, 'rcn_ajax_check_product_in_cart' ) );
-add_action( 'wp_ajax_nopriv_rcn_vatatc', array( $ajax_function, 'rcn_ajax_check_product_in_cart' ) );
+	foreach ( WC()->cart->get_cart() as $cart_item ) {
+		$product_in_cart = $cart_item['product_id'];
+		if ( $product_in_cart === $product_id ) {
+			$in_cart = true;
+		}
+	}
+
+	if ( $in_cart ) {
+		echo json_encode(
+			array(
+				'status'  => true,
+				'message' => 'Product is in the cart',
+			)
+		);
+
+	} else {
+		echo json_encode(
+			array(
+				'status'  => false,
+				'message' => 'Product is not in the cart',
+			)
+		);
+	}
+
+	wp_die();
+}
+
+add_action( 'wp_ajax_is_product_in_cart', 'is_product_in_cart_callback' );
+add_action( 'wp_ajax_nopriv_is_product_in_cart', 'is_product_in_cart_callback' );

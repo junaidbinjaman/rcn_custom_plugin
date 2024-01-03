@@ -61,6 +61,7 @@ class Rcn_Public {
 	public function enqueue_styles() {
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rcn-public.css', array(), $this->version, 'all' );
+		wp_enqueue_style( 'custom-scrollbar-styles', '//cdn.jsdelivr.net/npm/simplebar@6.2.5/dist/simplebar.css', array(), $this->version, 'all' );
 	}
 
 	/**
@@ -70,58 +71,11 @@ class Rcn_Public {
 	 */
 	public function enqueue_scripts() {
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rcn-public.js', array( 'jquery' ), $this->version, false );
-		wp_localize_script( $this->plugin_name, 'rcn_phpObject', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
-	}
+		wp_enqueue_script( 'custom-scrollbar-scripts', '//cdn.jsdelivr.net/npm/simplebar@6.2.5/dist/simplebar.min.js', array(), $this->version, false );
 
-	/**
-	 * Undocumented function
-	 *
-	 * Non variable product ID: 9470
-	 * Variable product and variation ID: 1521, 4491
-	 *
-	 * @return void
-	 */
-	public function foobar() {
-		// $result = Rcn_Utility::is_product_in_cart( 1521, 4491 );
-		// $result = Rcn_Utility::add_to_cart( 9470 );
-		// $result = Rcn_Utility::get_product_quantity( '9471', 'stock', );
-		// $result = Rcn_Utility::remove_product_from_cart( '9470' );
-		$result = Rcn_Utility::update_cart_quantity( '9470', '7' );
-		echo esc_html( $result['message'] );
-	}
-
-	/**
-	 * This function reads the contents of the WooCommerce (WC) cart and checks if any vendor packages exist in the cart.
-	 * It returns true if vendor packages exist, otherwise false.
-	 *
-	 * @since 1.0.0
-	 */
-	public function read_cart_contents() {
-
-		// Include the vendor package handler class.
-		require_once plugin_dir_path( __DIR__ ) . 'public/partials/class-rcn-vendor-package-handler.php';
-
-		// Access the cart contents.
-		$cart_items = WC()->cart->get_cart();
-
-		// Loop through the cart items and check if any vendor packages exist.
-		foreach ( $cart_items as $cart_item ) {
-			// Retrieve the product ID from the cart.
-			$product_id = $cart_item['product_id'];
-
-			// Initialize an instance of the Rcn_Vendor_Package_Handler class.
-			$vendor_package_handler = new Rcn_Vendor_Package_Handler();
-
-			// Pass the product ID to get associated category IDs.
-			$category_ids = $vendor_package_handler->get_product_information( $product_id )['categories'];
-
-			/**
-			 * Pass the category IDs to check if a vendor category is associated.
-			 * Returns true if a vendor package is associated; otherwise, it returns false.
-			 */
-			$result = $vendor_package_handler->is_vendor_package_in_cart( $category_ids );
+		if ( is_page( 27943 ) ) {
+			wp_enqueue_script( 'vendor-package', plugin_dir_url( __FILE__ ) . 'js/rcn-vendor-package.js', array( 'jquery' ), $this->version, 'all' );
+			wp_localize_script( 'vendor-package', 'wp_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 		}
-
-		echo 'Hello, World';
 	}
 }

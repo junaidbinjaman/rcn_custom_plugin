@@ -3,8 +3,7 @@
  * included in this file.
  */
 
-
- /* ------------------------------------------
+/* ------------------------------------------
  CSS for attendee tickets for vendor page
  --------------------------------------------- */
 .rcn_vatatc_main_section {
@@ -19,5 +18,91 @@
 }
 
 .rcn_vatatc form button {
+  display: none;
+}
+
+/* Vendor table selection box  & vendor cart */
+
+.rcn-vtsb {
+  height: 430px;
+}
+
+.rcn-vpc {
+  height: 453px;
+}
+
+.rcn-vpciw {
+  height: 210px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.rcn-vtsb-e-column {
+  width: 358px !important;
+}
+
+.rcn-vtsb .simplebar-track.simplebar-vertical,
+.rcn-vpciw .simplebar-track.simplebar-vertical {
+  top: 0;
+  background: #fafafa;
+  box-shadow: -1px 0px 0px 0px #f0f0f0 inset, 1px 0px 0px 0px #e8e8e8 inset;
+}
+
+.rcn-vtsb .simplebar-scrollbar.simplebar-visible:before,
+.rcn-vpciw .simplebar-scrollbar.simplebar-visible:before {
+  background: #939292;
+  margin: auto;
+}
+
+.rcn-vtsb .simplebar-track.simplebar-vertical {
+  width: 15px !important;
+}
+
+.rcn-vtsb .simplebar-scrollbar.simplebar-visible:before {
+  width: 8px;
+}
+
+.rcn-vpciw .simplebar-track.simplebar-vertical {
+  width: 10px !important;
+}
+
+.rcn-vpciw .simplebar-scrollbar.simplebar-visible:before {
+  width: 5px;
+}
+
+.rcn_vps-prev-button,
+.rcn_vps-next-button,
+.rcn_vps-checkout-button {
+  cursor: pointer;
+}
+
+.rcn-vp-step-indicator h2 {
+  background: var(--e-global-color-126a520);
+  padding: 22px 30px;
+  border-radius: 100%;
+  width: 75px;
+  height: 75px;
+  text-align: center;
+}
+
+/* Vendor package add-ons */
+
+.rcn-vpaa-header {
+  cursor: pointer;
+}
+
+.rcn-vpaa-header-active {
+  background-color: var(--e-global-color-primary);
+}
+
+.rcn-vpaa-header-active h2 {
+  color: #fff !important;
+}
+
+.rcn-vpaa-header-active i {
+  color: #fff;
+}
+
+.rc-vpaa-quantity button {
   display: none;
 }
