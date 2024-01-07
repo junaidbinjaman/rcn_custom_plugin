@@ -85,6 +85,114 @@
   text-align: center;
 }
 
+/* Table listing styles */
+.rcn-vp-available-table {
+  color: var(--e-global-color-secondary);
+  list-style: none;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 356px;
+  height: 48px;
+  border-bottom: 1px solid #c1c7cd;
+  padding-left: 20px;
+  padding-right: 20px;
+  cursor: pointer;
+}
+
+#rcn-vp-table-listing-container ul {
+  margin-left: 0 !important;
+}
+
+.rcn-vp-available-table i {
+  border-radius: 100%;
+  color: var(--e-global-color-126a520);
+  border: 2px solid var(--e-global-color-126a520);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rcn-vp-unavailable-table {
+  color: #7e7e84;
+  background: rgba(81, 81, 81, 0.14);
+  list-style: none;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 356px;
+  height: 48px;
+  border-bottom: 1px solid #c1c7cd !important;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.rcn-vp-unavailable-table small {
+  color: rgba(0, 0, 0, 0.45);
+  font-family: Montserrat;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+}
+
+.rcn-vp-unavailable-table i {
+  border-radius: 100%;
+  color: #7e7e84;
+  border: 2px solid #7e7e84;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rcn-vp-table-meta small {
+  color: rgba(0, 0, 0, 0.45);
+  font-family: Montserrat;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+}
+
+.rcn-vp-selected-table {
+  background: var(--e-global-color-primary);
+  color: white !important;
+  list-style: none;
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 356px;
+  height: 48px;
+  border-bottom: 1px solid #c1c7cd;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.rcn-vp-selected-table i {
+  color: #fff !important;
+  border: 2px solid !important;
+  border-radius: 100%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rcn-vp-selected-table i.fa-plus {
+  cursor: pointer;
+}
+
 /* Vendor package add-ons */
 
 .rcn-vpaa-header {

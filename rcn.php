@@ -38,6 +38,13 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'RCN_VERSION', '1.0.0' );
 
 /**
+ * The main utility functions class.
+ *
+ * The class contains all the utility functions that we will uses across RCN website.
+ */
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-rcn-utility.php';
+
+/**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-rcn-activator.php
  */
@@ -81,42 +88,85 @@ function run_rcn() {
 run_rcn();
 
 /**
- * 'Undocumented function'
+ * Undocumented function
  *
  * @return void
  */
-function is_product_in_cart_callback() {
-	// phpcs:ignore
-	$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0;
+function is_table_available() {
+	$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0; // phpcs:ignore
+	$quantity = isset( $_POST['variation_id'] ) ? intval( $_POST['variation_id'] ) : 0; // phpcs:ignore
 
-	$in_cart    = false;
+	$result = Rcn_Utility::get_product_quantity( $product_id, 'stock', $quantity );
 
-	foreach ( WC()->cart->get_cart() as $cart_item ) {
-		$product_in_cart = $cart_item['product_id'];
-		if ( $product_in_cart === $product_id ) {
-			$in_cart = true;
-		}
-	}
-
-	if ( $in_cart ) {
-		echo json_encode(
-			array(
-				'status'  => true,
-				'message' => 'Product is in the cart',
-			)
-		);
-
-	} else {
-		echo json_encode(
+	if ( ! $result['status'] ) {
+		echo wp_json_encode(
 			array(
 				'status'  => false,
-				'message' => 'Product is not in the cart',
+				'message' => 'Something went wrong',
 			)
 		);
+		wp_die();
 	}
+
+	if ( $result['stock_quantity'] > 0 ) {
+		echo wp_json_encode(
+			array(
+				'status'  => true,
+				'message' => 'The table is available',
+			)
+		);
+		wp_die();
+	}
+
+	if ( $result['stock_quantity'] <= 0 ) {
+		echo wp_json_encode(
+			array(
+				'status'  => false,
+				'message' => 'The table is not available',
+			)
+		);
+		wp_die();
+	}
+}
+
+add_action( 'wp_ajax_is_table_available', 'is_table_available' );
+add_action( 'wp_ajax_nopriv_is_table_available', 'is_table_available' );
+
+
+/**
+ * Undocumented function
+ *
+ * @return void
+ */
+function rcn_table_add_to_cart_handler() {
+	$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0; // phpcs:ignore
+	$variation_id = isset( $_POST['variation_id'] ) ? intval( $_POST['variation_id'] ) : 0; // phpcs:ignore
+
+	$is_table_available = Rcn_Utility::get_product_quantity( $product_id, 'stock', $variation_id );
+
+	if ( $is_table_available['stock_quantity'] < 1 ) {
+		echo wp_json_encode(
+			array(
+				'status'            => false,
+				'availability_code' => 1002, // unavailable.
+				'message'           => 'The table is already reserved',
+			)
+		);
+		wp_die();
+	}
+
+	$result = Rcn_Utility::add_to_cart( $product_id, 1, $variation_id );
+
+	echo wp_json_encode(
+		array(
+			'status'            => $result['status'],
+			'availability_code' => 1001, // available.
+			'message'           => $result['message'],
+		)
+	);
 
 	wp_die();
 }
 
-add_action( 'wp_ajax_is_product_in_cart', 'is_product_in_cart_callback' );
-add_action( 'wp_ajax_nopriv_is_product_in_cart', 'is_product_in_cart_callback' );
+add_action( 'wp_ajax_rcn_table_add_to_cart_handler', 'rcn_table_add_to_cart_handler' );
+add_action( 'wp_ajax_nopriv_rcn_table_add_to_cart_handler', 'rcn_table_add_to_cart_handler' );

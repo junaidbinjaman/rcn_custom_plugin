@@ -48,7 +48,6 @@ class Rcn_Public {
 	 */
 	public function __construct( $plugin_name, $version ) {
 
-		require_once plugin_dir_path( __DIR__ ) . 'includes/class-rcn-utility.php';
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
 	}
