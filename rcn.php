@@ -170,3 +170,45 @@ function rcn_table_add_to_cart_handler() {
 
 add_action( 'wp_ajax_rcn_table_add_to_cart_handler', 'rcn_table_add_to_cart_handler' );
 add_action( 'wp_ajax_nopriv_rcn_table_add_to_cart_handler', 'rcn_table_add_to_cart_handler' );
+
+/**
+ * Undocumented function
+ *
+ * @return void
+ */
+function rcn_get_vp_products() {
+	$vp_category_id = isset( $_POST['categoryID'] ) ? intval( $_POST['categoryID'] ) : 0; // phpcs:ignore
+
+	$vp_product_data = array();
+
+	foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+		$product      = $cart_item['data'];
+		$product_id   = $cart_item['product_id'];
+		$product_name = $product->get_name();
+		$quantity     = $cart_item['quantity'];
+		$price        = $product->get_price();
+
+		$product_categories = wp_get_post_terms( $product_id, 'product_cat' );
+
+		foreach ( $product_categories as $category ) {
+			if ( $category->term_id === $vp_category_id ) {
+				$product_data = array(
+					'id'       => $product_id,
+					'name'     => $product_name,
+					'quantity' => $quantity,
+					'price'    => $price,
+				);
+				array_push(
+					$vp_product_data,
+					$product_data
+				);
+			}
+		}
+	}
+
+	echo wp_json_encode( $vp_product_data );
+	wp_die();
+}
+
+add_action( 'wp_ajax_rcn_get_vp_products', 'rcn_get_vp_products' );
+add_action( 'wp_ajax_nopriv_rcn_get_vp_products', 'rcn_get_vp_products' );

@@ -6,6 +6,7 @@
    */
   const rcn_ajaxurl = wp_ajax_object.ajax_url;
   const productID = 28462; // table wrapper product
+  const categoryID = 264;
 
   /**
    * All of the code for vendor-package JavaScript source
@@ -14,10 +15,6 @@
    * This enables to define handlers, for when the DOM is ready:
    */
   $(function () {
-    // Sources for vendor cart
-    const vpciEvenLi = $('#rcn-vpci ul > li:even');
-    vpciEvenLi.css('background', '#F2F4F8');
-
     // Sources for vendor table listing box
     const vtsb = $('.rcn-vtsb')[0];
     new SimpleBar(vtsb, {autoHide: false});
@@ -58,8 +55,37 @@
         rcn_floorSelectionHandler($, 3, productID, rcn_ajaxurl);
       });
     });
+
+    // prettier-ignore
+    const cartItems = [
+      {id: 203, name: 'Example product - 1', quantity: 3, price: '$3030'},
+      {id: 204, name: 'Example product - 2', quantity: 2, price: '$6500'},
+      {id: 205, name: 'Example product - 3', quantity: 4, price: '$2170'},
+      {id: 206, name: 'Example product - 4', quantity: 2, price: '$3800'},
+      {id: 207, name: 'Example product - 5', quantity: 1, price: '$3190'},
+      {id: 208, name: 'Example product - 6', quantity: 4, price: '$00'},
+      {id: 209, name: 'Example product - 7', quantity: 4, price: '$2070'},
+      {id: 210, name: 'Example product - 8', quantity: 1, price: '$2000'},
+      {id: 211, name: 'Example product - 9', quantity: 1, price: '$2000'},
+    ];
+
+    const obj = {
+      id: 211,
+      name: 'Example product - 9',
+      quantity: 1,
+      price: '$2000',
+    };
+    // prettier-ignore
+    // rcn_vpCartVisualInteraction($, true, cartItems, message, callbackForTesting, 2);
+    rcn_addProductToCart($, 'loadCart', obj, null, null, categoryID, rcn_ajaxurl);
   });
 })(jQuery);
+
+function rcn_vpPriceFormatter(price) {
+  const formattedPrice =
+    '$' + price.toFixed(0).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  return formattedPrice;
+}
 
 /**
  * The function contains all the jQuery codes that powers the custom according box
@@ -490,7 +516,7 @@ function rcn_handleClickOnLi(clickedItem, ul) {
 
     clickedItem.addClass('rcn-vp-selected-table');
     clickedItem.removeClass('rcn-vp-available-table');
-    highlightTableOnFloorPlan();
+    rcn_highlightTableOnFloorPlan();
   }
 }
 
@@ -572,7 +598,225 @@ function rcn_tableActionHandler($, ul, actionBtn, productID, rcn_ajaxurl) {
   });
 }
 
-function highlightTableOnFloorPlan() {
+function rcn_highlightTableOnFloorPlan($) {
   // TODO: Implement the function to highlight table location on the floor plan
   console.log('Calling the function to highlight table location on floor plan');
+}
+
+function rcn_vpCartVisualInteraction(
+  $,
+  isUpdated = false,
+  cartItems = [],
+  message,
+  callback,
+  callbackPriority = 2
+) {
+  $('.rcn-vp-cart-message').remove();
+  const cartContainer = $('.rcn-vpciw');
+  const messageContainer = $('<div class="rcn-vp-cart-message">');
+  const disableScrollClass = 'disable-scroll';
+  const totalCartItems = cartItems.length;
+  callbackPriority = Number(callbackPriority);
+
+  if (isUpdated === false) {
+    if (message) {
+      messageContainer.html(message);
+
+      cartContainer.append(messageContainer);
+      cartContainer.addClass('disable-scroll');
+    }
+
+    if (callback) {
+      callback(
+        messageContainer,
+        cartContainer,
+        disableScrollClass,
+        totalCartItems
+      );
+    }
+  }
+
+  if (isUpdated === true) {
+    if (callback && 1 === callbackPriority) {
+      callback(
+        messageContainer,
+        cartContainer,
+        disableScrollClass,
+        totalCartItems
+      );
+    }
+
+    const ul = $('<ul>');
+
+    for (let i = 0; i < cartItems.length; i++) {
+      const element = cartItems[i];
+      const uniqueIdentifier = element.id;
+
+      const cartItem = $('<li>');
+      const cartItemContent =
+        '<span class="name">' +
+        element.name +
+        '</span>' +
+        '<span class="quantity">' +
+        element.quantity +
+        '</span>' +
+        '<span class="price">' +
+        rcn_vpPriceFormatter(Number(element.price)) +
+        '</span>' +
+        '<span class="remove">Remove</span>';
+
+      cartItem.append(cartItemContent);
+      cartItem.addClass('rcn-vp-cart-listing-' + uniqueIdentifier);
+      cartItem.addClass('rcn-vp-cart-listing');
+      cartItem.attr('data-product-id', uniqueIdentifier);
+
+      ul.append(cartItem);
+    }
+
+    cartContainer.empty().append(ul);
+    cartContainer.find('ul > li:nth-child(even)').css('background', '#F2F4F8');
+
+    $('.remove').on('click', function () {
+      let productID = $(this).parent();
+      productID = productID.attr('data-product-id');
+
+      rcn_vpRemoveProductFromCart(productID);
+    });
+
+    if (message) {
+      messageContainer.html(message);
+
+      cartContainer.append(messageContainer);
+      cartContainer.addClass(disableScrollClass);
+    }
+
+    if (callback && 1 !== callbackPriority) {
+      callback(
+        messageContainer,
+        cartContainer,
+        disableScrollClass,
+        totalCartItems
+      );
+    }
+  }
+}
+
+//TODO: Create remove product from cart function
+function rcn_vpRemoveProductFromCart(productID) {
+  console.log('Remove product from cart ' + productID);
+}
+
+function callbackForTesting(
+  messageContainer,
+  cartContainer,
+  disableScrollClass
+) {
+  setTimeout(() => {
+    messageContainer.remove();
+    cartContainer.removeClass(disableScrollClass);
+  }, 3000);
+}
+
+function rcn_addProductToCart(
+  $,
+  action = 'loadCart',
+  cartItem,
+  callback,
+  callbackPriority,
+  categoryID,
+  ajaxurl
+) {
+  if ('loadCart' === action) {
+    const message = '<p>Loading cart data. Please wait...</p>';
+    rcn_vpCartVisualInteraction($, false, cartItem, message);
+
+    $.ajax({
+      type: 'POST',
+      url: ajaxurl,
+      data: {
+        action: 'rcn_get_vp_products',
+        categoryID: categoryID,
+      },
+      success: function (response) {
+        response = JSON.parse(response);
+        console.log(response);
+      },
+      error: function (xhr, status, error) {
+        console.log(xhr.responseText);
+      },
+    });
+  }
+}
+
+function rcn_addProductToCart(
+  $,
+  action = 'loadCart',
+  cartItem,
+  callback,
+  callbackPriority,
+  categoryID,
+  ajaxurl
+) {
+  let message;
+
+  if ('loadCart' === action) {
+    message = '<p>Loading cart data. Please wait...</p>';
+    rcn_vpCartVisualInteraction($, false, cartItem, message);
+
+    $.ajax({
+      type: 'POST',
+      url: ajaxurl,
+      data: {
+        action: 'rcn_get_vp_products',
+        categoryID: categoryID,
+      },
+      success: function (response) {
+        try {
+          localStorage.setItem('rcn_vpCartData', response);
+          const parsedResponse = JSON.parse(response);
+          message = '<p>Data loaded successfully</p>';
+
+          // prettier-ignore
+          rcn_vpCartVisualInteraction($, true, parsedResponse, message, callback, 2);
+        } catch (error) {
+          console.error('Error parsing JSON response:', error);
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error('AJAX error:', error);
+      },
+    });
+  }
+
+  if ('updateCart' === action) {
+    if (!cartItem) {
+      message =
+        '<p style="text-align: center">Something went wrong. <br />Please try again or contact support</p>';
+      rcn_vpCartVisualInteraction($, false, [], message, callback, 2);
+      return;
+    }
+
+    let cartArray = localStorage.getItem('rcn_vpCartData');
+    cartArray = JSON.parse(cartArray);
+    cartArray.push(cartItem);
+    message = 'The product is added to cart successfully';
+
+    rcn_vpCartVisualInteraction($, true, cartArray, message, callback, 2);
+    cartArray = JSON.stringify(cartArray);
+
+    localStorage.setItem('rcn_vpCartData', cartArray);
+  }
+
+  function callback(
+    messageContainer,
+    cartContainer,
+    disableScrollClass,
+    totalCartItems
+  ) {
+    console.log(messageContainer);
+    setTimeout(() => {
+      $('.rcn-vp-cart-message').remove();
+      cartContainer.removeClass(disableScrollClass);
+    }, 700);
+  }
 }

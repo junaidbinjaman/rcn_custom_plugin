@@ -21,7 +21,7 @@
   display: none;
 }
 
-/* Vendor table selection box  & vendor cart */
+/* Vendor table selection box */
 
 .rcn-vtsb {
   height: 430px;
@@ -29,12 +29,6 @@
 
 .rcn-vpc {
   height: 453px;
-}
-
-.rcn-vpciw {
-  height: 210px;
-  overflow-y: scroll;
-  overflow-x: hidden;
 }
 
 .rcn-vtsb-e-column {
@@ -191,6 +185,68 @@
 
 .rcn-vp-selected-table i.fa-plus {
   cursor: pointer;
+}
+
+/* Vendor cart styles */
+.rcn-vpciw {
+  height: 229px;
+  overflow-x: hidden;
+}
+
+.rcn-vpciw.disable-scroll {
+  overflow: hidden;
+}
+
+.rcn-vpciw ul {
+  margin-left: 0px;
+}
+
+.rcn-vp-cart-listing {
+  color: var(--Secondary, #282b30);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  display: inline-flex;
+  padding: 10px 15px;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.rcn-vp-cart-listing .name {
+  width: 200px;
+}
+
+.rcn-vp-cart-listing .quantity {
+  width: 26px;
+}
+
+.rcn-vp-cart-listing .price {
+  width: 62px;
+}
+
+.rcn-vp-cart-listing .remove {
+  width: 48px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.rcn-vp-cart-listing .remove:active {
+  transform: scale(0.8);
+}
+
+.rcn-vp-cart-message {
+  color: #008000;
+  background: #ffffff9e;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.15);
+  position: absolute;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Vendor package add-ons */
