@@ -184,6 +184,7 @@ function rcn_get_vp_products() {
 	foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
 		$product      = $cart_item['data'];
 		$product_id   = $cart_item['product_id'];
+		$variation_id = $cart_item['variation_id'];
 		$product_name = $product->get_name();
 		$quantity     = $cart_item['quantity'];
 		$price        = $product->get_price();
@@ -193,7 +194,7 @@ function rcn_get_vp_products() {
 		foreach ( $product_categories as $category ) {
 			if ( $category->term_id === $vp_category_id ) {
 				$product_data = array(
-					'id'       => $product_id,
+					'id'       => $product->is_type( 'variation' ) ? $variation_id : $product_id,
 					'name'     => $product_name,
 					'quantity' => $quantity,
 					'price'    => $price,
@@ -212,3 +213,48 @@ function rcn_get_vp_products() {
 
 add_action( 'wp_ajax_rcn_get_vp_products', 'rcn_get_vp_products' );
 add_action( 'wp_ajax_nopriv_rcn_get_vp_products', 'rcn_get_vp_products' );
+
+/**
+ * Undocumented function
+ *
+ * @return void
+ */
+function rcn_vp_remove_product_from_cart() {
+	$product_id = isset( $_POST['productID'] ) ? intval( $_POST['productID'] ) : 0; // phpcs:ignore
+
+	$is_variable_product = wc_get_product( $product_id )->get_parent_id();
+
+	if ( $is_variable_product ) {
+		$result = Rcn_Utility::remove_product_from_cart( $is_variable_product, $product_id );
+	} else {
+		$result = Rcn_Utility::remove_product_from_cart( $product_id );
+	}
+
+	echo wp_json_encode(
+		array(
+			'status'       => $result['status'],
+			'message'      => $result['message'],
+			'product_id'   => $is_variable_product,
+			'variation_id' => $product_id,
+		)
+	);
+
+	wp_die();
+}
+
+add_action( 'wp_ajax_rcn_vp_remove_product_from_cart', 'rcn_vp_remove_product_from_cart' );
+add_action( 'wp_ajax_nopriv_rcn_vp_remove_product_from_cart', 'rcn_vp_remove_product_from_cart' );
+
+ // phpcs:disabled
+function rcn_example() {
+	$product = wc_get_product( '28463' ); // phpcs:ignore
+
+	echo '<pre>';
+	var_dump(Rcn_Utility::remove_product_from_cart( 1521, 4491 ));
+	echo '</pre>';
+
+	wp_die();
+}
+
+add_action( 'template_redirect', 'rcn_example' );
+// phpcs:enabled

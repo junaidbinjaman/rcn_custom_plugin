@@ -36,23 +36,26 @@
       });
     });
 
-    rcn_floorSelectionHandler($, 1, productID, rcn_ajaxurl);
+    rcn_floorSelectionHandler($, productID, rcn_ajaxurl);
 
     $('.rcn-vp-floor-1-selector-btn').each(function () {
       $(this).on('click', function () {
-        rcn_floorSelectionHandler($, 1, productID, rcn_ajaxurl);
+        localStorage.setItem('rcn_activeFloorNumber', 1);
+        rcn_floorSelectionHandler($, productID, rcn_ajaxurl);
       });
     });
 
     $('.rcn-vp-floor-2-selector-btn').each(function () {
       $(this).on('click', function () {
-        rcn_floorSelectionHandler($, 2, productID, rcn_ajaxurl);
+        localStorage.setItem('rcn_activeFloorNumber', 2);
+        rcn_floorSelectionHandler($, productID, rcn_ajaxurl);
       });
     });
 
     $('.rcn-vp-floor-3-selector-btn').each(function () {
       $(this).on('click', function () {
-        rcn_floorSelectionHandler($, 3, productID, rcn_ajaxurl);
+        localStorage.setItem('rcn_activeFloorNumber', 3);
+        rcn_floorSelectionHandler($, productID, rcn_ajaxurl);
       });
     });
 
@@ -267,7 +270,14 @@ function rcn_vpStepSwitchHandler($, totalSteps, rcn_ajaxurl) {
  * @param {string} rcn_ajaxurl - AJAX URL for server communication.
  * @returns {void} - No return value.
  */
-function rcn_floorSelectionHandler($, floorNumber = 1, productID, rcn_ajaxurl) {
+function rcn_floorSelectionHandler($, productID, rcn_ajaxurl) {
+  let floorNumber = localStorage.getItem('rcn_activeFloorNumber');
+
+  if (!floorNumber) {
+    localStorage.setItem('rcn_activeFloorNumber', 1);
+  }
+
+  floorNumber = localStorage.getItem('rcn_activeFloorNumber');
   floorNumber = Number(floorNumber);
 
   const floorOneTables = [
@@ -381,13 +391,13 @@ function rcn_vpTableListingHandler($, tables, productID, rcn_ajaxurl) {
   tableDataInCart = JSON.stringify(tableDataInCart);
 
   targetDiv.empty();
-  let isTableInCart = localStorage.getItem('rcn-vp-is-table-added-to-cart');
+  let isTableInCart = localStorage.getItem('rcn_vpIsTableAddedToCart');
 
   if (!isTableInCart) {
-    localStorage.setItem('rcn-vp-is-table-added-to-cart', tableDataInCart);
+    localStorage.setItem('rcn_vpIsTableAddedToCart', tableDataInCart);
   }
 
-  // Creates listings based on provided variation/table IDs
+  // Create listings based on provided variation/table IDs
   for (let i = 0; i < tables.length; i++) {
     const table = tables[i];
 
@@ -426,7 +436,6 @@ function rcn_vpTableListingHandler($, tables, productID, rcn_ajaxurl) {
  * @param {jQuery} targetDiv - jQuery selector for the target container.
  * @returns {void} - No return value.
  */
-
 function rcn_tableAvailabilityHandler(
   $,
   tables,
@@ -462,9 +471,7 @@ function rcn_tableAvailabilityHandler(
         const tableElement = $(targetDiv).find('.table-' + table.no);
         tableElement.find('small').replaceWith(() => $(action));
 
-        let isTableInCart = localStorage.getItem(
-          'rcn-vp-is-table-added-to-cart'
-        );
+        let isTableInCart = localStorage.getItem('rcn_vpIsTableAddedToCart');
         isTableInCart = JSON.parse(isTableInCart);
 
         if (
@@ -571,6 +578,18 @@ function rcn_tableActionHandler($, ul, actionBtn, productID, rcn_ajaxurl) {
 
       // 1001 means, the table is available for reservation
       if (result.availability_code === 1001) {
+        const id = variationID;
+        const name = 'Table - ' + tableNo;
+        const price = '100';
+        const quantity = 1;
+
+        // prettier-ignore
+        const productData = {
+          id, name, price, quantity
+        }
+
+        rcn_addProductToCart($, 'updateCart', productData);
+
         actionIcon.removeClass('fa-spinner').addClass('fa-check');
 
         $('.rcn-vp-table-action').prop('disabled', true);
@@ -589,7 +608,7 @@ function rcn_tableActionHandler($, ul, actionBtn, productID, rcn_ajaxurl) {
           }
         });
 
-        localStorage.setItem('rcn-vp-is-table-added-to-cart', tableData);
+        localStorage.setItem('rcn_vpIsTableAddedToCart', tableData);
       }
     },
     error: function (xhr, status, error) {
@@ -617,6 +636,16 @@ function rcn_vpCartVisualInteraction(
   const disableScrollClass = 'disable-scroll';
   const totalCartItems = cartItems.length;
   callbackPriority = Number(callbackPriority);
+
+  if (totalCartItems === 0) {
+    cartContainer.empty();
+    message = '<strong>🙁 No product is added to cart yet</strong>';
+
+    messageContainer.html(message);
+    cartContainer.append(messageContainer);
+    cartContainer.addClass('disable-scroll');
+    return;
+  }
 
   if (isUpdated === false) {
     if (message) {
@@ -680,7 +709,8 @@ function rcn_vpCartVisualInteraction(
       let productID = $(this).parent();
       productID = productID.attr('data-product-id');
 
-      rcn_vpRemoveProductFromCart(productID);
+      const ajaxurl = 'http://localhost:10019/wp-admin/admin-ajax.php';
+      rcn_vpRemoveProductFromCart($, productID, ajaxurl);
     });
 
     if (message) {
@@ -701,11 +731,6 @@ function rcn_vpCartVisualInteraction(
   }
 }
 
-//TODO: Create remove product from cart function
-function rcn_vpRemoveProductFromCart(productID) {
-  console.log('Remove product from cart ' + productID);
-}
-
 function callbackForTesting(
   messageContainer,
   cartContainer,
@@ -715,37 +740,6 @@ function callbackForTesting(
     messageContainer.remove();
     cartContainer.removeClass(disableScrollClass);
   }, 3000);
-}
-
-function rcn_addProductToCart(
-  $,
-  action = 'loadCart',
-  cartItem,
-  callback,
-  callbackPriority,
-  categoryID,
-  ajaxurl
-) {
-  if ('loadCart' === action) {
-    const message = '<p>Loading cart data. Please wait...</p>';
-    rcn_vpCartVisualInteraction($, false, cartItem, message);
-
-    $.ajax({
-      type: 'POST',
-      url: ajaxurl,
-      data: {
-        action: 'rcn_get_vp_products',
-        categoryID: categoryID,
-      },
-      success: function (response) {
-        response = JSON.parse(response);
-        console.log(response);
-      },
-      error: function (xhr, status, error) {
-        console.log(xhr.responseText);
-      },
-    });
-  }
 }
 
 function rcn_addProductToCart(
@@ -806,6 +800,98 @@ function rcn_addProductToCart(
 
     localStorage.setItem('rcn_vpCartData', cartArray);
   }
+
+  function callback(
+    messageContainer,
+    cartContainer,
+    disableScrollClass,
+    totalCartItems
+  ) {
+    console.log(messageContainer);
+    setTimeout(() => {
+      $('.rcn-vp-cart-message').remove();
+      cartContainer.removeClass(disableScrollClass);
+    }, 700);
+  }
+}
+
+function rcn_vpRemoveProductFromCart($, productID, ajaxurl) {
+  let cartArray = localStorage.getItem('rcn_vpCartData');
+  let isProductInCart = false;
+  let message =
+    '<p style="text-align: center">Something went wrong. <br />Please try again or contact support.</p>';
+  cartArray = JSON.parse(cartArray);
+
+  if (!cartArray) {
+    rcn_vpCartVisualInteraction($, false, cartArray, message);
+    return;
+  }
+
+  for (let i = 0; i < cartArray.length; i++) {
+    const element = cartArray[i];
+    if (productID == element.id) {
+      isProductInCart = true;
+      cartArray.splice(i, 1);
+      break;
+    }
+  }
+
+  if (!isProductInCart) {
+    rcn_vpCartVisualInteraction($, false, cartArray, message);
+    return;
+  }
+
+  let response;
+  message =
+    '<p style="text-align: center">Removing product from cart <br />Please wait a moment...</p>';
+  rcn_vpCartVisualInteraction($, false, cartArray, message);
+
+  $.ajax({
+    type: 'POST',
+    url: ajaxurl,
+    data: {
+      action: 'rcn_vp_remove_product_from_cart',
+      productID: productID,
+    },
+    success: function (responseData) {
+      response = JSON.parse(responseData);
+      console.log(response);
+      if (!response.status) {
+        message =
+          '<p style="text-align: center">Something went wrong. <br />Please try again or contact support 1.</p>';
+
+        rcn_vpCartVisualInteraction($, false, cartArray, message);
+        return;
+      }
+    },
+    error: function (xhr, status, error) {
+      console.error(xhr.responseText);
+    },
+    complete: function () {
+      // Only execute this code if response is defined and has a truthy status
+      if (response && response.status) {
+        message = message =
+          '<p style="text-align: center">The product is removed from cart successfully</p>';
+        rcn_vpCartVisualInteraction($, true, cartArray, message, callback);
+
+        cartArray = JSON.stringify(cartArray);
+        localStorage.setItem('rcn_vpCartData', cartArray);
+      }
+
+      let tableData = localStorage.getItem('rcn_vpIsTableAddedToCart');
+
+      if (tableData) {
+        tableData = JSON.parse(tableData);
+
+        if (tableData.tableId === productID) {
+          localStorage.removeItem('rcn_vpIsTableAddedToCart');
+
+          const ajaxurl = 'http://localhost:10019/wp-admin/admin-ajax.php';
+          rcn_floorSelectionHandler($, 28462, ajaxurl);
+        }
+      }
+    },
+  });
 
   function callback(
     messageContainer,
