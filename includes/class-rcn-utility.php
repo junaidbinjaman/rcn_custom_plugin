@@ -336,6 +336,7 @@ class Rcn_Utility {
 		 * I am calling the function before executing any other code because
 		 * It makes sure that, the $product_id and $variation_id are holding the right values and
 		 * It also, makes sure the, the product and variable(if applicable) are in cart
+		 * Branch to fix the bog
 		 */
 		$is_product_in_cart = self::is_product_in_cart( $product_id, $variation_id );
 
