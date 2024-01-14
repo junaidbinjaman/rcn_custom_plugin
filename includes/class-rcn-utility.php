@@ -89,22 +89,17 @@ class Rcn_Utility {
 				);
 			}
 
-			if ( $variation_id !== $variation_id_in_cart ) {
+			if ( $variation_id === $variation_id_in_cart ) {
 				return array(
-					'status'  => false,
-					'message' => 'The variation doesn’t exists on cart',
+					'status'  => true,
+					'message' => 'The product and variation is on cart',
 				);
 			}
-
-			return array(
-				'status'  => true,
-				'message' => 'The product and variation is added to cart',
-			);
 		}
 
 		return array(
 			'status'  => false,
-			'message' => 'The product is not added to cart',
+			'message' => 'The product is not on cart',
 		);
 	}
 
@@ -336,7 +331,6 @@ class Rcn_Utility {
 		 * I am calling the function before executing any other code because
 		 * It makes sure that, the $product_id and $variation_id are holding the right values and
 		 * It also, makes sure the, the product and variable(if applicable) are in cart
-		 * Branch to fix the bog
 		 */
 		$is_product_in_cart = self::is_product_in_cart( $product_id, $variation_id );
 
@@ -349,8 +343,10 @@ class Rcn_Utility {
 
 		$product_id   = intval( $product_id );
 		$variation_id = intval( $variation_id );
+		$product      = wc_get_product( $product_id );
 		$cart         = WC()->cart;
 		$cart_items   = $cart->get_cart();
+		$result       = false;
 
 		foreach ( $cart_items as $cart_item_key => $cart_item ) {
 			$product_id_in_cart = $cart_item['product_id'];
@@ -359,20 +355,26 @@ class Rcn_Utility {
 				continue;
 			}
 
-			$result = $cart->remove_cart_item( $cart_item_key );
-
-			if ( ! $result ) {
-				return array(
-					'status'  => false,
-					'message' => 'Something went wrong while trying to remove the product from cart',
-				);
+			if ( $product->is_type( 'variable' ) ) {
+				if ( $cart_item['variation_id'] === $variation_id ) {
+					$result = $cart->remove_cart_item( $cart_item_key );
+				}
+			} else {
+				$result = $cart->remove_cart_item( $cart_item_key );
 			}
+		}
 
+		if ( ! $result ) {
 			return array(
-				'status'  => true,
-				'message' => 'The product is removed from cart successfully',
+				'status'  => false,
+				'message' => 'Something went wrong while trying to remove the product from cart',
 			);
 		}
+
+		return array(
+			'status'  => true,
+			'message' => 'The product is removed from cart successfully',
+		);
 	}
 
 	/**

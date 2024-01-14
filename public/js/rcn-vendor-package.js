@@ -6,7 +6,7 @@
    */
   const rcn_ajaxurl = wp_ajax_object.ajax_url;
   const productID = 28462; // table wrapper product
-  const categoryID = 264;
+  const categoryID = 264; // RCN vendor package category
 
   /**
    * All of the code for vendor-package JavaScript source
@@ -23,6 +23,10 @@
     rcn_vpcb($);
 
     rcn_vpPrevNextButtonHandler($, null, rcn_ajaxurl);
+
+    // Load VP cart data
+    // prettier-ignore
+    rcn_addProductToCart($, 'loadCart', null, categoryID, rcn_ajaxurl);
 
     $('.rcn_vps-prev-button').each(function () {
       $(this).on('click', function () {
@@ -58,29 +62,6 @@
         rcn_floorSelectionHandler($, productID, rcn_ajaxurl);
       });
     });
-
-    // prettier-ignore
-    const cartItems = [
-      {id: 203, name: 'Example product - 1', quantity: 3, price: '$3030'},
-      {id: 204, name: 'Example product - 2', quantity: 2, price: '$6500'},
-      {id: 205, name: 'Example product - 3', quantity: 4, price: '$2170'},
-      {id: 206, name: 'Example product - 4', quantity: 2, price: '$3800'},
-      {id: 207, name: 'Example product - 5', quantity: 1, price: '$3190'},
-      {id: 208, name: 'Example product - 6', quantity: 4, price: '$00'},
-      {id: 209, name: 'Example product - 7', quantity: 4, price: '$2070'},
-      {id: 210, name: 'Example product - 8', quantity: 1, price: '$2000'},
-      {id: 211, name: 'Example product - 9', quantity: 1, price: '$2000'},
-    ];
-
-    const obj = {
-      id: 211,
-      name: 'Example product - 9',
-      quantity: 1,
-      price: '$2000',
-    };
-    // prettier-ignore
-    // rcn_vpCartVisualInteraction($, true, cartItems, message, callbackForTesting, 2);
-    rcn_addProductToCart($, 'loadCart', obj, null, null, categoryID, rcn_ajaxurl);
   });
 })(jQuery);
 
@@ -634,20 +615,10 @@ function rcn_vpCartVisualInteraction(
   const cartContainer = $('.rcn-vpciw');
   const messageContainer = $('<div class="rcn-vp-cart-message">');
   const disableScrollClass = 'disable-scroll';
-  const totalCartItems = cartItems.length;
+  const totalCartItems = cartItems ? cartItems.length : null;
   callbackPriority = Number(callbackPriority);
 
-  if (totalCartItems === 0) {
-    cartContainer.empty();
-    message = '<strong>🙁 No product is added to cart yet</strong>';
-
-    messageContainer.html(message);
-    cartContainer.append(messageContainer);
-    cartContainer.addClass('disable-scroll');
-    return;
-  }
-
-  if (isUpdated === false) {
+  if (isUpdated === false && totalCartItems !== 0) {
     if (message) {
       messageContainer.html(message);
 
@@ -665,7 +636,7 @@ function rcn_vpCartVisualInteraction(
     }
   }
 
-  if (isUpdated === true) {
+  if (isUpdated === true && totalCartItems !== 0) {
     if (callback && 1 === callbackPriority) {
       callback(
         messageContainer,
@@ -729,6 +700,16 @@ function rcn_vpCartVisualInteraction(
       );
     }
   }
+
+  if (totalCartItems === 0) {
+    cartContainer.empty();
+    message =
+      '<strong style="color: gray"><i aria-hidden="true" class="fas fa-sad-tear"></i> Sorry there are no product in cart</strong>';
+    messageContainer.html(message);
+
+    cartContainer.append(messageContainer);
+    cartContainer.addClass(disableScrollClass);
+  }
 }
 
 function callbackForTesting(
@@ -742,15 +723,8 @@ function callbackForTesting(
   }, 3000);
 }
 
-function rcn_addProductToCart(
-  $,
-  action = 'loadCart',
-  cartItem,
-  callback,
-  callbackPriority,
-  categoryID,
-  ajaxurl
-) {
+// prettier-ignore
+function rcn_addProductToCart($, action = 'loadCart', cartItem, categoryID, ajaxurl) {
   let message;
 
   if ('loadCart' === action) {
@@ -809,13 +783,14 @@ function rcn_addProductToCart(
   ) {
     console.log(messageContainer);
     setTimeout(() => {
-      $('.rcn-vp-cart-message').remove();
+      // $('.rcn-vp-cart-message').remove();
       cartContainer.removeClass(disableScrollClass);
     }, 700);
   }
 }
 
 function rcn_vpRemoveProductFromCart($, productID, ajaxurl) {
+  console.log(productID);
   let cartArray = localStorage.getItem('rcn_vpCartData');
   let isProductInCart = false;
   let message =

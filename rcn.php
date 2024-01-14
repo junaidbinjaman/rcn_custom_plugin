@@ -247,14 +247,15 @@ add_action( 'wp_ajax_nopriv_rcn_vp_remove_product_from_cart', 'rcn_vp_remove_pro
 
  // phpcs:disabled
 function rcn_example() {
-	$product = wc_get_product( '28463' ); // phpcs:ignore
 
-	echo '<pre>';
-	var_dump(Rcn_Utility::remove_product_from_cart( 1521, 4491 ));
-	echo '</pre>';
+	$product = wc_get_product( 1521 );
+
+	// echo '<pre>';
+	var_dump(Rcn_Utility::remove_product_from_cart( 28462, 28473 ));
+	// echo '</pre>';
 
 	wp_die();
 }
 
-add_action( 'template_redirect', 'rcn_example' );
+// add_action( 'template_redirect', 'rcn_example' );
 // phpcs:enabled
