@@ -5,7 +5,6 @@
    * Global variables declaration
    */
   const rcn_ajaxurl = wp_ajax_object.ajax_url;
-  const productID = 28462; // table wrapper product
   const categoryID = 264; // RCN vendor package category
 
   /**
@@ -26,7 +25,7 @@
 
     // Load VP cart data
     // prettier-ignore
-    rcn_addProductToCart($, 'loadCart', null, categoryID, rcn_ajaxurl);
+    rcn_addProductToCart($, 'loadCart', null, categoryID);
 
     $('.rcn_vps-prev-button').each(function () {
       $(this).on('click', function () {
@@ -40,34 +39,51 @@
       });
     });
 
-    rcn_floorSelectionHandler($, productID, rcn_ajaxurl);
+    rcn_floorSelectionHandler($);
 
     $('.rcn-vp-floor-1-selector-btn').each(function () {
       $(this).on('click', function () {
         localStorage.setItem('rcn_activeFloorNumber', 1);
-        rcn_floorSelectionHandler($, productID, rcn_ajaxurl);
+        rcn_floorSelectionHandler($);
       });
     });
 
     $('.rcn-vp-floor-2-selector-btn').each(function () {
       $(this).on('click', function () {
         localStorage.setItem('rcn_activeFloorNumber', 2);
-        rcn_floorSelectionHandler($, productID, rcn_ajaxurl);
+        rcn_floorSelectionHandler($);
       });
     });
 
     $('.rcn-vp-floor-3-selector-btn').each(function () {
       $(this).on('click', function () {
         localStorage.setItem('rcn_activeFloorNumber', 3);
-        rcn_floorSelectionHandler($, productID, rcn_ajaxurl);
+        rcn_floorSelectionHandler($);
       });
     });
+
+    const rcn_vpFloorSelectorForm = $(
+      '.rcn-vp-floor-selector-form form select'
+    );
+
+    rcn_vpFloorSelectorForm.val(localStorage.getItem('rcn_activeFloorNumber'));
+
+    rcn_vpFloorSelectorForm.on('change', function () {
+      localStorage.setItem('rcn_activeFloorNumber', $(this).val());
+      rcn_floorSelectionHandler($);
+    });
+  });
+
+  $('.rc-vpaa-quantity').on('click', function () {
+    const productID = $(this).attr('data-product-id');
+    console.log(productID);
+    rcn_vpAddOnsAddToCart($, productID);
   });
 })(jQuery);
 
-function rcn_vpPriceFormatter(price) {
+function rcn_vpPriceFormatter(price, decimal) {
   const formattedPrice =
-    '$' + price.toFixed(0).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    '$' + price.toFixed(decimal).replace(/\d(?=(\d{3})+\.)/g, '$&,');
   return formattedPrice;
 }
 
@@ -164,6 +180,14 @@ function rcn_vpPrevNextButtonHandler($, flag = null, rcn_ajaxurl) {
  */
 function rcn_vpStepSwitchHandler($, totalSteps, rcn_ajaxurl) {
   let activeStep = localStorage.getItem('rcn-vp-active-step');
+  let totalCartItems = localStorage.getItem('rcn_vpCartData');
+
+  if (totalCartItems) {
+    totalCartItems = JSON.parse(totalCartItems);
+    totalCartItems = length;
+  } else {
+    totalCartItems = 0;
+  }
 
   const stepClasses = [];
   const stepIndicatorClasses = [];
@@ -180,7 +204,11 @@ function rcn_vpStepSwitchHandler($, totalSteps, rcn_ajaxurl) {
   // Sources for prev, next and checkout buttons
   $('.rcn_vps-prev-button').toggle(activeStep > 0);
   $('.rcn_vps-next-button').toggle(activeStep < totalSteps);
-  $('.rcn_vps-checkout-button').toggle(activeStep === totalSteps);
+  $('.rcn_vps-checkout-button').hide();
+
+  if (totalCartItems) {
+    $('.rcn_vps-checkout-button').toggle(activeStep === totalSteps);
+  }
 
   // Sources for step hide and show
   for (let i = 0; i <= totalSteps; i++) {
@@ -251,8 +279,9 @@ function rcn_vpStepSwitchHandler($, totalSteps, rcn_ajaxurl) {
  * @param {string} rcn_ajaxurl - AJAX URL for server communication.
  * @returns {void} - No return value.
  */
-function rcn_floorSelectionHandler($, productID, rcn_ajaxurl) {
+function rcn_floorSelectionHandler($) {
   let floorNumber = localStorage.getItem('rcn_activeFloorNumber');
+  const productID = 28462; // table wrapper product
 
   if (!floorNumber) {
     localStorage.setItem('rcn_activeFloorNumber', 1);
@@ -319,15 +348,15 @@ function rcn_floorSelectionHandler($, productID, rcn_ajaxurl) {
   $('.rcn-vp-floor-3').toggle(floorNumber === 3);
 
   if (floorNumber === 1) {
-    rcn_vpTableListingHandler($, floorOneTables, productID, rcn_ajaxurl);
+    rcn_vpTableListingHandler($, floorOneTables, productID);
   }
 
   if (floorNumber === 2) {
-    rcn_vpTableListingHandler($, floorTwoTables, productID, rcn_ajaxurl);
+    rcn_vpTableListingHandler($, floorTwoTables, productID);
   }
 
   if (floorNumber === 3) {
-    rcn_vpTableListingHandler($, floorThreeTables, productID, rcn_ajaxurl);
+    rcn_vpTableListingHandler($, floorThreeTables, productID);
   }
 }
 
@@ -358,12 +387,13 @@ function rcn_floorSelectionHandler($, productID, rcn_ajaxurl) {
  * @param {string} rcn_ajaxurl - AJAX URL for server communication.
  * @returns {void} - No return value.
  */
-function rcn_vpTableListingHandler($, tables, productID, rcn_ajaxurl) {
+function rcn_vpTableListingHandler($, tables, productID) {
   // Initializes table listing functionality
   const targetDiv = $('#rcn-vp-table-listing-container');
+  const rcn_ajaxurl = wp_ajax_object.ajax_url;
   const ul = $('<ul>');
 
-  let action = '<small class="rcn-vp-table-meta">Confirming...</small>';
+  let action = '<small class="rcn-vp-table-meta">Checking</small>';
   let tableDataInCart = {
     status: false,
     tableNo: null,
@@ -522,6 +552,11 @@ function rcn_tableActionHandler($, ul, actionBtn, productID, rcn_ajaxurl) {
   const tableNo = actionBtn.parent().attr('data-table-no');
   const actionIcon = actionBtn;
 
+  let notification = {
+    type: 'info',
+    message: 'Adding item to cart.',
+  };
+
   let tableData = {
     status: true,
     tableNo: tableNo,
@@ -530,6 +565,7 @@ function rcn_tableActionHandler($, ul, actionBtn, productID, rcn_ajaxurl) {
   tableData = JSON.stringify(tableData);
 
   actionIcon.removeClass('fa-plus').addClass('fa-spinner');
+  rcn_vpCartVisualInteraction($, false, notification);
 
   // Storing the current parent element
   const parentElement = actionBtn.parent();
@@ -554,14 +590,14 @@ function rcn_tableActionHandler($, ul, actionBtn, productID, rcn_ajaxurl) {
 
         parentElement.attr('data-is-unavailable', true);
 
-        actionIcon.replaceWith($('<small>Already reserved</small>'));
+        actionIcon.replaceWith($('<small>Reserved</small>'));
       }
 
       // 1001 means, the table is available for reservation
       if (result.availability_code === 1001) {
         const id = variationID;
         const name = 'Table - ' + tableNo;
-        const price = '100';
+        const price = result.price;
         const quantity = 1;
 
         // prettier-ignore
@@ -574,7 +610,6 @@ function rcn_tableActionHandler($, ul, actionBtn, productID, rcn_ajaxurl) {
         actionIcon.removeClass('fa-spinner').addClass('fa-check');
 
         $('.rcn-vp-table-action').prop('disabled', true);
-        $('.rcn-vp-table-action').parent().prop('disabled', true);
         $('.rcn-vp-table-action').parent().attr('data-is-unavailable', true);
         $('.rcn-vp-table-action')
           .parent()
@@ -603,51 +638,86 @@ function rcn_highlightTableOnFloorPlan($) {
   console.log('Calling the function to highlight table location on floor plan');
 }
 
+/**
+ * Handles the visual interactions on vp cart.
+ * @param {function} $ - jQuery library.
+ * @param {boolean} isUpdated - Indicates whether the cart is updated.
+ * @param {Object} notification - Object containing notification details (type and message).
+ * @param {Array} cartItems - Array of cart items.
+ * @param {function} callback - Callback function to be executed.
+ * @param {number} callbackPriority - Priority level for the callback function.
+ */
 function rcn_vpCartVisualInteraction(
   $,
   isUpdated = false,
-  cartItems = [],
-  message,
+  notification = {type: null, message: null},
+  cartItems = null,
   callback,
   callbackPriority = 2
 ) {
-  $('.rcn-vp-cart-message').remove();
+  // Removing the vp cart container from DOM if already exists
+  $('.rcn-vp-cart-notification').remove();
+
   const cartContainer = $('.rcn-vpciw');
-  const messageContainer = $('<div class="rcn-vp-cart-message">');
+  const notificationContainerClass = 'rcn-vp-cart-notification';
+  const notificationContainer = $('<div>');
   const disableScrollClass = 'disable-scroll';
   const totalCartItems = cartItems ? cartItems.length : null;
+
+  notificationContainer.addClass(notificationContainerClass);
   callbackPriority = Number(callbackPriority);
 
-  if (isUpdated === false && totalCartItems !== 0) {
-    if (message) {
-      messageContainer.html(message);
+  // If the cart is empty
+  if (totalCartItems === 0) {
+    cartContainer.empty();
 
-      cartContainer.append(messageContainer);
+    rcn_vpCartCalculator($, null);
+
+    const notification = {
+      type: 'info',
+      message: 'Your cart is empty',
+    };
+
+    notificationContainer.html(notificationHandler(notification));
+    cartContainer.append(notificationContainer);
+    cartContainer.addClass(disableScrollClass);
+    return;
+  }
+
+  // If the cart is not empty
+  if (isUpdated === false) {
+    if (notification.type) {
+      notificationContainer.html(notificationHandler(notification));
+      cartContainer.append(notificationContainer);
       cartContainer.addClass('disable-scroll');
     }
 
     if (callback) {
       callback(
-        messageContainer,
+        notificationContainerClass,
         cartContainer,
         disableScrollClass,
         totalCartItems
       );
     }
+
+    return;
   }
 
-  if (isUpdated === true && totalCartItems !== 0) {
+  // If the cart is updated
+  if (isUpdated === true) {
     if (callback && 1 === callbackPriority) {
       callback(
-        messageContainer,
+        notificationContainerClass,
         cartContainer,
         disableScrollClass,
         totalCartItems
       );
     }
 
-    const ul = $('<ul>');
+    const cartItemsWrapper = $('<ul>');
 
+    // Populate the cart items
     for (let i = 0; i < cartItems.length; i++) {
       const element = cartItems[i];
       const uniqueIdentifier = element.id;
@@ -661,7 +731,7 @@ function rcn_vpCartVisualInteraction(
         element.quantity +
         '</span>' +
         '<span class="price">' +
-        rcn_vpPriceFormatter(Number(element.price)) +
+        rcn_vpPriceFormatter(Number(element.price, 0)) +
         '</span>' +
         '<span class="remove">Remove</span>';
 
@@ -670,66 +740,110 @@ function rcn_vpCartVisualInteraction(
       cartItem.addClass('rcn-vp-cart-listing');
       cartItem.attr('data-product-id', uniqueIdentifier);
 
-      ul.append(cartItem);
+      cartItemsWrapper.append(cartItem);
     }
 
-    cartContainer.empty().append(ul);
+    // Update cart container with the new items
+    cartContainer.empty().append(cartItemsWrapper);
     cartContainer.find('ul > li:nth-child(even)').css('background', '#F2F4F8');
 
+    // Add click event for the remove button
     $('.remove').on('click', function () {
       let productID = $(this).parent();
       productID = productID.attr('data-product-id');
 
-      const ajaxurl = 'http://localhost:10019/wp-admin/admin-ajax.php';
-      rcn_vpRemoveProductFromCart($, productID, ajaxurl);
+      rcn_vpRemoveProductFromCart($, productID);
     });
 
-    if (message) {
-      messageContainer.html(message);
+    // Update cart calculation
+    rcn_vpCartCalculator($, cartItems);
 
-      cartContainer.append(messageContainer);
+    // Display notification if provided
+    if (notification.type) {
+      notificationContainer.html(notificationHandler(notification));
+      cartContainer.append(notificationContainer);
       cartContainer.addClass(disableScrollClass);
     }
 
+    // Execute callback with appropriate priority
     if (callback && 1 !== callbackPriority) {
       callback(
-        messageContainer,
+        notificationContainerClass,
         cartContainer,
         disableScrollClass,
         totalCartItems
       );
     }
+
+    return;
   }
 
-  if (totalCartItems === 0) {
-    cartContainer.empty();
-    message =
-      '<strong style="color: gray"><i aria-hidden="true" class="fas fa-sad-tear"></i> Sorry there are no product in cart</strong>';
-    messageContainer.html(message);
+  /**
+   * Handles the creation of notification messages based on the notification type.
+   * @param {Object} notification - Object containing notification details (type and message).
+   * @returns {jQuery} - jQuery object representing the notification message.
+   */
+  function notificationHandler(notification) {
+    const msg = $('<p>');
 
-    cartContainer.append(messageContainer);
-    cartContainer.addClass(disableScrollClass);
+    if (notification.type === 'info') {
+      msg.addClass('rcn-vp-cart-info-notification');
+    }
+
+    if (notification.type === 'success') {
+      msg.addClass('rcn-vp-success-notification');
+    }
+
+    if (notification.type === 'error') {
+      msg.addClass('rcn-vp-error-notification');
+    }
+
+    msg.html(notification.message);
+    return msg;
   }
 }
 
-function callbackForTesting(
-  messageContainer,
-  cartContainer,
-  disableScrollClass
-) {
-  setTimeout(() => {
-    messageContainer.remove();
-    cartContainer.removeClass(disableScrollClass);
-  }, 3000);
+/**
+ * Calculates and updates the total price on vp cart.
+ * @param {function} $ - jQuery library.
+ * @param {Array} cartItems - Array of cart items containing price information.
+ */
+function rcn_vpCartCalculator($, cartItems) {
+  const priceElement = $('.rcn-vp-cart-total');
+
+  let totalPrice = 0;
+
+  if (cartItems && cartItems.length > 0) {
+    for (let i = 0; i < cartItems.length; i++) {
+      const cartItem = cartItems[i];
+
+      totalPrice += Number(cartItem.price);
+    }
+  }
+
+  totalPrice = rcn_vpPriceFormatter(totalPrice, 2);
+
+  priceElement.text(totalPrice);
 }
 
+/**
+ * Adds a product to the vp cart or loads cart data on page load using AJAX.
+ * @param {function} $ - jQuery library.
+ * @param {string} action - Specifies the action to perform ('loadCart' or 'updateCart').
+ * @param {Object} cartItem - Object representing the product to be added to the cart.
+ * @param {string} categoryID - ID of the product category.
+ */
 // prettier-ignore
-function rcn_addProductToCart($, action = 'loadCart', cartItem, categoryID, ajaxurl) {
-  let message;
+function rcn_addProductToCart($, action = 'loadCart', cartItem, categoryID) {
+  const ajaxurl = wp_ajax_object.ajax_url;
+  let notification;
 
   if ('loadCart' === action) {
-    message = '<p>Loading cart data. Please wait...</p>';
-    rcn_vpCartVisualInteraction($, false, cartItem, message);
+    notification = {
+      type: 'info',
+      message: 'Loading cart.'
+    };
+    rcn_vpCartVisualInteraction($, false, notification);
 
     $.ajax({
       type: 'POST',
@@ -741,16 +855,31 @@ function rcn_addProductToCart($, action = 'loadCart', cartItem, categoryID, ajax
       success: function (response) {
         try {
           localStorage.setItem('rcn_vpCartData', response);
-          const parsedResponse = JSON.parse(response);
-          message = '<p>Data loaded successfully</p>';
+          const cartItems = JSON.parse(response);
+
+          notification = {
+            type: 'success',
+            message: ''
+          };
 
           // prettier-ignore
-          rcn_vpCartVisualInteraction($, true, parsedResponse, message, callback, 2);
+          rcn_vpCartVisualInteraction($, true, notification, cartItems, callback, 2);
         } catch (error) {
+          notification = {
+            type: 'error',
+            message: 'Something went wrong. <br />Please refresh the page.'
+          };
+          rcn_vpCartVisualInteraction($, false, notification);
+
           console.error('Error parsing JSON response:', error);
         }
       },
       error: function (xhr, status, error) {
+        notification = {
+          type: 'error',
+          message: 'Something went wrong. <br />Please refresh the page.'
+        };
+        rcn_vpCartVisualInteraction($, false, notification);
         console.error('AJAX error:', error);
       },
     });
@@ -758,47 +887,72 @@ function rcn_addProductToCart($, action = 'loadCart', cartItem, categoryID, ajax
 
   if ('updateCart' === action) {
     if (!cartItem) {
-      message =
-        '<p style="text-align: center">Something went wrong. <br />Please try again or contact support</p>';
-      rcn_vpCartVisualInteraction($, false, [], message, callback, 2);
+        notification = {
+          type: 'error',
+          message: 'Something went wrong. <br />Please refresh the page.'
+        };
+
+      rcn_vpCartVisualInteraction($, false, notification);
       return;
     }
 
     let cartArray = localStorage.getItem('rcn_vpCartData');
     cartArray = JSON.parse(cartArray);
-    cartArray.push(cartItem);
-    message = 'The product is added to cart successfully';
 
-    rcn_vpCartVisualInteraction($, true, cartArray, message, callback, 2);
+    if (!cartArray) {
+      notification = {
+        type: 'error',
+        message: 'Something went wrong. <br />Please refresh the page.'
+      };
+
+      rcn_vpCartVisualInteraction($, false, notification);
+      return;
+    }
+
+    cartArray.push(cartItem);
+    notification = {
+      type: 'success',
+      message: ''
+    };
+
+    rcn_vpCartVisualInteraction($, true, notification, cartArray, callback, 2);
     cartArray = JSON.stringify(cartArray);
 
     localStorage.setItem('rcn_vpCartData', cartArray);
   }
 
   function callback(
-    messageContainer,
+    notificationContainerClass,
     cartContainer,
     disableScrollClass,
     totalCartItems
   ) {
-    console.log(messageContainer);
     setTimeout(() => {
-      // $('.rcn-vp-cart-message').remove();
+      $('.' + notificationContainerClass).remove();
       cartContainer.removeClass(disableScrollClass);
     }, 700);
   }
 }
 
-function rcn_vpRemoveProductFromCart($, productID, ajaxurl) {
-  console.log(productID);
+/**
+ * Removes a product from the vp cart using AJAX and updates the cart visual interaction.
+ * @param {function} $ - jQuery library.
+ * @param {string} productID - ID of the product to be removed from the cart.
+ */
+function rcn_vpRemoveProductFromCart($, productID) {
+  const ajaxurl = wp_ajax_object.ajax_url;
   let cartArray = localStorage.getItem('rcn_vpCartData');
   let isProductInCart = false;
-  let message =
-    '<p style="text-align: center">Something went wrong. <br />Please try again or contact support.</p>';
+  let notification;
+
   cartArray = JSON.parse(cartArray);
 
   if (!cartArray) {
-    rcn_vpCartVisualInteraction($, false, cartArray, message);
+    notification = {
+      type: 'error',
+      message: 'Something went wrong. <br />Please refresh the page.',
+    };
+    rcn_vpCartVisualInteraction($, false, notification);
     return;
   }
 
@@ -812,14 +966,20 @@ function rcn_vpRemoveProductFromCart($, productID, ajaxurl) {
   }
 
   if (!isProductInCart) {
-    rcn_vpCartVisualInteraction($, false, cartArray, message);
+    notification = {
+      type: 'error',
+      message: 'The item does not exist in cart',
+    };
+    rcn_vpCartVisualInteraction($, false, notification);
     return;
   }
 
-  let response;
-  message =
-    '<p style="text-align: center">Removing product from cart <br />Please wait a moment...</p>';
-  rcn_vpCartVisualInteraction($, false, cartArray, message);
+  notification = {
+    type: 'info',
+    message: 'Removing item from cart.',
+  };
+
+  rcn_vpCartVisualInteraction($, false, notification);
 
   $.ajax({
     type: 'POST',
@@ -830,24 +990,34 @@ function rcn_vpRemoveProductFromCart($, productID, ajaxurl) {
     },
     success: function (responseData) {
       response = JSON.parse(responseData);
-      console.log(response);
-      if (!response.status) {
-        message =
-          '<p style="text-align: center">Something went wrong. <br />Please try again or contact support 1.</p>';
 
-        rcn_vpCartVisualInteraction($, false, cartArray, message);
+      if (!response.status) {
+        notification = {
+          type: 'error',
+          message: 'Something went wrong. <br />Please refresh the page.',
+        };
+
+        rcn_vpCartVisualInteraction($, false, notification);
         return;
       }
     },
     error: function (xhr, status, error) {
+      notification = {
+        type: 'error',
+        message: 'Something went wrong. <br />Please refresh the page.',
+      };
+
+      rcn_vpCartVisualInteraction($, false, notification);
       console.error(xhr.responseText);
     },
     complete: function () {
-      // Only execute this code if response is defined and has a truthy status
       if (response && response.status) {
-        message = message =
-          '<p style="text-align: center">The product is removed from cart successfully</p>';
-        rcn_vpCartVisualInteraction($, true, cartArray, message, callback);
+        notification = {
+          type: 'success',
+          message: '',
+        };
+
+        rcn_vpCartVisualInteraction($, true, notification, cartArray, callback);
 
         cartArray = JSON.stringify(cartArray);
         localStorage.setItem('rcn_vpCartData', cartArray);
@@ -861,22 +1031,100 @@ function rcn_vpRemoveProductFromCart($, productID, ajaxurl) {
         if (tableData.tableId === productID) {
           localStorage.removeItem('rcn_vpIsTableAddedToCart');
 
-          const ajaxurl = 'http://localhost:10019/wp-admin/admin-ajax.php';
-          rcn_floorSelectionHandler($, 28462, ajaxurl);
+          rcn_floorSelectionHandler($, 28462);
         }
       }
     },
   });
 
   function callback(
-    messageContainer,
+    notificationContainerClass,
     cartContainer,
     disableScrollClass,
     totalCartItems
   ) {
-    console.log(messageContainer);
     setTimeout(() => {
-      $('.rcn-vp-cart-message').remove();
+      $('.' + notificationContainerClass).remove();
+      cartContainer.removeClass(disableScrollClass);
+    }, 700);
+  }
+}
+
+function rcn_vpAddOnsAddToCart($, productID) {
+  productID = Number(productID);
+  const ajaxurl = wp_ajax_object.ajax_url;
+  let cartNotification;
+
+  cartNotification = {
+    type: 'info',
+    message: 'Adding item to cart.',
+  };
+
+  rcn_vpCartVisualInteraction($, false, cartNotification);
+
+  $.ajax({
+    type: 'POST',
+    url: ajaxurl,
+    data: {
+      action: 'rcn_vp_addons_add_to_cart',
+      productID: productID,
+    },
+    success: function (responseData) {
+      let response = JSON.parse(responseData);
+      addOnsAddedSuccessfully(response);
+      console.log(response);
+    },
+    error: function (xhr, status, error) {
+      cartNotification = {
+        type: 'error',
+        message: 'Something went wrong. <br />Please refresh the page.',
+      };
+
+      rcn_vpCartVisualInteraction($, false, cartNotification);
+
+      console.error(xhr.responseText);
+    },
+  });
+
+  function addOnsAddedSuccessfully(response) {
+    if (response.status_code === 800800) {
+      cartNotification = {
+        type: 'info',
+        message: '',
+      };
+
+      rcn_vpCartVisualInteraction($, false, cartNotification, null, callback);
+      return;
+    }
+
+    if (!response.status) {
+      cartNotification = {
+        type: 'info',
+        message: 'Something went wrong. <br />Please refresh the page.',
+      };
+
+      rcn_vpCartVisualInteraction($, false, cartNotification, null);
+      return;
+    }
+
+    const productData = {
+      id: response.id,
+      name: response.name,
+      quantity: response.cart_quantity,
+      price: response.price,
+    };
+
+    rcn_addProductToCart($, 'updateCart', productData);
+  }
+
+  function callback(
+    notificationContainerClass,
+    cartContainer,
+    disableScrollClass,
+    totalCartItems
+  ) {
+    setTimeout(() => {
+      $('.' + notificationContainerClass).remove();
       cartContainer.removeClass(disableScrollClass);
     }, 700);
   }

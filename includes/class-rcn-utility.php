@@ -126,8 +126,9 @@ class Rcn_Utility {
 
 		if ( $is_product_in_cart['status'] ) {
 			return array(
-				'status'  => $is_product_in_cart['status'],
-				'message' => $is_product_in_cart['message'],
+				'status'      => $is_product_in_cart['status'],
+				'message'     => $is_product_in_cart['message'],
+				'status_code' => 800800, // the product is already added to cart.
 			);
 		}
 

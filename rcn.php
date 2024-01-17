@@ -139,8 +139,9 @@ add_action( 'wp_ajax_nopriv_is_table_available', 'is_table_available' );
  * @return void
  */
 function rcn_table_add_to_cart_handler() {
-	$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0; // phpcs:ignore
+	$product_id   = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0; // phpcs:ignore
 	$variation_id = isset( $_POST['variation_id'] ) ? intval( $_POST['variation_id'] ) : 0; // phpcs:ignore
+	$product      = wc_get_product( $variation_id );
 
 	$is_table_available = Rcn_Utility::get_product_quantity( $product_id, 'stock', $variation_id );
 
@@ -160,6 +161,7 @@ function rcn_table_add_to_cart_handler() {
 	echo wp_json_encode(
 		array(
 			'status'            => $result['status'],
+			'price'             => $product->get_price(),
 			'availability_code' => 1001, // available.
 			'message'           => $result['message'],
 		)
@@ -246,16 +248,45 @@ add_action( 'wp_ajax_rcn_vp_remove_product_from_cart', 'rcn_vp_remove_product_fr
 add_action( 'wp_ajax_nopriv_rcn_vp_remove_product_from_cart', 'rcn_vp_remove_product_from_cart' );
 
  // phpcs:disabled
+
+function rcn_vp_addons_add_to_cart() {
+	$product_id = isset( $_POST['productID'] ) ? intval( $_POST['productID'] ) : 0; // phpcs:ignore
+	$product = wc_get_product( $product_id );
+
+	$result = Rcn_Utility::add_to_cart( $product_id );
+
+	$cart_quantity =  Rcn_Utility::get_product_quantity( $product_id, 'cart' );
+	$cart_quantity =  $cart_quantity['cart_quantity'] ? $cart_quantity['cart_quantity'] : 0;
+	$name = $product->get_name();
+	$price = $product->get_price();
+	$status_code = $result['status_code'] ? $result['status_code'] : 0;
+
+
+	echo wp_json_encode( array(
+		'status' => $result['status'],
+		'message' => $result['message'],
+		'status_code' => $status_code,
+		'productID' => $product_id,
+		'name' => $name,
+		'cart_quantity' => $cart_quantity,
+		'price' => $price
+	) );
+	wp_die();
+}
+
+add_action( 'wp_ajax_rcn_vp_addons_add_to_cart', 'rcn_vp_addons_add_to_cart' );
+add_action( 'wp_ajax_nopriv_rcn_vp_addons_add_to_cart', 'rcn_vp_addons_add_to_cart' );
+
 function rcn_example() {
 
-	$product = wc_get_product( 1521 );
+	$product = wc_get_product( 28487 );
 
-	// echo '<pre>';
-	var_dump(Rcn_Utility::remove_product_from_cart( 28462, 28473 ));
-	// echo '</pre>';
+	echo '<pre>';
+	var_dump($product->get_price());
+	echo '</pre>';
 
 	wp_die();
 }
 
-// add_action( 'template_redirect', 'rcn_example' );
+// add_action( 'plugin_loaded', 'rcn_vp_addons_add_to_cart' );
 // phpcs:enabled

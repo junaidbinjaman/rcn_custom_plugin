@@ -23,6 +23,21 @@
 
 /* Vendor table selection box */
 
+.rcn-vp-content-wrapper {
+  width: 500px !important;
+  margin: auto;
+}
+
+/* Available on mobile and tab only */
+.rcn-vp-floor-selector-form {
+  max-width: 330px;
+  margin: auto;
+}
+
+.rcn-vp-floor-selector-form button {
+  display: none;
+}
+
 .rcn-vtsb {
   height: 430px;
 }
@@ -33,6 +48,18 @@
 
 .rcn-vtsb-e-column {
   width: 358px !important;
+}
+
+@media screen and (max-width: 1300px) {
+  .rcn-vp-floor-1-selector-btn,
+  .rcn-vp-floor-2-selector-btn,
+  .rcn-vp-floor-3-selector-btn {
+    display: none;
+  }
+
+  .rcn-vp-cart-wrapper {
+    display: none !important;
+  }
 }
 
 .rcn-vtsb .simplebar-track.simplebar-vertical,
@@ -193,12 +220,15 @@
   overflow-x: hidden;
 }
 
-.rcn-vpciw.disable-scroll {
-  overflow: hidden;
-}
-
 .rcn-vpciw ul {
   margin-left: 0px;
+}
+
+.rcn-vpciw.disable-scroll ul {
+  overflow: hidden;
+  height: 100%;
+  overflow: hidden;
+  margin-bottom: 0px;
 }
 
 .rcn-vp-cart-listing {
@@ -235,9 +265,9 @@
   transform: scale(0.8);
 }
 
-.rcn-vp-cart-message {
-  color: #008000;
+.rcn-vp-cart-notification {
   background: #ffffff9e;
+  text-align: center;
   width: 100%;
   height: 100%;
   padding: 12px;
@@ -247,6 +277,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.rcn-vp-cart-info-notification {
+  color: var(--e-global-color-secondary);
+}
+
+.rcn-vp-success-notification {
+  color: var(--e-global-color-secondary);
+}
+
+.rcn-vp-error-notification {
+  color: var(--e-global-color-secondary);
 }
 
 /* Vendor package add-ons */
