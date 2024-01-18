@@ -7,6 +7,9 @@
   const rcn_ajaxurl = wp_ajax_object.ajax_url;
   const categoryID = 264; // RCN vendor package category
 
+  window.rcn_vpAjaxurl = wp_ajax_object.ajax_url;
+  window.rcn_vpCategoryID = 264;
+
   /**
    * All of the code for vendor-package JavaScript source
    * reside in this file.
@@ -21,23 +24,7 @@
     // custom according boxes used for package addons
     rcn_vpcb($);
 
-    rcn_vpPrevNextButtonHandler($, null, rcn_ajaxurl);
-
-    // Load VP cart data
-    // prettier-ignore
-    rcn_addProductToCart($, 'loadCart', null, categoryID);
-
-    $('.rcn_vps-prev-button').each(function () {
-      $(this).on('click', function () {
-        rcn_vpPrevNextButtonHandler($, 'prev', rcn_ajaxurl);
-      });
-    });
-
-    $('.rcn_vps-next-button').each(function () {
-      $(this).on('click', function () {
-        rcn_vpPrevNextButtonHandler($, 'next', rcn_ajaxurl);
-      });
-    });
+    rcn_cartInitializer($);
 
     rcn_floorSelectionHandler($);
 
@@ -72,14 +59,40 @@
       localStorage.setItem('rcn_activeFloorNumber', $(this).val());
       rcn_floorSelectionHandler($);
     });
-  });
 
-  $('.rc-vpaa-quantity').on('click', function () {
-    const productID = $(this).attr('data-product-id');
-    console.log(productID);
-    rcn_vpAddOnsAddToCart($, productID);
+    $('.rc-vpaa-quantity').on('click', function () {
+      const productID = $(this).attr('data-product-id');
+      console.log(productID);
+      rcn_vpAddOnsAddToCart($, productID);
+    });
+
+    $('.rcn-vp-floating-cart').on('click', function () {
+      setTimeout(function () {
+        rcn_cartInitializer($);
+      }, 100);
+    });
   });
 })(jQuery);
+
+function rcn_cartInitializer($) {
+  rcn_vpPrevNextButtonHandler($, null);
+
+  rcn_addProductToCart($, 'loadCart', null, window.rcn_vpCategoryID);
+
+  $('.rcn_vps-next-button').each(function () {
+    $(this).off('click');
+    $(this).on('click', function () {
+      rcn_vpPrevNextButtonHandler($, 'next');
+    });
+  });
+
+  $('.rcn_vps-prev-button').each(function () {
+    $(this).off('click');
+    $(this).on('click', function () {
+      rcn_vpPrevNextButtonHandler($, 'prev');
+    });
+  });
+}
 
 function rcn_vpPriceFormatter(price, decimal) {
   const formattedPrice =
@@ -132,12 +145,12 @@ function rcn_vpcb($) {
  *                        Use 'prev' for the previous step and 'next' for the next step.
  * @returns {void} - The return type is 'void' as the purpose is to update the active step, not to return a value.
  */
-function rcn_vpPrevNextButtonHandler($, flag = null, rcn_ajaxurl) {
+function rcn_vpPrevNextButtonHandler($, flag = null) {
   const totalSteps = 2;
   if (!localStorage.getItem('rcn-vp-active-step')) {
     localStorage.setItem('rcn-vp-active-step', 0);
 
-    rcn_vpStepSwitchHandler($, totalSteps, rcn_ajaxurl);
+    rcn_vpStepSwitchHandler($, totalSteps);
     return;
   }
 
@@ -148,7 +161,7 @@ function rcn_vpPrevNextButtonHandler($, flag = null, rcn_ajaxurl) {
     let nextActiveStep = activeStep + 1;
     localStorage.setItem('rcn-vp-active-step', nextActiveStep);
 
-    rcn_vpStepSwitchHandler($, totalSteps, rcn_ajaxurl);
+    rcn_vpStepSwitchHandler($, totalSteps);
     return;
   }
 
@@ -159,11 +172,11 @@ function rcn_vpPrevNextButtonHandler($, flag = null, rcn_ajaxurl) {
     let nextActiveStep = activeStep - 1;
     localStorage.setItem('rcn-vp-active-step', nextActiveStep);
 
-    rcn_vpStepSwitchHandler($, totalSteps, rcn_ajaxurl);
+    rcn_vpStepSwitchHandler($, totalSteps);
     return;
   }
 
-  rcn_vpStepSwitchHandler($, totalSteps, rcn_ajaxurl);
+  rcn_vpStepSwitchHandler($, totalSteps);
 }
 
 /**
@@ -178,7 +191,8 @@ function rcn_vpPrevNextButtonHandler($, flag = null, rcn_ajaxurl) {
  * @param {string} rcn_ajaxurl - The WP AJAX URL for server communication.
  * @returns {void} - The function doesn't return a value.
  */
-function rcn_vpStepSwitchHandler($, totalSteps, rcn_ajaxurl) {
+function rcn_vpStepSwitchHandler($, totalSteps) {
+  let rcn_ajaxurl = window.window.rcn_vpAjaxurl;
   let activeStep = localStorage.getItem('rcn-vp-active-step');
   let totalCartItems = localStorage.getItem('rcn_vpCartData');
 
@@ -731,7 +745,7 @@ function rcn_vpCartVisualInteraction(
         element.quantity +
         '</span>' +
         '<span class="price">' +
-        rcn_vpPriceFormatter(Number(element.price, 0)) +
+        rcn_vpPriceFormatter(Number(element.price), 2) +
         '</span>' +
         '<span class="remove">Remove</span>';
 

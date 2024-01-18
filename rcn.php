@@ -282,11 +282,10 @@ function rcn_example() {
 	$product = wc_get_product( 28487 );
 
 	echo '<pre>';
-	var_dump($product->get_price());
+	var_dump(get_permalink( get_the_ID() ));
 	echo '</pre>';
 
-	wp_die();
+	// wp_die();
 }
 
-// add_action( 'plugin_loaded', 'rcn_vp_addons_add_to_cart' );
 // phpcs:enabled
