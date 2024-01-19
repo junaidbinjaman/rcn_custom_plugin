@@ -3,6 +3,28 @@
  * included in this file.
  */
 
+ /* Targeting the entire scrollbar */
+ .rcn-vpciw::-webkit-scrollbar {
+  width: 0px; /* Set the width of the scrollbar */
+}
+
+/* Track (the area the thumb moves along) */
+.rcn-vpciw::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Set the background color of the track */
+}
+
+/* Handle (the draggable part of the scrollbar) */
+.rcn-vpciw::-webkit-scrollbar-thumb {
+  background-color: #888; /* Set the color of the thumb */
+  border-radius: 6px; /* Set the border radius of the thumb */
+}
+
+/* Handle on hover */
+.rcn-vpciw::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Set the color of the thumb on hover */
+}
+
+
 /* ------------------------------------------
  CSS for attendee tickets for vendor page
  --------------------------------------------- */
@@ -23,6 +45,27 @@
 
 /* Vendor table selection box */
 
+.rcn-vp-content-wrapper {
+  width: 500px !important;
+  margin: auto;
+}
+
+@media screen and (max-width: 450px) {
+  .rcn-vp-content-wrapper {
+    width: 350px !important;
+  }
+}
+
+/* Available on mobile and tab only */
+.rcn-vp-floor-selector-form {
+  max-width: 330px;
+  margin: auto;
+}
+
+.rcn-vp-floor-selector-form button {
+  display: none;
+}
+
 .rcn-vtsb {
   height: 430px;
 }
@@ -33,6 +76,18 @@
 
 .rcn-vtsb-e-column {
   width: 358px !important;
+}
+
+@media screen and (max-width: 1030px) {
+  .rcn-vp-floor-1-selector-btn,
+  .rcn-vp-floor-2-selector-btn,
+  .rcn-vp-floor-3-selector-btn {
+    display: none;
+  }
+
+  .rcn-vp-cart-wrapper {
+    display: none !important;
+  }
 }
 
 .rcn-vtsb .simplebar-track.simplebar-vertical,
@@ -49,15 +104,15 @@
 }
 
 .rcn-vtsb .simplebar-track.simplebar-vertical {
-  width: 15px !important;
+  width: 10px !important;
 }
 
 .rcn-vtsb .simplebar-scrollbar.simplebar-visible:before {
-  width: 8px;
+  width: 5px;
 }
 
 .rcn-vpciw .simplebar-track.simplebar-vertical {
-  width: 10px !important;
+  width: 1px !important;
 }
 
 .rcn-vpciw .simplebar-scrollbar.simplebar-visible:before {
@@ -77,6 +132,16 @@
   width: 75px;
   height: 75px;
   text-align: center;
+}
+
+@media screen and (max-width: 770px) {
+  .rcn-vp-step-indicator h2 {
+    width: 65px;
+    height: 65px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 /* Table listing styles */
@@ -193,12 +258,22 @@
   overflow-x: hidden;
 }
 
-.rcn-vpciw.disable-scroll {
-  overflow: hidden;
+@media screen and (max-width: 1030px) {
+  .rcn-vpciw {
+    height: 230px;
+    overflow-x: hidden;
+  }
 }
 
 .rcn-vpciw ul {
   margin-left: 0px;
+}
+
+.rcn-vpciw.disable-scroll ul {
+  overflow: hidden;
+  height: 100%;
+  overflow: hidden;
+  margin-bottom: 0px;
 }
 
 .rcn-vp-cart-listing {
@@ -207,37 +282,111 @@
   font-style: normal;
   font-weight: 400;
   line-height: normal;
-  display: inline-flex;
+  display: flex;
   padding: 10px 15px;
   align-items: flex-start;
   gap: 15px;
 }
 
-.rcn-vp-cart-listing .name {
-  width: 200px;
+.rcn-vp-cart-name-header {
+  margin-right: 15px;
 }
 
-.rcn-vp-cart-listing .quantity {
-  width: 26px;
+.rcn-vp-cart-quantity-header {
+  margin-right: 16px;
 }
 
-.rcn-vp-cart-listing .price {
-  width: 62px;
+.rcn-vp-cart-price-header {
+  margin-right: 15px;
 }
 
-.rcn-vp-cart-listing .remove {
-  width: 48px;
-  font-size: 11px;
+.rcn-vp-cart-listing-remove {
   cursor: pointer;
+}
+
+.rcn-vp-cart-listing-meta {
+  display: flex;
+  gap: 15px;
+}
+
+.rcn-vp-cart-name-header,
+.rcn-vp-cart-listing-name {
+  width: 170px !important;
+}
+
+.rcn-vp-cart-quantity-header,
+.rcn-vp-cart-listing-quantity {
+  width: 26px !important;
+}
+
+.rcn-vp-cart-price-header,
+.rcn-vp-cart-listing-price {
+  width: 80px !important;
+}
+
+.rcn-vp-cart-remove-header,
+.rcn-vp-cart-listing-remove {
+  width: 58px !important;
+}
+
+.rcn-vp-cart-listing-label {
+  display: none;
+}
+
+@media screen and (max-width: 767px) {
+  .rcn-vpciw {
+    height: 276px;
+  }
+
+  .rcn-vp-cart-listing {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .rcn-vp-cart-listing-name {
+    color: var(--e-global-color-secondary);
+    width: 100% !important;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .rcn-vp-cart-listing-meta {
+    width: 100%;
+    gap: 5px;
+  }
+
+  .rcn-vp-cart-listing-label,
+  .rcn-vp-cart-listing-quantity,
+  .rcn-vp-cart-listing-price,
+  .rcn-vp-cart-listing-remove {
+    display: inline-block;
+    margin-right: 2px;
+    color: var(--e-global-color-126a520);
+    font-size: 11px;
+    font-weight: 400;
+  }
+
+  .rcn-vp-cart-listing-quantity {
+    width: 35px !important;
+  }
+
+  .rcn-vp-cart-listing-price {
+    width: 170px !important;
+  }
+
+  .rcn-vp-cart-listing-remove {
+    width: 58px !important;
+  }
 }
 
 .rcn-vp-cart-listing .remove:active {
   transform: scale(0.8);
 }
 
-.rcn-vp-cart-message {
-  color: #008000;
+.rcn-vp-cart-notification {
   background: #ffffff9e;
+  text-align: center;
   width: 100%;
   height: 100%;
   padding: 12px;
@@ -247,6 +396,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.rcn-vp-cart-info-notification {
+  color: var(--e-global-color-secondary);
+}
+
+.rcn-vp-success-notification {
+  color: var(--e-global-color-secondary);
+}
+
+.rcn-vp-error-notification {
+  color: var(--e-global-color-secondary);
 }
 
 /* Vendor package add-ons */
