@@ -23,6 +23,7 @@
 
     // custom according boxes used for package addons
     rcn_vpcb($);
+    rcn_vpAddonsHandler($);
 
     rcn_cartInitializer($);
 
@@ -734,20 +735,28 @@ function rcn_vpCartVisualInteraction(
     // Populate the cart items
     for (let i = 0; i < cartItems.length; i++) {
       const element = cartItems[i];
+      const item = cartItems[i];
       const uniqueIdentifier = element.id;
 
       const cartItem = $('<li>');
-      const cartItemContent =
-        '<span class="name">' +
-        element.name +
-        '</span>' +
-        '<span class="quantity">' +
-        element.quantity +
-        '</span>' +
-        '<span class="price">' +
-        rcn_vpPriceFormatter(Number(element.price), 2) +
-        '</span>' +
-        '<span class="remove">Remove</span>';
+      const cartItemContent = `
+        <div class="rcn-vp-cart-listing-name">
+          ${item.name}
+        </div>
+        <div class="rcn-vp-cart-listing-meta">
+          <span class="rcn-vp-cart-listing-quantity">
+            <span class="rcn-vp-cart-listing-label">Qty:</span>
+            ${item.quantity}
+          </span>
+          <span class="rcn-vp-cart-listing-price">
+            <span class="rcn-vp-cart-listing-label">Subtotal:</span>
+            ${rcn_vpPriceFormatter(Number(item.price), 2)}
+          </span>
+          <span data-product-id="${uniqueIdentifier}" class="rcn-vp-cart-listing-remove">
+          Remove
+          </span>
+        </div>
+        `;
 
       cartItem.append(cartItemContent);
       cartItem.addClass('rcn-vp-cart-listing-' + uniqueIdentifier);
@@ -762,9 +771,8 @@ function rcn_vpCartVisualInteraction(
     cartContainer.find('ul > li:nth-child(even)').css('background', '#F2F4F8');
 
     // Add click event for the remove button
-    $('.remove').on('click', function () {
-      let productID = $(this).parent();
-      productID = productID.attr('data-product-id');
+    $('.rcn-vp-cart-listing-remove').on('click', function () {
+      let productID = $(this).attr('data-product-id');
 
       rcn_vpRemoveProductFromCart($, productID);
     });
@@ -982,7 +990,7 @@ function rcn_vpRemoveProductFromCart($, productID) {
   if (!isProductInCart) {
     notification = {
       type: 'error',
-      message: 'The item does not exist in cart',
+      message: 'Unidentified product',
     };
     rcn_vpCartVisualInteraction($, false, notification);
     return;
@@ -1141,5 +1149,34 @@ function rcn_vpAddOnsAddToCart($, productID) {
       $('.' + notificationContainerClass).remove();
       cartContainer.removeClass(disableScrollClass);
     }, 700);
+  }
+}
+
+function rcn_vpAddonsHandler($) {
+  const addonsIDs = [9481, 9473, 17630, 9480, 9475, 9476, 9474, 9479];
+
+  for (let i = 0; i < addonsIDs.length; i++) {
+    const ID = addonsIDs[i];
+    const uniqueIdentifier = 'rcn-vpaa-' + ID;
+
+    $.ajax({
+      type: 'POST',
+      url: window.rcn_vpAjaxurl,
+      data: {
+        action: 'rcn_vp_addons_stock_checker',
+        productID: ID,
+      },
+      success: function (response) {
+        response = JSON.parse(response);
+
+        if (response.status && response.stock_quantity === 0) {
+          $('.' + uniqueIdentifier).find('.rcn-vpaa-oosi').css('display', 'block');
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error(xhr.responseText);
+        return false;
+      },
+    });
   }
 }

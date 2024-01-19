@@ -3,6 +3,28 @@
  * included in this file.
  */
 
+ /* Targeting the entire scrollbar */
+ .rcn-vpciw::-webkit-scrollbar {
+  width: 0px; /* Set the width of the scrollbar */
+}
+
+/* Track (the area the thumb moves along) */
+.rcn-vpciw::-webkit-scrollbar-track {
+  background-color: #f1f1f1; /* Set the background color of the track */
+}
+
+/* Handle (the draggable part of the scrollbar) */
+.rcn-vpciw::-webkit-scrollbar-thumb {
+  background-color: #888; /* Set the color of the thumb */
+  border-radius: 6px; /* Set the border radius of the thumb */
+}
+
+/* Handle on hover */
+.rcn-vpciw::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Set the color of the thumb on hover */
+}
+
+
 /* ------------------------------------------
  CSS for attendee tickets for vendor page
  --------------------------------------------- */
@@ -82,15 +104,15 @@
 }
 
 .rcn-vtsb .simplebar-track.simplebar-vertical {
-  width: 15px !important;
+  width: 10px !important;
 }
 
 .rcn-vtsb .simplebar-scrollbar.simplebar-visible:before {
-  width: 8px;
+  width: 5px;
 }
 
 .rcn-vpciw .simplebar-track.simplebar-vertical {
-  width: 10px !important;
+  width: 1px !important;
 }
 
 .rcn-vpciw .simplebar-scrollbar.simplebar-visible:before {
@@ -238,7 +260,7 @@
 
 @media screen and (max-width: 1030px) {
   .rcn-vpciw {
-    height: 210px;
+    height: 230px;
     overflow-x: hidden;
   }
 }
@@ -260,7 +282,7 @@
   font-style: normal;
   font-weight: 400;
   line-height: normal;
-  display: inline-flex;
+  display: flex;
   padding: 10px 15px;
   align-items: flex-start;
   gap: 15px;
@@ -278,34 +300,83 @@
   margin-right: 15px;
 }
 
-.rcn-vp-cart-listing .remove {
+.rcn-vp-cart-listing-remove {
   cursor: pointer;
 }
 
+.rcn-vp-cart-listing-meta {
+  display: flex;
+  gap: 15px;
+}
+
 .rcn-vp-cart-name-header,
-.rcn-vp-cart-listing .name {
+.rcn-vp-cart-listing-name {
   width: 170px !important;
 }
 
 .rcn-vp-cart-quantity-header,
-.rcn-vp-cart-listing .quantity {
+.rcn-vp-cart-listing-quantity {
   width: 26px !important;
 }
 
 .rcn-vp-cart-price-header,
-.rcn-vp-cart-listing .price {
+.rcn-vp-cart-listing-price {
   width: 80px !important;
 }
 
 .rcn-vp-cart-remove-header,
-.rcn-vp-cart-listing .remove {
+.rcn-vp-cart-listing-remove {
   width: 58px !important;
 }
 
-@media screen and (max-width: 1030px) {
-  .rcn-vp-cart-name-header,
-  .rcn-vp-cart-listing .name {
-    width: 195px;
+.rcn-vp-cart-listing-label {
+  display: none;
+}
+
+@media screen and (max-width: 767px) {
+  .rcn-vpciw {
+    height: 276px;
+  }
+
+  .rcn-vp-cart-listing {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .rcn-vp-cart-listing-name {
+    color: var(--e-global-color-secondary);
+    width: 100% !important;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .rcn-vp-cart-listing-meta {
+    width: 100%;
+    gap: 5px;
+  }
+
+  .rcn-vp-cart-listing-label,
+  .rcn-vp-cart-listing-quantity,
+  .rcn-vp-cart-listing-price,
+  .rcn-vp-cart-listing-remove {
+    display: inline-block;
+    margin-right: 2px;
+    color: var(--e-global-color-126a520);
+    font-size: 11px;
+    font-weight: 400;
+  }
+
+  .rcn-vp-cart-listing-quantity {
+    width: 35px !important;
+  }
+
+  .rcn-vp-cart-listing-price {
+    width: 170px !important;
+  }
+
+  .rcn-vp-cart-listing-remove {
+    width: 58px !important;
   }
 }
 

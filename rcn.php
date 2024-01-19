@@ -277,6 +277,30 @@ function rcn_vp_addons_add_to_cart() {
 add_action( 'wp_ajax_rcn_vp_addons_add_to_cart', 'rcn_vp_addons_add_to_cart' );
 add_action( 'wp_ajax_nopriv_rcn_vp_addons_add_to_cart', 'rcn_vp_addons_add_to_cart' );
 
+function rcn_vp_addons_stock_checker() {
+	$product_id = isset( $_POST['productID'] ) ? intval( $_POST['productID'] ) : 0;
+
+	$result = Rcn_Utility::get_product_quantity( $product_id, 'stock' );
+
+	if ( is_wp_error( $result ) ) {
+		echo wp_json_encode(
+			array(
+				'status'  => false,
+				'message' => 'Error retrieving product quantity',
+			)
+		);
+		wp_die();
+	}
+
+	echo wp_json_encode(
+		$result
+	);
+	wp_die();
+}
+
+add_action( 'wp_ajax_rcn_vp_addons_stock_checker', 'rcn_vp_addons_stock_checker' );
+add_action( 'wp_ajax_nopriv_rcn_vp_addons_stock_checker', 'rcn_vp_addons_stock_checker' );
+
 function rcn_example() {
 
 	$product = wc_get_product( 28487 );
