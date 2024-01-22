@@ -5,7 +5,7 @@
    */
   window.rcn_vpAjaxurl = wp_ajax_object.ajax_url;
   window.rcn_vpCategoryID = 264; // RCN vendor package category
-  window.productID = 28462; // vendor table product
+  window.productID = 28462; // table wrapper product where each table is a variation
 
   /**
    * All of the js/jQuery code for vendor-package reside in this file.
@@ -246,9 +246,7 @@ function rcn_vpStepSwitchHandler($, totalSteps) {
   }
 
   if (activeStep > 0) {
-    let prevStepStatus = localStorage.getItem(
-      'rcn_vpStep' + (activeStep - 1)
-    );
+    let prevStepStatus = localStorage.getItem('rcn_vpStep' + (activeStep - 1));
 
     if (prevStepStatus === null) {
       console.error('Step ' + (activeStep - 1) + ' is required');
@@ -459,11 +457,12 @@ function rcn_vpCartVisualInteraction(
 
 /**
  * Calculates and updates the total price on vp cart.
- * @param {function} $ - jQuery library.
+ *
+ * @param {function} $ - jQuery reference.
  * @param {Array} cartItems - Array of cart items containing price information.
  */
 function rcn_vpCartCalculator($, cartItems) {
-  const priceElement = $('.rcn-vp-cart-total');
+  const priceElement = $('.rcn-vp-cart-total'); // The element that displays the cart total
 
   let totalPrice = 0;
 
@@ -482,8 +481,9 @@ function rcn_vpCartCalculator($, cartItems) {
 
 /**
  * Adds a product to the vp cart or loads cart data on page load using AJAX.
- * @param {function} $ - jQuery library.
- * @param {string} action - Specifies the action to perform ('loadCart' or 'updateCart').
+ *
+ * @param {function} $ - jQuery reference.
+ * @param {string} action - A flag('loadCart' or 'updateCart') specifies the action to perform.
  * @param {Object} cartItem - Object representing the product to be added to the cart.
  * @param {string} categoryID - ID of the product category.
  */
@@ -508,26 +508,7 @@ function rcn_addProductToCart($, action = 'loadCart', cartItem) {
         categoryID: categoryID,
       },
       success: function (response) {
-        try {
-          localStorage.setItem('rcn_vpCartData', response);
-          const cartItems = JSON.parse(response);
-
-          notification = {
-            type: 'success',
-            message: ''
-          };
-
-          // prettier-ignore
-          rcn_vpCartVisualInteraction($, true, notification, cartItems, callback, 2);
-        } catch (error) {
-          notification = {
-            type: 'error',
-            message: 'Something went wrong. <br />Please refresh the page.'
-          };
-          rcn_vpCartVisualInteraction($, false, notification);
-
-          console.error('Error parsing JSON response:', error);
-        }
+        loadCartItems(response);
       },
       error: function (xhr, status, error) {
         notification = {
@@ -576,6 +557,29 @@ function rcn_addProductToCart($, action = 'loadCart', cartItem) {
     localStorage.setItem('rcn_vpCartData', cartArray);
   }
 
+  function loadCartItems(response) {
+    try {
+      localStorage.setItem('rcn_vpCartData', response);
+      const cartItems = JSON.parse(response);
+
+      notification = {
+        type: 'success',
+        message: ''
+      };
+
+      // prettier-ignore
+      rcn_vpCartVisualInteraction($, true, notification, cartItems, callback, 2);
+    } catch (error) {
+      notification = {
+        type: 'error',
+        message: 'Something went wrong. <br />Please refresh the page.'
+      };
+      rcn_vpCartVisualInteraction($, false, notification);
+
+      console.error('Error parsing JSON response:', error);
+    }
+  }
+
   function callback(
     notificationContainerClass,
     cartContainer,
@@ -591,11 +595,12 @@ function rcn_addProductToCart($, action = 'loadCart', cartItem) {
 
 /**
  * Removes a product from the vp cart using AJAX and updates the cart visual interaction.
- * @param {function} $ - jQuery library.
+ *
+ * @param {function} $ - jQuery reference.
  * @param {string} productID - ID of the product to be removed from the cart.
  */
 function rcn_vpRemoveProductFromCart($, productID) {
-  const ajaxurl = wp_ajax_object.ajax_url;
+  const ajaxurl = window.rcn_vpAjaxurl;
   let cartArray = localStorage.getItem('rcn_vpCartData');
   let isProductInCart = false;
   let notification;
@@ -612,8 +617,8 @@ function rcn_vpRemoveProductFromCart($, productID) {
   }
 
   for (let i = 0; i < cartArray.length; i++) {
-    const element = cartArray[i];
-    if (productID == element.id) {
+    const item = cartArray[i];
+    if (productID == Number(item.id)) {
       isProductInCart = true;
       cartArray.splice(i, 1);
       break;
@@ -643,8 +648,8 @@ function rcn_vpRemoveProductFromCart($, productID) {
       action: 'rcn_vp_remove_product_from_cart',
       productID: productID,
     },
-    success: function (responseData) {
-      response = JSON.parse(responseData);
+    success: function (response) {
+      response = JSON.parse(response);
 
       if (!response.status) {
         notification = {
@@ -655,6 +660,8 @@ function rcn_vpRemoveProductFromCart($, productID) {
         rcn_vpCartVisualInteraction($, false, notification);
         return;
       }
+
+      handleSuccessfulProductRemoval(response);
     },
     error: function (xhr, status, error) {
       notification = {
@@ -663,39 +670,40 @@ function rcn_vpRemoveProductFromCart($, productID) {
       };
 
       rcn_vpCartVisualInteraction($, false, notification);
-      console.error(xhr.responseText);
-    },
-    complete: function () {
-      if (response && response.status) {
-        notification = {
-          type: 'success',
-          message: '',
-        };
-
-        rcn_vpCartVisualInteraction($, true, notification, cartArray, callback);
-
-        cartArray = JSON.stringify(cartArray);
-        localStorage.setItem('rcn_vpCartData', cartArray);
-      }
-
-      $('.rcn-vp-table-wrapper-ul li').each(function () {
-        const element = $(this)
-          .find('.rcn-vp-table-action')
-          .attr('data-table-id');
-
-        if (Number(element) === response.variation_id) {
-          $(this)
-            .attr('data-is-unavailable', false)
-            .removeClass('rcn-vp-selected-table')
-            .addClass('rcn-vp-available-table')
-            .find('i')
-            .removeClass('fa-check')
-            .addClass('fa-plus')
-            .prop('disabled', false);
-        }
-      });
+      console.error(xhr.responseText + 'JJJ');
     },
   });
+
+  function handleSuccessfulProductRemoval(response) {
+    if (response && response.status) {
+      notification = {
+        type: 'success',
+        message: '',
+      };
+
+      rcn_vpCartVisualInteraction($, true, notification, cartArray, callback);
+
+      cartArray = JSON.stringify(cartArray);
+      localStorage.setItem('rcn_vpCartData', cartArray);
+    }
+
+    $('.rcn-vp-table-wrapper-ul li').each(function () {
+      const tableID = $(this)
+        .find('.rcn-vp-table-action')
+        .attr('data-table-id');
+
+      if (Number(tableID) === response.variation_id) {
+        $(this)
+          .attr('data-is-unavailable', false)
+          .removeClass('rcn-vp-selected-table')
+          .addClass('rcn-vp-available-table')
+          .find('i')
+          .removeClass('fa-check')
+          .addClass('fa-plus')
+          .prop('disabled', false);
+      }
+    });
+  }
 
   function callback(
     notificationContainerClass,
@@ -717,16 +725,12 @@ function rcn_vpRemoveProductFromCart($, productID) {
  * displaying the corresponding floor plan image and passing floor tables to the
  * rcn_vpTableListingHandler function based on the selected floorNumber.
  *
- * @param {jQuery} $ - jQuery selector for the target element.
- * @param {number} floorNumber - Selected floor number (default is 1).
- * @param {number} productID - Product ID representing the vendor table.
- * @param {string} rcn_ajaxurl - AJAX URL for server communication.
+ * @param {jQuery} $ - jQuery reference.
  * @returns {void} - No return value.
  */
 function rcn_floorSelectionHandler($) {
-  console.log('Hello, World');
   let floorNumber = localStorage.getItem('rcn_activeFloorNumber');
-  const productID = window.productID; // table wrapper product
+  const productID = window.productID; // table wrapper product where each table is a variation
 
   if (!floorNumber) {
     localStorage.setItem('rcn_activeFloorNumber', 1);
@@ -788,6 +792,7 @@ function rcn_floorSelectionHandler($) {
     {no: 45, id: 28507},
   ];
 
+  // Toggle floor plan map/image
   $('.rcn-vp-floor-1').toggle(floorNumber === 1);
   $('.rcn-vp-floor-2').toggle(floorNumber === 2);
   $('.rcn-vp-floor-3').toggle(floorNumber === 3);
@@ -806,78 +811,64 @@ function rcn_floorSelectionHandler($) {
 }
 
 /**
- * Initializes and manages table listings, checking availability and cart status.
+ * Initializes and manages table listings, checking availability.
  *
  * This function sets up the table listing functionality, creates listings based on
- * provided variation/table IDs, and handles table availability and cart status.
+ * provided variation/table IDs, and handles table availability.
  *
  * Key Features:
  * - Initializes table listing functionality.
  * - Creates listings based on provided variation/table IDs.
- * - Handles table availability and cart status.
- *
- * When a table is in the cart:
- * - Disables 'add to cart' for all li tags.
+ * - Handles table availability.
  *
  * When a table is available:
  * - Enables 'add to cart' for available tables.
+ * - disable 'add to cart' for unavailable tables.
  *
  * Click Handlers:
  * - Handles clicks on li tags.
  * - Handles clicks on the plus icon associated with available tables.
  *
- * @param {jQuery} $ - jQuery selector for the target element.
+ * @param {jQuery} $ - jQuery reference.
  * @param {Array} tables - Array of variation/table IDs.
  * @param {number} productID - Product ID representing the vendor table.
- * @param {string} rcn_ajaxurl - AJAX URL for server communication.
  * @returns {void} - No return value.
  */
 function rcn_vpTableListingHandler($, tables, productID) {
   // Initializes table listing functionality
-  const targetDiv = $('#rcn-vp-table-listing-container');
-  const rcn_ajaxurl = wp_ajax_object.ajax_url;
-  const ul = $('<ul>');
+  const tableListingContainer = $('#rcn-vp-table-listing-container');
+  const rcn_ajaxurl = window.rcn_vpAjaxurl;
+  const tableListingWrapper = $('<ul>');
 
-  ul.addClass('rcn-vp-table-wrapper-ul');
+  tableListingWrapper.addClass('rcn-vp-table-wrapper-ul');
 
   let action = '<small class="rcn-vp-table-meta">Checking</small>';
-  let tableDataInCart = {
-    status: false,
-    tableNo: null,
-    variationID: null,
-  };
-  tableDataInCart = JSON.stringify(tableDataInCart);
 
-  targetDiv.empty();
-  let isTableInCart = localStorage.getItem('rcn_vpIsTableAddedToCart');
-
-  if (!isTableInCart) {
-    localStorage.setItem('rcn_vpIsTableAddedToCart', tableDataInCart);
-  }
+  tableListingContainer.empty();
 
   // Create listings based on provided variation/table IDs
   for (let i = 0; i < tables.length; i++) {
     const table = tables[i];
 
-    ul.append(
+    tableListingWrapper.append(
       `<li data-is-unavailable="true" class="rcn-vp-unavailable-table table-${table.no}" data-table-no="${table.no}">
         Table - ${table.no}${action}
       </li>`
     );
   }
 
-  rcn_tableAvailabilityHandler($, tables, rcn_ajaxurl, productID, targetDiv);
+  rcn_tableAvailabilityHandler($, tables, tableListingContainer);
 
   // Handles clicks on li tags
-  ul.on('click', 'li', function () {
-    rcn_handleClickOnLi($, $(this), ul);
+  tableListingWrapper.on('click', 'li', function () {
+    rcn_handleClickOnLi($, $(this));
   });
 
-  ul.on('click', '.rcn-vp-table-action', function () {
-    rcn_tableActionHandler($, ul, $(this), productID, rcn_ajaxurl);
+  tableListingWrapper.on('click', '.rcn-vp-table-action', function () {
+    rcn_tableActionHandler($, $(this));
   });
 
-  targetDiv.append(ul);
+  tableListingContainer.append(tableListingWrapper);
 }
 
 /**
@@ -887,20 +878,19 @@ function rcn_vpTableListingHandler($, tables, productID) {
  * and based on the response, it updates the UI elements of the tables in the targetDiv.
  * It also considers the reservation and cart status to apply proper styling.
  *
- * @param {jQuery} $ - jQuery selector for the target element.
+ * @param {jQuery} $ - jQuery reference.
  * @param {Array} tables - Array of table objects with 'id' and 'no' properties.
- * @param {string} rcn_ajaxurl - AJAX URL for server communication.
- * @param {number} productID - Product ID representing the vendor table.
- * @param {jQuery} targetDiv - jQuery selector for the target container.
+ * @param {jQuery} tableListingContainer - jQuery selector for the target container.
  * @returns {void} - No return value.
  */
 function rcn_tableAvailabilityHandler(
   $,
   tables,
-  rcn_ajaxurl,
-  productID,
-  targetDiv
+  tableListingContainer
 ) {
+  const rcn_ajaxurl = window.rcn_vpAjaxurl;
+  const productID = window.productID;
+
   function iconElement(iconClass, tableId) {
     return `<i data-table-id="${tableId}" aria-hidden="true" class="fas ${iconClass} rcn-vp-table-action"></i>`;
   }
@@ -930,12 +920,13 @@ function rcn_tableAvailabilityHandler(
   }
 
   function availableTableHandler(response, table) {
-    const jsonResponse = JSON.parse(response);
-    const status = jsonResponse.status;
+    response = JSON.parse(response);
+    const status = response.status;
+    const tableElement = $(tableListingContainer).find('.table-' + table.no);
+
     const action = status
-      ? iconElement('fa-plus', table.id)
-      : reservedElement(table.id);
-    const tableElement = $(targetDiv).find('.table-' + table.no);
+    ? iconElement('fa-plus', table.id)
+    : reservedElement(table.id);
     tableElement.find('small').replaceWith(() => $(action));
 
     // If the table is already reserved
@@ -952,7 +943,7 @@ function rcn_tableAvailabilityHandler(
       tableElement.removeClass('rcn-vp-unavailable-table');
       tableElement.addClass('rcn-vp-selected-table');
       tableElement.find('.fa-plus').replaceWith(() => $(iconElement('fa-check', table.id))); // prettier-ignore
-      tableElement.find('i').prop('disabled', true);
+      tableElement.find('.rcn-vp-table-action').prop('disabled', true);
       return;
     }
 
@@ -968,26 +959,25 @@ function rcn_tableAvailabilityHandler(
 /**
  * Handles the click event on a table item/li.
  *
+ * @param {jQuery} $ - jQuery reference.
  * @param {jQuery} clickedItem - The jQuery object representing the clicked table item/li.
- * @param {jQuery} ul - The jQuery object representing the parent unordered list of table items.
  * @returns {void} - The function doesn't return a value.
  */
 function rcn_handleClickOnLi($, clickedItem) {
-  let ul = $('.rcn-vp-table-wrapper-ul');
-  var isAvailable = clickedItem.data('is-unavailable') === false;
-  let isTableInCart;
+  const tableListingWrapper = $('.rcn-vp-table-wrapper-ul');
+  const isAvailable = clickedItem.data('is-unavailable') === false;
   let cartItems = localStorage.getItem('rcn_vpCartData');
+  let isTableInCart;
 
   cartItems = JSON.parse(cartItems);
   cartItems = cartItems ? cartItems.map((item) => item.id) : [];
 
-  ul.find('li').each(function () {
+  tableListingWrapper.find('li').each(function () {
     const table = $(this);
     const tableID = table.find('.rcn-vp-table-action').attr('data-table-id');
 
     isTableInCart = cartItems.includes(Number(tableID));
 
-    console.log(cartItems);
     if (isTableInCart) return;
 
     if (isAvailable && !isTableInCart) {
@@ -998,7 +988,6 @@ function rcn_handleClickOnLi($, clickedItem) {
 
       clickedItem.addClass('rcn-vp-selected-table');
       clickedItem.removeClass('rcn-vp-available-table');
-      rcn_highlightTableOnFloorPlan();
     }
   });
 }
@@ -1006,13 +995,13 @@ function rcn_handleClickOnLi($, clickedItem) {
 /**
  * Handles the click event on table action icons and performs actions based on server response.
  *
- * @param {jQuery} $ - jQuery selector for the target element.
- * @param {jQuery} ul - The parent <ul> element containing the table listings.
- * @param {number} productID - The product ID representing the vendor tables.
- * @param {string} rcn_ajaxurl - The AJAX URL for server communication.
+ * @param {jQuery} $ - jQuery reference.
+ * @param {jQuery} actionBtn - the table add to cart actionBtn.
  * @returns {void} - No return value.
  */
-function rcn_tableActionHandler($, ul, actionBtn, productID, rcn_ajaxurl) {
+function rcn_tableActionHandler($, actionBtn) {
+  const rcn_ajaxurl = window.rcn_vpAjaxurl;
+  const productID = window.productID;
   const variationID = actionBtn.attr('data-table-id');
   const tableNo = actionBtn.parent().attr('data-table-no');
   const actionIcon = actionBtn;
@@ -1025,8 +1014,8 @@ function rcn_tableActionHandler($, ul, actionBtn, productID, rcn_ajaxurl) {
   actionIcon.removeClass('fa-plus').addClass('fa-spinner');
   rcn_vpCartVisualInteraction($, false, notification);
 
-  // Storing the current parent element
-  const parentElement = actionBtn.parent();
+  // Storing the current table listing element
+  const tableElement = actionBtn.parent();
 
   $.ajax({
     type: 'POST',
@@ -1041,12 +1030,12 @@ function rcn_tableActionHandler($, ul, actionBtn, productID, rcn_ajaxurl) {
 
       // 1002 means, the table is recently reserved by someone else
       if (result.availability_code === 1002) {
-        parentElement.removeClass('rcn-vp-selected-table');
-        parentElement.removeClass('rcn-vp-available-table');
-        parentElement.addClass('rcn-vp-unavailable-table');
-        parentElement.prop('disabled', true);
+        tableElement.removeClass('rcn-vp-selected-table');
+        tableElement.removeClass('rcn-vp-available-table');
+        tableElement.addClass('rcn-vp-unavailable-table');
+        tableElement.prop('disabled', true);
 
-        parentElement.attr('data-is-unavailable', true);
+        tableElement.attr('data-is-unavailable', true);
 
         actionIcon.replaceWith($('<small>Reserved</small>'));
       }
@@ -1067,8 +1056,8 @@ function rcn_tableActionHandler($, ul, actionBtn, productID, rcn_ajaxurl) {
 
         actionIcon.removeClass('fa-spinner').addClass('fa-check');
 
-        parentElement.find('.rcn-vp-table-action').prop('disabled', true);
-        parentElement.attr('data-is-unavailable', true);
+        tableElement.find('.rcn-vp-table-action').prop('disabled', true);
+        tableElement.attr('data-is-unavailable', true);
       }
     },
     error: function (xhr, status, error) {
