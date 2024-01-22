@@ -88,13 +88,23 @@ function run_rcn() {
 run_rcn();
 
 /**
- * Undocumented function
+ * Temporary Placement for Vendor Package Ajax Functions
+ *
+ * These Ajax functions are currently placed here to address issues with the vendor package.
+ * When initially placed with the other callbacks, they weren't functioning correctly.
+ * A more permanent solution for Ajax callbacks is under consideration.
+ *
+ * Note: This placement is intended to resolve immediate issues and will be revisited for a cleaner organization.
+ */
+
+/**
+ * Vendor package table availability checker
  *
  * @return void
  */
 function is_table_available() {
 	$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0; // phpcs:ignore
-	$quantity = isset( $_POST['variation_id'] ) ? intval( $_POST['variation_id'] ) : 0; // phpcs:ignore
+	$quantity 	= isset( $_POST['variation_id'] ) ? intval( $_POST['variation_id'] ) : 0; // phpcs:ignore
 
 	$result = Rcn_Utility::get_product_quantity( $product_id, 'stock', $quantity );
 
@@ -134,7 +144,11 @@ add_action( 'wp_ajax_nopriv_is_table_available', 'is_table_available' );
 
 
 /**
- * Undocumented function
+ * Handle vendor's table add to cart request
+ *
+ * We are using a status codes to inform the frontend about table's stock status.
+ * 1001 indicates that, the table is available for reservation
+ * 1002 indicates that, the table is out of stock.
  *
  * @return void
  */
@@ -174,7 +188,7 @@ add_action( 'wp_ajax_rcn_table_add_to_cart_handler', 'rcn_table_add_to_cart_hand
 add_action( 'wp_ajax_nopriv_rcn_table_add_to_cart_handler', 'rcn_table_add_to_cart_handler' );
 
 /**
- * Undocumented function
+ * The function loads products for vendor package cart
  *
  * @return void
  */
@@ -217,7 +231,7 @@ add_action( 'wp_ajax_rcn_get_vp_products', 'rcn_get_vp_products' );
 add_action( 'wp_ajax_nopriv_rcn_get_vp_products', 'rcn_get_vp_products' );
 
 /**
- * Undocumented function
+ * Handles product removal requests from vendor cart
  *
  * @return void
  */
@@ -247,38 +261,47 @@ function rcn_vp_remove_product_from_cart() {
 add_action( 'wp_ajax_rcn_vp_remove_product_from_cart', 'rcn_vp_remove_product_from_cart' );
 add_action( 'wp_ajax_nopriv_rcn_vp_remove_product_from_cart', 'rcn_vp_remove_product_from_cart' );
 
- // phpcs:disabled
-
+/**
+ * Handles add-ons add to cart on vendor package
+ *
+ * @return void
+ */
 function rcn_vp_addons_add_to_cart() {
 	$product_id = isset( $_POST['productID'] ) ? intval( $_POST['productID'] ) : 0; // phpcs:ignore
-	$product = wc_get_product( $product_id );
+	$product    = wc_get_product( $product_id );
 
 	$result = Rcn_Utility::add_to_cart( $product_id );
 
-	$cart_quantity =  Rcn_Utility::get_product_quantity( $product_id, 'cart' );
-	$cart_quantity =  $cart_quantity['cart_quantity'] ? $cart_quantity['cart_quantity'] : 0;
-	$name = $product->get_name();
-	$price = $product->get_price();
-	$status_code = $result['status_code'] ? $result['status_code'] : 0;
+	$cart_quantity = Rcn_Utility::get_product_quantity( $product_id, 'cart' );
+	$cart_quantity = $cart_quantity['cart_quantity'] ? $cart_quantity['cart_quantity'] : 0;
+	$name          = $product->get_name();
+	$price         = $product->get_price();
+	$status_code   = $result['status_code'] ? $result['status_code'] : 0;
 
-
-	echo wp_json_encode( array(
-		'status' => $result['status'],
-		'message' => $result['message'],
-		'status_code' => $status_code,
-		'productID' => $product_id,
-		'name' => $name,
-		'cart_quantity' => $cart_quantity,
-		'price' => $price
-	) );
+	echo wp_json_encode(
+		array(
+			'status'        => $result['status'],
+			'message'       => $result['message'],
+			'status_code'   => $status_code,
+			'productID'     => $product_id,
+			'name'          => $name,
+			'cart_quantity' => $cart_quantity,
+			'price'         => $price,
+		)
+	);
 	wp_die();
 }
 
 add_action( 'wp_ajax_rcn_vp_addons_add_to_cart', 'rcn_vp_addons_add_to_cart' );
 add_action( 'wp_ajax_nopriv_rcn_vp_addons_add_to_cart', 'rcn_vp_addons_add_to_cart' );
 
+/**
+ * Handles addons status checker for vendor package
+ *
+ * @return void
+ */
 function rcn_vp_addons_stock_checker() {
-	$product_id = isset( $_POST['productID'] ) ? intval( $_POST['productID'] ) : 0;
+	$product_id = isset( $_POST['productID'] ) ? intval( $_POST['productID'] ) : 0; // phpcs:ignore
 
 	$result = Rcn_Utility::get_product_quantity( $product_id, 'stock' );
 
@@ -300,16 +323,3 @@ function rcn_vp_addons_stock_checker() {
 
 add_action( 'wp_ajax_rcn_vp_addons_stock_checker', 'rcn_vp_addons_stock_checker' );
 add_action( 'wp_ajax_nopriv_rcn_vp_addons_stock_checker', 'rcn_vp_addons_stock_checker' );
-
-function rcn_example() {
-
-	$product = wc_get_product( 28487 );
-
-	echo '<pre>';
-	var_dump(get_permalink( get_the_ID() ));
-	echo '</pre>';
-
-	// wp_die();
-}
-
-// phpcs:enabled

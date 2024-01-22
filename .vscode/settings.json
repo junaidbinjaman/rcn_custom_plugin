@@ -19,6 +19,7 @@
         "vpci",
         "vpciw",
         "vsc",
-        "vtsb"
+        "vtsb",
+        "wppb"
     ]
 }

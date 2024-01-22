@@ -61,6 +61,11 @@ class Rcn_Public {
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rcn-public.css', array(), $this->version, 'all' );
 		wp_enqueue_style( 'custom-scrollbar-styles', '//cdn.jsdelivr.net/npm/simplebar@6.2.5/dist/simplebar.css', array(), $this->version, 'all' );
+
+		// 27943 is vendor package page id
+		if ( is_page( 27943 ) ) {
+			wp_enqueue_style( 'rcn-vendor-package', plugin_dir_url( __FILE__ ) . 'css/rcn-vendor-package.css', array(), $this->version, 'all' );
+		}
 	}
 
 	/**
@@ -72,6 +77,7 @@ class Rcn_Public {
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rcn-public.js', array( 'jquery' ), $this->version, false );
 		wp_enqueue_script( 'custom-scrollbar-scripts', '//cdn.jsdelivr.net/npm/simplebar@6.2.5/dist/simplebar.min.js', array(), $this->version, false );
 
+		// 27943 is vendor package page id
 		if ( is_page( 27943 ) ) {
 			wp_enqueue_script( 'vendor-package', plugin_dir_url( __FILE__ ) . 'js/rcn-vendor-package.js', array( 'jquery' ), $this->version, 'all' );
 			wp_localize_script( 'vendor-package', 'wp_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
