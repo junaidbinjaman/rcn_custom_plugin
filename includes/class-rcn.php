@@ -76,7 +76,9 @@ class Rcn {
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
-		$this->define_public_hooks();
+		if ( ! is_admin() ) {
+			$this->define_public_hooks();
+		}
 	}
 
 	/**

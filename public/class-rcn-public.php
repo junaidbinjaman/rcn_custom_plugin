@@ -53,46 +53,34 @@ class Rcn_Public {
 	}
 
 	/**
-	 * Register the stylesheets for the public-facing side of the site.
+	 * Register the stylesheets for the public facing area.
 	 *
 	 * @since    1.0.0
 	 */
 	public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Rcn_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Rcn_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rcn-public.css', array(), $this->version, 'all' );
+		wp_enqueue_style( 'custom-scrollbar-styles', '//cdn.jsdelivr.net/npm/simplebar@6.2.5/dist/simplebar.css', array(), $this->version, 'all' );
+
+		// 27943 is vendor package page id
+		if ( is_page( 27943 ) ) {
+			wp_enqueue_style( 'rcn-vendor-package', plugin_dir_url( __FILE__ ) . 'css/rcn-vendor-package.css', array(), $this->version, 'all' );
+		}
 	}
 
 	/**
-	 * Register the JavaScript for the public-facing side of the site.
+	 * The function enqueue public facing js code file.
 	 *
-	 * @since    1.0.0
+	 * @return void
 	 */
 	public function enqueue_scripts() {
-
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Rcn_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Rcn_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
-
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rcn-public.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( 'custom-scrollbar-scripts', '//cdn.jsdelivr.net/npm/simplebar@6.2.5/dist/simplebar.min.js', array(), $this->version, false );
+
+		// 27943 is vendor package page id
+		if ( is_page( 27943 ) ) {
+			wp_enqueue_script( 'vendor-package', plugin_dir_url( __FILE__ ) . 'js/rcn-vendor-package.js', array( 'jquery' ), $this->version, 'all' );
+			wp_localize_script( 'vendor-package', 'wp_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+		}
 	}
 }
