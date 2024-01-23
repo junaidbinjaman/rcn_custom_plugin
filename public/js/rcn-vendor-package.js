@@ -4,7 +4,7 @@
    * Global variable declarations
    */
   window.rcn_vpAjaxurl = wp_ajax_object.ajax_url;
-  window.rcn_vpCategoryID = 264; // RCN vendor package category
+  window.rcn_vpCategoryID = 504; // RCN vendor package category
   window.productID = 28462; // table wrapper product where each table is a variation
 
   /**
@@ -21,7 +21,7 @@
 
     $('.rcn-vp-floating-cart').on('click', function () {
       setTimeout(function () {
-        rcn_cartInitializer($);
+        rcn_vpCartInitializer($);
       }, 100);
     });
   });
@@ -148,7 +148,7 @@ function rcn_vpPriceFormatter(price, decimal) {
  * @returns {void} - The return type is 'void' as the purpose is to update the active step, not to return a value.
  */
 function rcn_vpPrevNextButtonHandler($, flag = null) {
-  const totalSteps = 2; // starts from 0. So 0 means 1 step and 2 means 3 steps
+  const totalSteps = 1; // starts from 0. So 0 means 1 step and 2 means 3 steps
 
   if (!localStorage.getItem('rcn_vpActiveStep')) {
     localStorage.setItem('rcn_vpActiveStep', 0);
@@ -195,7 +195,6 @@ function rcn_vpPrevNextButtonHandler($, flag = null) {
  * @returns {void} - The function doesn't return a value.
  */
 function rcn_vpStepSwitchHandler($, totalSteps) {
-  let rcn_ajaxurl = window.window.rcn_vpAjaxurl;
   let activeStep = localStorage.getItem('rcn_vpActiveStep');
   let totalCartItems = localStorage.getItem('rcn_vpCartData');
 
@@ -223,11 +222,7 @@ function rcn_vpStepSwitchHandler($, totalSteps) {
   // Sources for prev, next and checkout buttons
   $('.rcn_vps-prev-button').toggle(activeStep > 0);
   $('.rcn_vps-next-button').toggle(activeStep < totalSteps);
-  $('.rcn_vps-checkout-button').hide();
-
-  if (totalCartItems) {
-    $('.rcn_vps-checkout-button').toggle(activeStep === totalSteps);
-  }
+  $('.rcn_vps-checkout-button').toggle(activeStep === totalSteps);
 
   // Sources for step hide and show
   for (let i = 0; i <= totalSteps; i++) {
@@ -883,11 +878,7 @@ function rcn_vpTableListingHandler($, tables, productID) {
  * @param {jQuery} tableListingContainer - jQuery selector for the target container.
  * @returns {void} - No return value.
  */
-function rcn_tableAvailabilityHandler(
-  $,
-  tables,
-  tableListingContainer
-) {
+function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
   const rcn_ajaxurl = window.rcn_vpAjaxurl;
   const productID = window.productID;
 
@@ -925,8 +916,8 @@ function rcn_tableAvailabilityHandler(
     const tableElement = $(tableListingContainer).find('.table-' + table.no);
 
     const action = status
-    ? iconElement('fa-plus', table.id)
-    : reservedElement(table.id);
+      ? iconElement('fa-plus', table.id)
+      : reservedElement(table.id);
     tableElement.find('small').replaceWith(() => $(action));
 
     // If the table is already reserved
@@ -1026,39 +1017,7 @@ function rcn_tableActionHandler($, actionBtn) {
       variation_id: variationID,
     },
     success: function (response) {
-      const result = JSON.parse(response);
-
-      // 1002 means, the table is recently reserved by someone else
-      if (result.availability_code === 1002) {
-        tableElement.removeClass('rcn-vp-selected-table');
-        tableElement.removeClass('rcn-vp-available-table');
-        tableElement.addClass('rcn-vp-unavailable-table');
-        tableElement.prop('disabled', true);
-
-        tableElement.attr('data-is-unavailable', true);
-
-        actionIcon.replaceWith($('<small>Reserved</small>'));
-      }
-
-      // 1001 means, the table is available for reservation
-      if (result.availability_code === 1001) {
-        const id = Number(variationID);
-        const name = 'Table - ' + tableNo;
-        const price = result.price;
-        const quantity = 1;
-
-        // prettier-ignore
-        const productData = {
-          id, name, price, quantity
-        }
-
-        rcn_addProductToCart($, 'updateCart', productData);
-
-        actionIcon.removeClass('fa-spinner').addClass('fa-check');
-
-        tableElement.find('.rcn-vp-table-action').prop('disabled', true);
-        tableElement.attr('data-is-unavailable', true);
-      }
+      tableAddToCartResponseHandler(response);
     },
     error: function (xhr, status, error) {
       notification = {
@@ -1070,6 +1029,42 @@ function rcn_tableActionHandler($, actionBtn) {
       console.log(xhr.responseText);
     },
   });
+
+  function tableAddToCartResponseHandler(response) {
+    const result = JSON.parse(response);
+
+    // 1002 means, the table is recently reserved by someone else
+    if (result.availability_code === 1002) {
+      tableElement.removeClass('rcn-vp-selected-table');
+      tableElement.removeClass('rcn-vp-available-table');
+      tableElement.addClass('rcn-vp-unavailable-table');
+      tableElement.prop('disabled', true);
+
+      tableElement.attr('data-is-unavailable', true);
+
+      actionIcon.replaceWith($('<small>Reserved</small>'));
+    }
+
+    // 1001 means, the table is available for reservation
+    if (result.availability_code === 1001) {
+      const id = Number(variationID);
+      const name = 'Table - ' + tableNo;
+      const price = result.price;
+      const quantity = 1;
+
+      // prettier-ignore
+      const productData = {
+        id, name, price, quantity
+      }
+
+      rcn_addProductToCart($, 'updateCart', productData);
+
+      actionIcon.removeClass('fa-spinner').addClass('fa-check');
+
+      tableElement.find('.rcn-vp-table-action').prop('disabled', true);
+      tableElement.attr('data-is-unavailable', true);
+    }
+  }
 }
 
 /**
@@ -1098,13 +1093,6 @@ function rcn_vpAddonsAccording($) {
   $('.rcn-vpaa-wrapper').each(function () {
     var wrapper = $(this);
 
-    var result = wrapper.find('.rcn-vpaa-oosi').hasClass('rcn-oos');
-
-    if (result) {
-      wrapper.find('.rcn-vpaa-oosi').show();
-      wrapper.find('.rc-vpaa-quantity').hide();
-    }
-
     wrapper.on('click', '.rcn-vpaa-header', function (event) {
       event.stopPropagation();
 
@@ -1123,7 +1111,6 @@ function rcn_vpAddonsAccording($) {
  * @param {jQuery} $ - jQuery reference.
  */
 function rcn_vpAddonsStatusChecker($) {
-  console.log('Addons checker  function is called');
   const addonsIDs = [9481, 9473, 17630, 9480, 9475, 9476, 9474, 9479];
 
   for (let i = 0; i < addonsIDs.length; i++) {
@@ -1138,19 +1125,35 @@ function rcn_vpAddonsStatusChecker($) {
         productID: ID,
       },
       success: function (response) {
-        response = JSON.parse(response);
-
-        if (response.status && response.stock_quantity === 0) {
-          $('.' + uniqueIdentifier)
-            .find('.rcn-vpaa-oosi')
-            .css('display', 'block');
-        }
+        statusChecker(response, uniqueIdentifier);
       },
       error: function (xhr, status, error) {
         console.error(xhr.responseText);
         return false;
       },
     });
+  }
+
+  function statusChecker(response, uniqueIdentifier) {
+    response = JSON.parse(response);
+    const accordingWrapperClass = $('.' + uniqueIdentifier);
+
+    if (response.status) {
+      accordingWrapperClass.find('.rcn-vpaa-oosc').remove();
+    }
+
+    if (response.status) {
+      accordingWrapperClass
+        .find('.rcn-vpaa-oosc h2')
+        .replaceWith(
+          '<h2 class="elementor-heading-title elementor-size-default">Status check failed</h2>'
+        );
+    }
+
+    if (response.status && response.stock_quantity === 0) {
+      accordingWrapperClass.find('.rcn-vpaa-oosi').toggle();
+      accordingWrapperClass.find('.rc-vpaa-quantity').remove();
+    }
   }
 }
 
@@ -1162,7 +1165,7 @@ function rcn_vpAddonsStatusChecker($) {
  */
 function rcn_vpAddOnsAddToCart($, productID) {
   productID = Number(productID);
-  const ajaxurl = wp_ajax_object.ajax_url;
+  const ajaxurl = window.rcn_vpAjaxurl;
   let cartNotification;
 
   cartNotification = {
@@ -1180,9 +1183,8 @@ function rcn_vpAddOnsAddToCart($, productID) {
       productID: productID,
     },
     success: function (responseData) {
-      let response = JSON.parse(responseData);
+      const response = JSON.parse(responseData);
       addOnsAddedSuccessfully(response);
-      console.log(response);
     },
     error: function (xhr, status, error) {
       cartNotification = {
@@ -1197,7 +1199,7 @@ function rcn_vpAddOnsAddToCart($, productID) {
   });
 
   function addOnsAddedSuccessfully(response) {
-    if (response.status_code === 800800) {
+    if (response.status_code === 800800) { // the product is already added to cart.
       cartNotification = {
         type: 'info',
         message: '',
@@ -1213,12 +1215,12 @@ function rcn_vpAddOnsAddToCart($, productID) {
         message: 'Something went wrong. <br />Please refresh the page.',
       };
 
-      rcn_vpCartVisualInteraction($, false, cartNotification, null);
+      rcn_vpCartVisualInteraction($, false, cartNotification);
       return;
     }
 
     const productData = {
-      id: response.id,
+      id: response.productID,
       name: response.name,
       quantity: response.cart_quantity,
       price: response.price,
