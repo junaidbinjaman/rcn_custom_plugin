@@ -3,6 +3,16 @@
  * included in this file.
  */
 
+ /**
+ * #.# Vendor Package General Styles
+ *
+ * The style that applies to each section of vendor package function
+ */
+
+ .rcn-vp-general-button-class {
+  cursor: pointer;
+ }
+
 /**
  * #.# Vendor Package Step Styles
  *

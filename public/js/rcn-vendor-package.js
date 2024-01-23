@@ -491,7 +491,7 @@ function rcn_addProductToCart($, action = 'loadCart', cartItem) {
   if ('loadCart' === action) {
     notification = {
       type: 'info',
-      message: 'Loading cart.'
+      message: 'Loading cart'
     };
     rcn_vpCartVisualInteraction($, false, notification);
 
@@ -631,7 +631,7 @@ function rcn_vpRemoveProductFromCart($, productID) {
 
   notification = {
     type: 'info',
-    message: 'Removing item from cart.',
+    message: 'Removing item from cart',
   };
 
   rcn_vpCartVisualInteraction($, false, notification);
@@ -989,7 +989,7 @@ function rcn_tableActionHandler($, actionBtn) {
 
   let notification = {
     type: 'info',
-    message: 'Adding item to cart.',
+    message: 'Adding item to cart',
   };
 
   actionIcon.removeClass('fa-plus').addClass('fa-spinner');
