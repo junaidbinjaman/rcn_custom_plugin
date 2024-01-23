@@ -4,8 +4,8 @@
    * Global variable declarations
    */
   window.rcn_vpAjaxurl = wp_ajax_object.ajax_url;
-  window.rcn_vpCategoryID = 504; // RCN vendor package category
-  window.productID = 28462; // table wrapper product where each table is a variation
+  window.rcn_vpCategoryID = 497; // RCN vendor package category
+  window.productID = 27759; // table wrapper product where each table is a variation
 
   /**
    * All of the js/jQuery code for vendor-package reside in this file.
@@ -735,56 +735,46 @@ function rcn_floorSelectionHandler($) {
   floorNumber = Number(floorNumber);
 
   const floorOneTables = [
-    {no: 1, id: 28463},
-    {no: 2, id: 28464},
-    {no: 3, id: 28465},
-    {no: 4, id: 28466},
-    {no: 5, id: 28467},
+    {no: 1, id: 27760},
+    {no: 2, id: 27771},
+    {no: 3, id: 27761},
+    {no: 4, id: 27762},
+    {no: 5, id: 27763},
   ];
   const floorTwoTables = [
-    {no: 6, id: 28468},
-    {no: 7, id: 28469},
-    {no: 8, id: 28470},
-    {no: 9, id: 28471},
-    {no: 10, id: 28472},
-    {no: 11, id: 28473},
-    {no: 12, id: 28474},
-    {no: 13, id: 28475},
-    {no: 14, id: 28476},
-    {no: 15, id: 28477},
-    {no: 16, id: 28478},
-    {no: 17, id: 28479},
-    {no: 18, id: 28480},
-    {no: 19, id: 28481},
-    {no: 20, id: 28482},
+    {no: 6, id: 27764},
+    {no: 7, id: 27765},
+    {no: 8, id: 27766},
+    {no: 9, id: 27767},
+    {no: 10, id: 27768},
+    {no: 11, id: 27769},
+    {no: 12, id: 27770},
+    {no: 13, id: 27772},
+    {no: 14, id: 27773},
+    {no: 15, id: 27774},
+    {no: 16, id: 27775},
+    {no: 17, id: 27776},
+    {no: 18, id: 27777},
+    {no: 19, id: 27778},
+    {no: 20, id: 27779},
   ];
 
   const floorThreeTables = [
-    {no: 21, id: 28483},
-    {no: 22, id: 28484},
-    {no: 23, id: 28485},
-    {no: 24, id: 28486},
-    {no: 25, id: 28487},
-    {no: 26, id: 28488},
-    {no: 27, id: 28489},
-    {no: 28, id: 28490},
-    {no: 29, id: 28491},
-    {no: 30, id: 28492},
-    {no: 31, id: 28493},
-    {no: 32, id: 28494},
-    {no: 33, id: 28495},
-    {no: 34, id: 28496},
-    {no: 35, id: 28497},
-    {no: 36, id: 28498},
-    {no: 37, id: 28499},
-    {no: 38, id: 28500},
-    {no: 39, id: 28501},
-    {no: 40, id: 28502},
-    {no: 41, id: 28503},
-    {no: 42, id: 28504},
-    {no: 43, id: 28505},
-    {no: 44, id: 28506},
-    {no: 45, id: 28507},
+    {no: 21, id: 27780},
+    {no: 22, id: 27781},
+    {no: 23, id: 27782},
+    {no: 24, id: 27783},
+    {no: 25, id: 27784},
+    {no: 26, id: 27785},
+    {no: 27, id: 27786},
+    {no: 28, id: 27787},
+    {no: 29, id: 27788},
+    {no: 30, id: 27789},
+    {no: 31, id: 27790},
+    {no: 32, id: 27791},
+    {no: 33, id: 27792},
+    {no: 34, id: 27793},
+    {no: 35, id: 27794},
   ];
 
   // Toggle floor plan map/image
@@ -1111,7 +1101,7 @@ function rcn_vpAddonsAccording($) {
  * @param {jQuery} $ - jQuery reference.
  */
 function rcn_vpAddonsStatusChecker($) {
-  const addonsIDs = [9481, 9473, 17630, 9480, 9475, 9476, 9474, 9479];
+  const addonsIDs = [27798, 27800, 27801, 27802, 27803, 27804, 27797];
 
   for (let i = 0; i < addonsIDs.length; i++) {
     const ID = addonsIDs[i];
