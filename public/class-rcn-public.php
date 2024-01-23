@@ -62,8 +62,8 @@ class Rcn_Public {
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rcn-public.css', array(), $this->version, 'all' );
 		wp_enqueue_style( 'custom-scrollbar-styles', '//cdn.jsdelivr.net/npm/simplebar@6.2.5/dist/simplebar.css', array(), $this->version, 'all' );
 
-		// 27943 is vendor package page id
-		if ( is_page( 27943 ) ) {
+		// 27500 is vendor package page id
+		if ( is_page( 27500 ) ) {
 			wp_enqueue_style( 'rcn-vendor-package', plugin_dir_url( __FILE__ ) . 'css/rcn-vendor-package.css', array(), $this->version, 'all' );
 		}
 	}
