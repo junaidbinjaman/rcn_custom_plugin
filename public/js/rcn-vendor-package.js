@@ -260,7 +260,7 @@ function rcn_vpStepSwitchHandler($, totalSteps) {
 
   const activeStepIndicators = stepIndicatorClasses.splice(0, activeStep + 1);
   const activeStepIndicatorsStyles = {
-    backgroundColor: '#0040E0',
+    backgroundColor: '#006cfa',
     cursor: 'pointer',
   };
 
