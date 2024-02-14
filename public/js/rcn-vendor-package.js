@@ -55,7 +55,8 @@ function rcn_vpCartInitializer($) {
 }
 
 /**
- * Handles the floor selection functionality in the vendor package table.
+ * Handles the floor selection functionality in the vendor package table
+ * and table location indicator initialization
  *
  * @param {jQuery} $ - jQuery reference.
  */
@@ -102,6 +103,7 @@ function rcn_vpTableFloorHandler($) {
     localStorage.setItem('rcn_activeFloorNumber', $(this).val());
     rcn_floorSelectionHandler($);
   });
+
 }
 
 /**
@@ -793,6 +795,8 @@ function rcn_floorSelectionHandler($) {
   if (floorNumber === 3) {
     rcn_vpTableListingHandler($, floorThreeTables, productID);
   }
+
+  rcn_vpTableLocationIndicatorHandler($, 0);
 }
 
 /**
@@ -947,6 +951,7 @@ function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
 function rcn_handleClickOnLi($, clickedItem) {
   const tableListingWrapper = $('.rcn-vp-table-wrapper-ul');
   const isAvailable = clickedItem.data('is-unavailable') === false;
+  const SelectedTableID = clickedItem.find('i').data('table-id');
   let cartItems = localStorage.getItem('rcn_vpCartData');
   let isTableInCart;
 
@@ -971,6 +976,8 @@ function rcn_handleClickOnLi($, clickedItem) {
       clickedItem.removeClass('rcn-vp-available-table');
     }
   });
+
+  rcn_vpTableLocationIndicatorHandler($, SelectedTableID);
 }
 
 /**
@@ -1058,15 +1065,26 @@ function rcn_tableActionHandler($, actionBtn) {
 }
 
 /**
- * TODO: Implement the function to highlight table locations on the floor plan.
- * Note: This function is a placeholder and will be implemented in the next phase.
+ * Highlight table locations on the floor plan image.
  *
  * @param {jQuery} $ - jQuery reference.
+ * @param {jQuery} tableID - The table ID.
  */
-function rcn_highlightTableOnFloorPlan($) {
-  console.log(
-    'Calling the function to highlight table locations on the floor plan'
-  );
+function rcn_vpTableLocationIndicatorHandler($, tableID) {
+  const activeFloorNumber = localStorage.getItem('rcn_activeFloorNumber');
+
+  $('.rcn-vp-floor-' + activeFloorNumber)
+    .find('.rcn-vp-table-location-indicator')
+    .each(function () {
+      $(this).show();
+
+      let currentTableID = $(this).data('table-id');
+      currentTableID = Number(currentTableID);
+
+      if (currentTableID !== tableID) {
+        $(this).hide();
+      }
+    });
 }
 
 /**
@@ -1189,7 +1207,8 @@ function rcn_vpAddOnsAddToCart($, productID) {
   });
 
   function addOnsAddedSuccessfully(response) {
-    if (response.status_code === 800800) { // the product is already added to cart.
+    if (response.status_code === 800800) {
+      // the product is already added to cart.
       cartNotification = {
         type: 'info',
         message: '',
