@@ -785,15 +785,15 @@ function rcn_floorSelectionHandler($) {
   $('.rcn-vp-floor-3').toggle(floorNumber === 3);
 
   if (floorNumber === 1) {
-    rcn_vpTableListingHandler($, floorOneTables, productID);
+    rcn_vpTableListingHandler($, floorOneTables);
   }
 
   if (floorNumber === 2) {
-    rcn_vpTableListingHandler($, floorTwoTables, productID);
+    rcn_vpTableListingHandler($, floorTwoTables);
   }
 
   if (floorNumber === 3) {
-    rcn_vpTableListingHandler($, floorThreeTables, productID);
+    rcn_vpTableListingHandler($, floorThreeTables);
   }
 
   rcn_vpTableLocationIndicatorHandler($, 0);
@@ -823,10 +823,9 @@ function rcn_floorSelectionHandler($) {
  * @param {number} productID - Product ID representing the vendor table.
  * @returns {void} - No return value.
  */
-function rcn_vpTableListingHandler($, tables, productID) {
+function rcn_vpTableListingHandler($, tables) {
   // Initializes table listing functionality
   const tableListingContainer = $('#rcn-vp-table-listing-container');
-  const rcn_ajaxurl = window.rcn_vpAjaxurl;
   const tableListingWrapper = $('<ul>');
 
   tableListingWrapper.addClass('rcn-vp-table-wrapper-ul');
