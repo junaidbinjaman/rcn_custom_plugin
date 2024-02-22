@@ -65,7 +65,7 @@ function rcn_vpTableFloorHandler($) {
   const floorSelectorForm = $('.rcn-vp-floor-selector-form form select'); // Appears on mobile and table
   let activeFloor;
 
-  new SimpleBar(vtsb, {autoHide: false});
+  // new SimpleBar(vtsb, {autoHide: false});
 
   rcn_floorSelectionHandler($);
 
@@ -925,7 +925,7 @@ function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
     // If the table is in cart
     if (isTableInCart) {
       tableElement.removeClass('rcn-vp-unavailable-table');
-      tableElement.addClass('rcn-vp-selected-table');
+      tableElement.addClass('rcn-vp-added-to-cart-table');
       tableElement.find('.fa-plus').replaceWith(() => $(iconElement('fa-check', table.id))); // prettier-ignore
       tableElement.find('.rcn-vp-table-action').prop('disabled', true);
       return;
