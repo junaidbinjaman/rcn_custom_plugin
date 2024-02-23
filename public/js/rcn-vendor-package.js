@@ -52,6 +52,10 @@ function rcn_vpCartInitializer($) {
       rcn_vpPrevNextButtonHandler($, 'prev');
     });
   });
+
+  $('.rcn_vp-product-add-to-cart-btn').click('click', function() {
+    rcn_vpTriggerCartOnTabletMobile($);
+  })
 }
 
 /**
@@ -103,7 +107,6 @@ function rcn_vpTableFloorHandler($) {
     localStorage.setItem('rcn_activeFloorNumber', $(this).val());
     rcn_floorSelectionHandler($);
   });
-
 }
 
 /**
@@ -590,6 +593,17 @@ function rcn_addProductToCart($, action = 'loadCart', cartItem) {
   }
 }
 
+function rcn_vpTriggerCartOnTabletMobile() {
+  let isMobile = window.matchMedia(
+    'only screen and (max-width: 1030px)'
+  ).matches;
+
+  if (isMobile) {
+    elementorProFrontend.modules.popup.showPopup( { id: 27815 } );
+    rcn_vpCartInitializer(jQuery);
+  }
+}
+
 /**
  * Removes a product from the vp cart using AJAX and updates the cart visual interaction.
  *
@@ -692,7 +706,7 @@ function rcn_vpRemoveProductFromCart($, productID) {
       if (Number(tableID) === response.variation_id) {
         $(this)
           .attr('data-is-unavailable', false)
-          .removeClass('rcn-vp-selected-table')
+          .removeClass('rcn-vp-added-to-cart-table')
           .addClass('rcn-vp-available-table')
           .find('i')
           .removeClass('fa-check')
@@ -1043,6 +1057,10 @@ function rcn_tableActionHandler($, actionBtn) {
 
     // 1001 means, the table is available for reservation
     if (result.availability_code === 1001) {
+      tableElement.removeClass('rcn-vp-selected-table');
+      tableElement.removeClass('rcn-vp-available-table');
+      tableElement.addClass('rcn-vp-added-to-cart-table');
+
       const id = Number(variationID);
       const name = 'Table - ' + tableNo;
       const price = result.price;
@@ -1059,6 +1077,7 @@ function rcn_tableActionHandler($, actionBtn) {
 
       tableElement.find('.rcn-vp-table-action').prop('disabled', true);
       tableElement.attr('data-is-unavailable', true);
+      rcn_vpTriggerCartOnTabletMobile($);
     }
   }
 }

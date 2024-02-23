@@ -501,19 +501,15 @@
   }
   20% {
     transform: scale(0.8);
-    /* color: #ffdb58; */
   }
   40% {
     transform: scale(1);
-    /* color: #87d0db; */
   }
   60% {
     transform: scale(0.8);
-    /* color: #8cc640; */
   }
   100% {
     transform: scale(0.6);
-    color: #ff5733;
   }
 }
 
