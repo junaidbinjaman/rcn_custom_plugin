@@ -81,4 +81,48 @@ class Rcn_Public {
 			wp_localize_script( 'vendor-package', 'wp_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 		}
 	}
+
+	/**
+	 * This is the callback for init action hook.
+	 *
+	 * All the function that needs to go inside init hook on public side will take place inside this callback
+	 *
+	 * @return void
+	 */
+	public function initialize_rcn() {
+		add_shortcode( 'foobar', array( $this, 'foobar' ) );
+	}
+
+	/**
+	 * THis is a testing function.
+	 *
+	 * The function is temporary. It's used just to visualize the development
+	 *
+	 * @return void
+	 */
+	public function foobar() {
+		echo <<<HTML
+			<div style="background: lightgray" class="rcn_vp-table-listing">
+				<div class="rcn_vp-table-listing-head">
+					<div class="rcn_vp-table-listing-head-left">
+						<i aria-hidden="true" class="fas fa-angle-down"></i>
+						<span>Table - 3</span>
+					</div>
+					<div class="rcn_vp-table-listing-head-right">
+						<i data-table-id="27770" aria-hidden="true" class="fas rcn-vp-table-action fa-check"></i>
+						<small>reserved</small>
+					</div>
+				</div>
+				<div style="background: #5bc0de69" class="rcn_vp-table-listing-body">
+					<div>
+						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Saepe, aliquam.</p>
+					</div>
+					<div class="rcn_vp-table-listing-body-action">
+						<button>Add To Cart</button>
+						<span><strong>Price:</strong> $5000.00</span>
+					</div>
+				</div>
+			</div>
+		HTML;
+	}
 }

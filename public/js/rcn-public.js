@@ -7,8 +7,11 @@
    *
    * This enables to define handlers, for when the DOM is ready:
    */
-  $(function () {
 
+  $(function () {
+    $('.rcn_vp-table-listing-head').on('click', function() {
+      $('.rcn_vp-table-listing-body').toggle();
+    })
     
   });
 })(jQuery);

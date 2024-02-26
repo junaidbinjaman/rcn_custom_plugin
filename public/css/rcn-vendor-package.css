@@ -240,7 +240,7 @@
 /* Mobile styles */
 @media (max-width: 767px) {
   .rcn-vpciw {
-    height: 261px
+    height: 261px;
   }
 
   .rcn_vps-prev-button,
@@ -438,6 +438,59 @@
   color: #7e7e84;
 }
 
+/* Table listing head styes */
+.rcn_vp-table-listing {
+  color: var(--e-global-color-secondary);
+}
+
+.rcn_vp-table-listing-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.rcn_vp-table-listing-head-left {
+  column-gap: 20px;
+}
+
+.rcn_vp-table-listing-head-right i {
+  display: none;
+}
+
+.rcn_vp-table-listing-head-right small {
+  display: none;
+}
+
+.rcn_vp-table-listing-body {
+  background: #fff;
+  padding: 20px 20px;
+}
+
+.rcn_vp-table-listing-body-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rcn_vp-table-listing-body button {
+  transition: all 0.2s ease-in-out;
+}
+
+.rcn_vp-table-listing-head-right i {
+  border: 1px solid var(--e-global-color-126a520);
+  padding: 7px;
+  border-radius: 100px;
+  font-size: 16px;
+}
+
 /* Meta meas the word "checking" */
 .rcn-vp-table-meta small {
   color: rgba(0, 0, 0, 0.45);
@@ -488,8 +541,7 @@
   .rcn-vp-available-table,
   .rcn-vp-added-to-cart-table,
   .rcn-vp-unavailable-table,
-  .rcn-vp-selected-table
-   {
+  .rcn-vp-selected-table {
     width: 313px;
   }
 }
