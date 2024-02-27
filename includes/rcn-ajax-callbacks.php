@@ -23,8 +23,6 @@ function is_table_available() {
 	$price        = $product->get_price();
 	$stock_status = $product->get_stock_status();
 
-	// $result = Rcn_Utility::get_product_quantity( $product_id, 'stock', $quantity );
-
 	if ( 'instock' === $stock_status ) {
 		echo wp_json_encode(
 			array(

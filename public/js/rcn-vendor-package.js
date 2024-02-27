@@ -897,9 +897,9 @@ function rcn_vpTableListingHandler($, tables) {
     rcn_handleClickOnLi($, $(this));
   });
 
-  tableListingWrapper.on('click', '.rcn-vp-table-action', function () {
-    rcn_tableActionHandler($, $(this));
-  });
+  // tableListingWrapper.on('click', '.rcn-vp-table-action', function () {
+  //   rcn_tableActionHandler($, $(this));
+  // });
 
   tableListingContainer.append(tableListingWrapper);
 }
