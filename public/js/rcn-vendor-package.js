@@ -53,9 +53,9 @@ function rcn_vpCartInitializer($) {
     });
   });
 
-  $('.rcn_vp-product-add-to-cart-btn').click('click', function() {
+  $('.rcn_vp-product-add-to-cart-btn').click('click', function () {
     rcn_vpTriggerCartOnTabletMobile($);
-  })
+  });
 }
 
 /**
@@ -599,7 +599,7 @@ function rcn_vpTriggerCartOnTabletMobile() {
   ).matches;
 
   if (isMobile) {
-    elementorProFrontend.modules.popup.showPopup( { id: 27815 } );
+    elementorProFrontend.modules.popup.showPopup({id: 27815});
     rcn_vpCartInitializer(jQuery);
   }
 }
@@ -699,19 +699,16 @@ function rcn_vpRemoveProductFromCart($, productID) {
     }
 
     $('.rcn-vp-table-wrapper-ul li').each(function () {
-      const tableID = $(this)
-        .find('.rcn-vp-table-action')
-        .attr('data-table-id');
+      const tableID = $(this).attr('data-table-id');
 
       if (Number(tableID) === response.variation_id) {
+        $(this).find('.rcn_vp-table-listing-body-action-spinner').hide();
+        $(this).find('.rcn_vp-table-listing-body-remove-cart-btn').show();
+
         $(this)
           .attr('data-is-unavailable', false)
           .removeClass('rcn-vp-added-to-cart-table')
-          .addClass('rcn-vp-available-table')
-          .find('i')
-          .removeClass('fa-check')
-          .addClass('fa-plus')
-          .prop('disabled', false);
+          .addClass('rcn-vp-available-table');
       }
     });
   }
@@ -844,8 +841,6 @@ function rcn_vpTableListingHandler($, tables) {
 
   tableListingWrapper.addClass('rcn-vp-table-wrapper-ul');
 
-  let action = '<small class="rcn-vp-table-meta">Checking</small>';
-
   tableListingContainer.empty();
 
   // Create listings based on provided variation/table IDs
@@ -853,11 +848,47 @@ function rcn_vpTableListingHandler($, tables) {
     const table = tables[i];
 
     tableListingWrapper.append(
-      `<li data-is-unavailable="true" class="rcn-vp-unavailable-table table-${table.no}" data-table-no="${table.no}">
-        Table - ${table.no}${action}
+      `<li data-is-unavailable="true" class="rcn-vp-unavailable-table rcn_vp-table-listing table-${table.no}" data-table-no="${table.no}" data-table-id="${table.id}">
+				  <div class="rcn_vp-table-listing-head">
+					  <div class="rcn_vp-table-listing-head-left">
+						  <i aria-hidden="true" class="fas fa-angle-down"></i>
+						  <i aria-hidden="true" class="fas fa-angle-up"></i>
+						  <span>Table - ${table.no}</span>
+					  </div>
+					  <div class="rcn_vp-table-listing-head-right">
+						  <i data-table-id="27770" aria-hidden="true" class="fas rcn-vp-table-added-to-cart-indicator fa-check"></i>
+						  <small class="rcn_vp-table-status-checking">Checking</small>
+						  <small class="rcn_vp-table-status-reserved">Reserved</small>
+					  </div>
+				  </div>
+				  <div class="rcn_vp-table-listing-body">
+					  <div class="rcn_vp-table-listing-body-description"></div>
+					  <div class="rcn_vp-table-listing-body-action">
+						  <div>
+                <img 
+                class="rcn_vp-table-listing-body-action-spinner" 
+                src="https://realitycapturenetwork.com/wp-content/uploads/2024/02/Eclipse-1s-200px.gif" 
+                width="30px"
+                height="30px"
+                />
+							  <button class="rcn_vp-table-listing-body-add-to-cart-btn">Add To Cart</button>
+							  <div class="rcn_vp-table-listing-body-remove-cart-btn">
+								  Remove from cart
+							  </div>
+							  <small class="rcn_vp-table-status-reserved">Reserved</small>
+						  </div>
+						  <span class="rcn_vp-table-listing-body-action-price"><strong>Price: </strong></span>
+					  </div>
+				  </div>
       </li>`
     );
   }
+
+  tableListingContainer.ready(function () {
+    $('.rcn_vp-table-listing').each(function () {
+      rcn_tableActionHandler($, $(this));
+    });
+  });
 
   rcn_tableAvailabilityHandler($, tables, tableListingContainer);
 
@@ -921,11 +952,15 @@ function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
     response = JSON.parse(response);
     const status = response.status;
     const tableElement = $(tableListingContainer).find('.table-' + table.no);
+    let price = Number(response.price);
 
-    const action = status
-      ? iconElement('fa-plus', table.id)
-      : reservedElement(table.id);
-    tableElement.find('small').replaceWith(() => $(action));
+    tableElement
+      .find('.rcn_vp-table-listing-body-description')
+      .append(response.description);
+
+    tableElement
+      .find('.rcn_vp-table-listing-body-action-price')
+      .append(rcn_vpPriceFormatter(price, 2));
 
     // If the table is already reserved
     if (!status) return;
@@ -940,8 +975,13 @@ function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
     if (isTableInCart) {
       tableElement.removeClass('rcn-vp-unavailable-table');
       tableElement.addClass('rcn-vp-added-to-cart-table');
-      tableElement.find('.fa-plus').replaceWith(() => $(iconElement('fa-check', table.id))); // prettier-ignore
-      tableElement.find('.rcn-vp-table-action').prop('disabled', true);
+      return;
+    }
+
+    // If the table is available
+    if (status) {
+      tableElement.removeClass('rcn-vp-unavailable-table');
+      tableElement.addClass('rcn-vp-available-table');
       return;
     }
 
@@ -963,32 +1003,12 @@ function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
  */
 function rcn_handleClickOnLi($, clickedItem) {
   const tableListingWrapper = $('.rcn-vp-table-wrapper-ul');
-  const isAvailable = clickedItem.data('is-unavailable') === false;
-  const SelectedTableID = clickedItem.find('i').data('table-id');
-  let cartItems = localStorage.getItem('rcn_vpCartData');
-  let isTableInCart;
+  const SelectedTableID = Number(clickedItem.attr('data-table-id'));
 
-  cartItems = JSON.parse(cartItems);
-  cartItems = cartItems ? cartItems.map((item) => item.id) : [];
-
-  tableListingWrapper.find('li').each(function () {
-    const table = $(this);
-    const tableID = table.find('.rcn-vp-table-action').attr('data-table-id');
-
-    isTableInCart = cartItems.includes(Number(tableID));
-
-    if (isTableInCart) return;
-
-    if (isAvailable && !isTableInCart) {
-      table
-        .removeClass('rcn-vp-selected-table')
-        .filter(':not(.rcn-vp-unavailable-table)')
-        .addClass('rcn-vp-available-table');
-
-      clickedItem.addClass('rcn-vp-selected-table');
-      clickedItem.removeClass('rcn-vp-available-table');
-    }
-  });
+  tableListingWrapper
+    .find('.rcn_vp-table-listing')
+    .removeClass('rcn-vp-selected-table');
+  clickedItem.addClass('rcn-vp-selected-table');
 
   rcn_vpTableLocationIndicatorHandler($, SelectedTableID);
 }
@@ -1000,66 +1020,80 @@ function rcn_handleClickOnLi($, clickedItem) {
  * @param {jQuery} actionBtn - the table add to cart actionBtn.
  * @returns {void} - No return value.
  */
-function rcn_tableActionHandler($, actionBtn) {
+function rcn_tableActionHandler($, element) {
   const rcn_ajaxurl = window.rcn_vpAjaxurl;
   const productID = window.productID;
-  const variationID = actionBtn.attr('data-table-id');
-  const tableNo = actionBtn.parent().attr('data-table-no');
-  const actionIcon = actionBtn;
+  const variationID = element.attr('data-table-id');
+  const tableNo = element.attr('data-table-no');
 
   let notification = {
     type: 'info',
     message: 'Adding item to cart',
   };
-
-  actionIcon.removeClass('fa-plus').addClass('fa-spinner');
   rcn_vpCartVisualInteraction($, false, notification);
 
-  // Storing the current table listing element
-  const tableElement = actionBtn.parent();
+  $(element)
+    .find('.rcn_vp-table-listing-body-add-to-cart-btn')
+    .click('click', function () {
+      $(this).hide();
 
-  $.ajax({
-    type: 'POST',
-    url: rcn_ajaxurl,
-    data: {
-      action: 'rcn_table_add_to_cart_handler',
-      product_id: productID,
-      variation_id: variationID,
-    },
-    success: function (response) {
-      tableAddToCartResponseHandler(response);
-    },
-    error: function (xhr, status, error) {
-      notification = {
-        type: 'info',
-        message: 'Something went wrong. Please refresh the page.',
-      };
+      $(element).find('.rcn_vp-table-listing-body-action-spinner').show();
 
-      rcn_vpCartVisualInteraction($, false, notification);
-      console.log(xhr.responseText);
-    },
-  });
+      addTableToCart();
+    });
+
+  $(element)
+    .find('.rcn_vp-table-listing-body-remove-cart-btn')
+    .click('click', function () {
+      $(this).hide();
+      $(element).find('.rcn_vp-table-listing-body-action-spinner').show();
+
+      rcn_vpRemoveProductFromCart($, variationID);
+    });
+
+  function addTableToCart() {
+    $.ajax({
+      type: 'POST',
+      url: rcn_ajaxurl,
+      data: {
+        action: 'rcn_table_add_to_cart_handler',
+        product_id: productID,
+        variation_id: variationID,
+      },
+      success: function (response) {
+        tableAddToCartResponseHandler(response);
+      },
+      error: function (xhr, status, error) {
+        notification = {
+          type: 'info',
+          message: 'Something went wrong. Please refresh the page.',
+        };
+
+        rcn_vpCartVisualInteraction($, false, notification);
+        console.log(xhr.responseText);
+      },
+    });
+  }
 
   function tableAddToCartResponseHandler(response) {
+    $(element).find('.rcn_vp-table-listing-body-action-spinner').hide();
+    $(element).find('.rcn_vp-table-listing-body-add-to-cart-btn').show();
     const result = JSON.parse(response);
 
     // 1002 means, the table is recently reserved by someone else
     if (result.availability_code === 1002) {
-      tableElement.removeClass('rcn-vp-selected-table');
-      tableElement.removeClass('rcn-vp-available-table');
-      tableElement.addClass('rcn-vp-unavailable-table');
-      tableElement.prop('disabled', true);
+      element
+        .removeClass('rcn-vp-available-table')
+        .addClass('rcn-vp-unavailable-table');
 
-      tableElement.attr('data-is-unavailable', true);
-
-      actionIcon.replaceWith($('<small>Reserved</small>'));
+      element.attr('data-is-unavailable', true);
     }
 
     // 1001 means, the table is available for reservation
     if (result.availability_code === 1001) {
-      tableElement.removeClass('rcn-vp-selected-table');
-      tableElement.removeClass('rcn-vp-available-table');
-      tableElement.addClass('rcn-vp-added-to-cart-table');
+      element
+        .removeClass('rcn-vp-available-table')
+        .addClass('rcn-vp-added-to-cart-table');
 
       const id = Number(variationID);
       const name = 'Table - ' + tableNo;
@@ -1073,10 +1107,6 @@ function rcn_tableActionHandler($, actionBtn) {
 
       rcn_addProductToCart($, 'updateCart', productData);
 
-      actionIcon.removeClass('fa-spinner').addClass('fa-check');
-
-      tableElement.find('.rcn-vp-table-action').prop('disabled', true);
-      tableElement.attr('data-is-unavailable', true);
       rcn_vpTriggerCartOnTabletMobile($);
     }
   }

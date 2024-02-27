@@ -101,28 +101,17 @@ class Rcn_Public {
 	 * @return void
 	 */
 	public function foobar() {
-		echo <<<HTML
-			<div style="background: lightgray" class="rcn_vp-table-listing">
-				<div class="rcn_vp-table-listing-head">
-					<div class="rcn_vp-table-listing-head-left">
-						<i aria-hidden="true" class="fas fa-angle-down"></i>
-						<span>Table - 3</span>
-					</div>
-					<div class="rcn_vp-table-listing-head-right">
-						<i data-table-id="27770" aria-hidden="true" class="fas rcn-vp-table-action fa-check"></i>
-						<small>reserved</small>
-					</div>
-				</div>
-				<div style="background: #5bc0de69" class="rcn_vp-table-listing-body">
-					<div>
-						<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Saepe, aliquam.</p>
-					</div>
-					<div class="rcn_vp-table-listing-body-action">
-						<button>Add To Cart</button>
-						<span><strong>Price:</strong> $5000.00</span>
-					</div>
-				</div>
-			</div>
-		HTML;
+		$product      = wc_get_product( 27760 );
+		$description  = $product->get_description();
+		$price        = $product->get_price();
+		$stock_status = $product->get_stock_status();
+
+		echo '<pre style="background: black">';
+		var_dump( 
+			'Description: ' . $description .
+			'Price: ' . $price . 
+			'Stock Status: ' . $stock_status
+		 );
+		echo '</pre>';
 	}
 }

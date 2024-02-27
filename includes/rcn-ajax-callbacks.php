@@ -16,35 +16,36 @@
  */
 function is_table_available() {
 	$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0; // phpcs:ignore
-	$quantity 	= isset( $_POST['variation_id'] ) ? intval( $_POST['variation_id'] ) : 0; // phpcs:ignore
+	$variation_id 	= isset( $_POST['variation_id'] ) ? intval( $_POST['variation_id'] ) : 0; // phpcs:ignore
 
-	$result = Rcn_Utility::get_product_quantity( $product_id, 'stock', $quantity );
+	$product      = wc_get_product( $variation_id );
+	$description  = $product->get_description();
+	$price        = $product->get_price();
+	$stock_status = $product->get_stock_status();
 
-	if ( ! $result['status'] ) {
+	// $result = Rcn_Utility::get_product_quantity( $product_id, 'stock', $quantity );
+
+	if ( 'instock' === $stock_status ) {
 		echo wp_json_encode(
 			array(
-				'status'  => false,
-				'message' => 'Something went wrong',
+				'table_id'    => $variation_id,
+				'status'      => true,
+				'description' => $description,
+				'price'       => $price,
+				'message'     => 'The table is available',
 			)
 		);
 		wp_die();
 	}
 
-	if ( $result['stock_quantity'] > 0 ) {
+	if ( 'instock' !== $stock_status ) {
 		echo wp_json_encode(
 			array(
-				'status'  => true,
-				'message' => 'The table is available',
-			)
-		);
-		wp_die();
-	}
-
-	if ( $result['stock_quantity'] <= 0 ) {
-		echo wp_json_encode(
-			array(
-				'status'  => false,
-				'message' => 'The table is not available',
+				'table_id'    => $variation_id,
+				'status'      => false,
+				'description' => $description,
+				'price'       => $price,
+				'message'     => 'The table is not available',
 			)
 		);
 		wp_die();
