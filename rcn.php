@@ -8,14 +8,14 @@
  * that starts the plugin.
  *
  * @link              https://junaidbinjaman.com
- * @since             1.0.1
+ * @since             1.0.0
  * @package           Rcn
  *
  * @wordpress-plugin
  * Plugin Name:       RCN Custom Plugin
  * Plugin URI:        https://realitycapturenetwork.com
  * Description:       Introducing the RCN-exclusive plugin, meticulously crafted with tailored RCN custom codes and specialized functions to enhance your experience uniquely. Designed exclusively for RCN, this plugin brings a world of customized possibilities to your fingertips.
- * Version:           1.0.0
+ * Version:           1.1.0
  * Author:            Junaid Bin Jaman
  * Author URI:        https://junaidbinjaman.com/
  * License:           GPL-2.0+
