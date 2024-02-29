@@ -5,7 +5,7 @@
    */
   window.rcn_vpAjaxurl = wp_ajax_object.ajax_url;
   window.rcn_vpCategoryID = 497; // RCN vendor package category
-  window.productID = 27759; // table wrapper product where each table is a variation
+  window.productID = 27759; // The parent product id
 
   /**
    * All of the js/jQuery code for vendor-package reside in this file.
@@ -113,7 +113,6 @@ function rcn_vpAddonsHandler($) {
 
   rcn_vpAddonsStatusChecker($);
 
-  // Add "add to cart" functionality on add-ons add to cart btn
   $('.rc-vpaa-quantity').on('click', function () {
     const productID = $(this).attr('data-product-id');
     rcn_vpAddOnsAddToCart($, productID);
@@ -213,8 +212,6 @@ function rcn_vpStepSwitchHandler($, totalSteps) {
       status: false,
       message: 'Invalid active step',
     });
-
-    return;
   }
 
   // Sources for prev, next and checkout buttons
@@ -285,6 +282,7 @@ function rcn_vpStepSwitchHandler($, totalSteps) {
  * @param {Array} cartItems - Array of cart items.
  * @param {function} callback - Callback function to be executed.
  * @param {number} callbackPriority - Priority level for the callback function.
+ * @returns {void} - The function doesn't return a value.
  */
 function rcn_vpCartVisualInteraction(
   $,
@@ -445,6 +443,7 @@ function rcn_vpCartVisualInteraction(
  *
  * @param {function} $ - jQuery reference.
  * @param {Array} cartItems - Array of cart items containing price information.
+ * @returns {void} - The function doesn't return a value.
  */
 function rcn_vpCartCalculator($, cartItems) {
   const priceElement = $('.rcn-vp-cart-total'); // The element that displays the cart total
@@ -471,6 +470,7 @@ function rcn_vpCartCalculator($, cartItems) {
  * @param {string} action - A flag('loadCart' or 'updateCart') specifies the action to perform.
  * @param {Object} cartItem - Object representing the product to be added to the cart.
  * @param {string} categoryID - ID of the product category.
+ * @returns {void} - The function doesn't return a value.
  */
 // prettier-ignore
 function rcn_addProductToCart($, action = 'loadCart', cartItem) {
@@ -582,6 +582,7 @@ function rcn_addProductToCart($, action = 'loadCart', cartItem) {
  * Trigger cart popup on mobile and tablet after a product is added to cart
  *
  * @param {string} productID - ID of the product to be removed from the cart.
+ * @returns {void} - The function doesn't return a value.
  */
 function rcn_vpTriggerCartOnTabletMobile() {
   const popupId = 27815; // Elementor popup id
@@ -601,6 +602,7 @@ function rcn_vpTriggerCartOnTabletMobile() {
  *
  * @param {function} $ - jQuery reference.
  * @param {string} productID - ID of the product to be removed from the cart.
+ * @returns {void} - The function doesn't return a value.
  */
 function rcn_vpRemoveProductFromCart($, productID) {
   const ajaxurl = window.rcn_vpAjaxurl;
@@ -698,7 +700,6 @@ function rcn_vpRemoveProductFromCart($, productID) {
         $(this).find('.rcn_vp-table-listing-body-remove-cart-btn').show();
 
         $(this)
-          .attr('data-is-unavailable', false)
           .removeClass('rcn-vp-added-to-cart-table')
           .addClass('rcn-vp-available-table');
       }
@@ -811,12 +812,12 @@ function rcn_floorSelectionHandler($) {
  *
  * Key Features:
  * - Initializes table listing functionality.
- * - Creates listing according boxes based on provided variation/table IDs.
+ * - Creates listing according boxes with different colors based on provided variation/table IDs.
  * - Handles table availability.
  *
  * When a table is available:
  * - Enables 'add to cart' for available tables.
- * - disable 'add to cart' for unavailable tables.
+ * - disable 'add to cart' for unavailable tables and displays reserved word.
  *
  * Click Handlers:
  * - Handles clicks on li tags.
@@ -889,7 +890,7 @@ function rcn_vpTableListingHandler($, tables) {
 
   rcn_tableDataHandler($, tables, tableListingContainer);
 
-  // Handles clicks on li tags
+  // Handles clicks on li tags/ table listings
   tableListingWrapper.on('click', 'li', function () {
     rcn_handleClickOnLi($, $(this));
   });
@@ -902,7 +903,8 @@ function rcn_vpTableListingHandler($, tables) {
  *
  * This function checks the availability of each table through an AJAX request,
  * and based on the response, it updates the UI elements of the tables in the targetDiv.
- * It also considers the reservation and cart status to apply proper styling.
+ * 
+ * The function also retrieves the table price and description and add them to the right place.
  *
  * @param {jQuery} $ - jQuery reference.
  * @param {Array} tables - Array of table objects with 'id' and 'no' properties.
@@ -933,8 +935,10 @@ function rcn_tableDataHandler($, tables, tableListingContainer) {
 
   function availableTableHandler(response, table) {
     response = JSON.parse(response);
+
     const status = response.status;
     const tableElement = $(tableListingContainer).find('.table-' + table.no);
+
     let price = Number(response.price);
     price = '<strong>Price: </strong>' + rcn_vpPriceFormatter(price, 2);
 
@@ -995,7 +999,7 @@ function rcn_handleClickOnLi($, clickedItem) {
 }
 
 /**
- * Handles the click event on table action icons and performs actions based on server response.
+ * Handle click on table buttons.
  *
  * @param {jQuery} $ - jQuery reference.
  * @param {jQuery} actionBtn - the table add to cart actionBtn.
@@ -1067,7 +1071,8 @@ function rcn_tableActionHandler($, element) {
     if (result.availability_code === 1002) {
       element
         .removeClass('rcn-vp-available-table')
-        .addClass('rcn-vp-unavailable-table');
+        .addClass('rcn-vp-unavailable-table')
+        .attr('data-is-unavailable', true);
 
       let notification = {
         type: 'info',
