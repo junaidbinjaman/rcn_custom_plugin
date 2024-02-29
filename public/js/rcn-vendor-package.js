@@ -62,20 +62,17 @@ function rcn_vpCartInitializer($) {
  * Handles the floor selection functionality in the vendor package table
  * and table location indicator initialization
  *
+ * Codes responsible for table listing resides inside this function as well
+ *
  * @param {jQuery} $ - jQuery reference.
  */
 function rcn_vpTableFloorHandler($) {
-  const vtsb = $('.rcn-vtsb')[0];
   const floorSelectorForm = $('.rcn-vp-floor-selector-form form select'); // Appears on mobile and table
   let activeFloor;
-
-  // new SimpleBar(vtsb, {autoHide: false});
 
   rcn_floorSelectionHandler($);
 
   $('.rcn-vp-floor-1-selector-btn').each(function () {
-    $(this).off('click');
-
     $(this).on('click', function () {
       localStorage.setItem('rcn_activeFloorNumber', 1);
       rcn_floorSelectionHandler($);
@@ -83,8 +80,6 @@ function rcn_vpTableFloorHandler($) {
   });
 
   $('.rcn-vp-floor-2-selector-btn').each(function () {
-    $(this).off('click');
-
     $(this).on('click', function () {
       localStorage.setItem('rcn_activeFloorNumber', 2);
       rcn_floorSelectionHandler($);
@@ -92,8 +87,6 @@ function rcn_vpTableFloorHandler($) {
   });
 
   $('.rcn-vp-floor-3-selector-btn').each(function () {
-    $(this).off('click');
-
     $(this).on('click', function () {
       localStorage.setItem('rcn_activeFloorNumber', 3);
       rcn_floorSelectionHandler($);
@@ -107,8 +100,6 @@ function rcn_vpTableFloorHandler($) {
     localStorage.setItem('rcn_activeFloorNumber', $(this).val());
     rcn_floorSelectionHandler($);
   });
-
-  rcn_vpTableListingAccordingBox($);
 }
 
 /**
@@ -596,12 +587,14 @@ function rcn_addProductToCart($, action = 'loadCart', cartItem) {
 }
 
 function rcn_vpTriggerCartOnTabletMobile() {
-  let isMobile = window.matchMedia(
+  const popupId = 27815
+
+  let isNotDesktop = window.matchMedia(
     'only screen and (max-width: 1030px)'
   ).matches;
 
-  if (isMobile) {
-    elementorProFrontend.modules.popup.showPopup({id: 27815});
+  if (isNotDesktop) {
+    elementorProFrontend.modules.popup.showPopup({id: popupId});
     rcn_vpCartInitializer(jQuery);
   }
 }
@@ -740,7 +733,6 @@ function rcn_vpRemoveProductFromCart($, productID) {
  */
 function rcn_floorSelectionHandler($) {
   let floorNumber = localStorage.getItem('rcn_activeFloorNumber');
-  const productID = window.productID; // table wrapper product where each table is a variation
 
   if (!floorNumber) {
     localStorage.setItem('rcn_activeFloorNumber', 1);
@@ -756,6 +748,7 @@ function rcn_floorSelectionHandler($) {
     {no: 4, id: 27762},
     {no: 5, id: 27763},
   ];
+
   const floorTwoTables = [
     {no: 6, id: 27764},
     {no: 7, id: 27765},
@@ -788,8 +781,6 @@ function rcn_floorSelectionHandler($) {
     {no: 31, id: 27790},
     {no: 32, id: 27791},
     {no: 33, id: 27792},
-    // {no: 34, id: 27793},
-    // {no: 35, id: 27794},
   ];
 
   // Toggle floor plan map/image
@@ -809,7 +800,9 @@ function rcn_floorSelectionHandler($) {
     rcn_vpTableListingHandler($, floorThreeTables);
   }
 
-  rcn_vpTableListingAccordingBox($);
+  setTimeout(() => {
+    rcn_vpTableListingAccordingBox($);
+  }, 200)
   rcn_vpTableLocationIndicatorHandler($, 0);
 }
 
@@ -821,7 +814,7 @@ function rcn_floorSelectionHandler($) {
  *
  * Key Features:
  * - Initializes table listing functionality.
- * - Creates listings based on provided variation/table IDs.
+ * - Creates listing according boxes based on provided variation/table IDs.
  * - Handles table availability.
  *
  * When a table is available:
@@ -830,23 +823,19 @@ function rcn_floorSelectionHandler($) {
  *
  * Click Handlers:
  * - Handles clicks on li tags.
- * - Handles clicks on the plus icon associated with available tables.
+ * - Handles clicks on the "Add to cart" and "Remove from cart" button.
  *
  * @param {jQuery} $ - jQuery reference.
  * @param {Array} tables - Array of variation/table IDs.
- * @param {number} productID - Product ID representing the vendor table.
  * @returns {void} - No return value.
  */
 function rcn_vpTableListingHandler($, tables) {
-  // Initializes table listing functionality
   const tableListingContainer = $('#rcn-vp-table-listing-container');
   const tableListingWrapper = $('<ul>');
 
   tableListingWrapper.addClass('rcn-vp-table-wrapper-ul');
-
   tableListingContainer.empty();
 
-  // Create listings based on provided variation/table IDs
   for (let i = 0; i < tables.length; i++) {
     const table = tables[i];
 
@@ -865,7 +854,13 @@ function rcn_vpTableListingHandler($, tables) {
 					  </div>
 				  </div>
 				  <div class="rcn_vp-table-listing-body">
-					  <div class="rcn_vp-table-listing-body-description"></div>
+					  <div class="rcn_vp-table-listing-body-description">
+              <img
+              src="https://realitycapturenetwork.com/wp-content/uploads/2024/02/Eclipse-1s-200px.gif" 
+              width="30px"
+              height="30px"
+              />
+            </div>
 					  <div class="rcn_vp-table-listing-body-action">
 						  <div>
                 <img 
@@ -880,7 +875,7 @@ function rcn_vpTableListingHandler($, tables) {
 							  </div>
 							  <small class="rcn_vp-table-status-reserved">Reserved</small>
 						  </div>
-						  <span class="rcn_vp-table-listing-body-action-price"><strong>Price: </strong></span>
+						  <span class="rcn_vp-table-listing-body-action-price"></span>
 					  </div>
 				  </div>
       </li>`
@@ -893,16 +888,12 @@ function rcn_vpTableListingHandler($, tables) {
     });
   });
 
-  rcn_tableAvailabilityHandler($, tables, tableListingContainer);
+  rcn_tableDataHandler($, tables, tableListingContainer);
 
   // Handles clicks on li tags
   tableListingWrapper.on('click', 'li', function () {
     rcn_handleClickOnLi($, $(this));
   });
-
-  // tableListingWrapper.on('click', '.rcn-vp-table-action', function () {
-  //   rcn_tableActionHandler($, $(this));
-  // });
 
   tableListingContainer.append(tableListingWrapper);
 }
@@ -919,17 +910,8 @@ function rcn_vpTableListingHandler($, tables) {
  * @param {jQuery} tableListingContainer - jQuery selector for the target container.
  * @returns {void} - No return value.
  */
-function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
+function rcn_tableDataHandler($, tables, tableListingContainer) {
   const rcn_ajaxurl = window.rcn_vpAjaxurl;
-  const productID = window.productID;
-
-  function iconElement(iconClass, tableId) {
-    return `<i data-table-id="${tableId}" aria-hidden="true" class="fas ${iconClass} rcn-vp-table-action"></i>`;
-  }
-
-  function reservedElement(tableId) {
-    return `<span data-table-id="${tableId}" class="rcn-vp-reserved-table"><small>Reserved</small></span>`;
-  }
 
   for (let i = 0; i < tables.length; i++) {
     const table = tables[i];
@@ -938,8 +920,7 @@ function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
       type: 'POST',
       url: rcn_ajaxurl,
       data: {
-        action: 'is_table_available',
-        product_id: productID,
+        action: 'rcn_vp_get_table_data',
         variation_id: table.id,
       },
       success: function (response) {
@@ -956,14 +937,15 @@ function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
     const status = response.status;
     const tableElement = $(tableListingContainer).find('.table-' + table.no);
     let price = Number(response.price);
+    price = '<strong>Price: </strong>' + rcn_vpPriceFormatter(price, 2);
 
     tableElement
       .find('.rcn_vp-table-listing-body-description')
-      .append(response.description);
+      .html(response.description);
 
     tableElement
       .find('.rcn_vp-table-listing-body-action-price')
-      .append(rcn_vpPriceFormatter(price, 2));
+      .html(price);
 
     // If the table is already reserved
     if (!status) {
@@ -972,31 +954,26 @@ function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
       return;
     }
 
+    tableElement.attr('data-is-unavailable', false);
+
+    // If the table is in cart
     let cartItems = localStorage.getItem('rcn_vpCartData');
     cartItems = JSON.parse(cartItems);
     cartItems = cartItems ? cartItems.map((item) => item.id) : [];
 
     let isTableInCart = cartItems.includes(table.id);
 
-    // If the table is in cart
     if (isTableInCart) {
       tableElement.removeClass('rcn-vp-status-checking-table');
       tableElement.addClass('rcn-vp-added-to-cart-table');
       return;
     }
 
-    // If the table is available
+    // If the table is available and not in cart
     if (status) {
       tableElement.removeClass('rcn-vp-status-checking-table');
       tableElement.addClass('rcn-vp-available-table');
       return;
-    }
-
-    // If the table is not in cart
-    if (!isTableInCart) {
-      tableElement.removeClass('rcn-vp-unavailable-table');
-      tableElement.addClass('rcn-vp-available-table');
-      tableElement.attr('data-is-unavailable', false);
     }
   }
 }
@@ -1036,15 +1013,14 @@ function rcn_tableActionHandler($, element) {
   // Handle add to cart event
   $(element)
     .find('.rcn_vp-table-listing-body-add-to-cart-btn')
-    .click('click', function () {
+    .on('click', function () {
       let notification = {
         type: 'info',
         message: 'Adding item to cart',
       };
-
       rcn_vpCartVisualInteraction($, false, notification);
-      $(this).hide();
 
+      $(this).hide();
       $(element).find('.rcn_vp-table-listing-body-action-spinner').show();
 
       addTableToCart();
@@ -1087,6 +1063,7 @@ function rcn_tableActionHandler($, element) {
   function tableAddToCartResponseHandler(response) {
     $(element).find('.rcn_vp-table-listing-body-action-spinner').hide();
     $(element).find('.rcn_vp-table-listing-body-add-to-cart-btn').show();
+
     const result = JSON.parse(response);
 
     // 1002 means, the table is recently reserved by someone else
@@ -1094,8 +1071,6 @@ function rcn_tableActionHandler($, element) {
       element
         .removeClass('rcn-vp-available-table')
         .addClass('rcn-vp-unavailable-table');
-
-      element.attr('data-is-unavailable', true);
     }
 
     // 1001 means, the table is available for reservation
@@ -1125,17 +1100,14 @@ function rcn_tableActionHandler($, element) {
  * Initializes table according boxes.
  *
  * @param {jQuery} $ - jQuery reference.
+ * @returns {void} - No return value.
  */
 function rcn_vpTableListingAccordingBox($) {
-  // This is assuming that this function is being called after the DOM is loaded
-  console.log('!!');
 
-  // Hide elements and set up event handlers directly
   $('.rcn_vp-table-listing-body').fadeOut();
   $('.rcn_vp-table-listing-head .fa-angle-up').hide();
   $('.rcn_vp-table-listing-body-action-spinner').hide();
 
-  // Set up click event for table head
   $('.rcn_vp-table-listing-head').on('click', function () {
     $(this).siblings('.rcn_vp-table-listing-body').toggle();
     $(this).find('.fa-angle-down').toggle();
@@ -1148,6 +1120,7 @@ function rcn_vpTableListingAccordingBox($) {
  *
  * @param {jQuery} $ - jQuery reference.
  * @param {jQuery} tableID - The table ID.
+ * @returns {void} - No return value.
  */
 function rcn_vpTableLocationIndicatorHandler($, tableID) {
   const activeFloorNumber = localStorage.getItem('rcn_activeFloorNumber');
@@ -1170,6 +1143,7 @@ function rcn_vpTableLocationIndicatorHandler($, tableID) {
  * Configures the custom accordion box used for displaying vendor package add-ons.
  *
  * @param {jQuery selector} $ - jQuery reference.
+ * @returns {void} - No return value.
  */
 function rcn_vpAddonsAccording($) {
   $('.rcn-vpaa-angle-down').show();

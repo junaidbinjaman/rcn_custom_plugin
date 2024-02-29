@@ -10,12 +10,16 @@
  */
 
 /**
- * Vendor package table availability checker
+ * Table data retriever.
+ *
+ * The function checks the table stock status and returns true if not out of stock.
+ * It returns false of it is out of stock.
+ *
+ * The function also, returns table description and price to the price as well.
  *
  * @return void
  */
-function is_table_available() {
-	$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0; // phpcs:ignore
+function rcn_vp_get_table_data() {
 	$variation_id 	= isset( $_POST['variation_id'] ) ? intval( $_POST['variation_id'] ) : 0; // phpcs:ignore
 
 	$product      = wc_get_product( $variation_id );
@@ -50,8 +54,8 @@ function is_table_available() {
 	}
 }
 
-add_action( 'wp_ajax_is_table_available', 'is_table_available' );
-add_action( 'wp_ajax_nopriv_is_table_available', 'is_table_available' );
+add_action( 'wp_ajax_rcn_vp_get_table_data', 'rcn_vp_get_table_data' );
+add_action( 'wp_ajax_nopriv_rcn_vp_get_table_data', 'rcn_vp_get_table_data' );
 
 
 /**
