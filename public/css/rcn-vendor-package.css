@@ -344,6 +344,15 @@
   margin-left: 0 !important;
 }
 
+.rcn_vp-table-listing-head {
+  border-top: 0.5px solid #8080803d;
+}
+
+.rcn_vp-table-listing-body {
+  border-top: 0.5px solid #8080803d;
+  text-align: left;
+}
+
 .rcn_vp-table-listing-body-description {
   margin-bottom: 10px;
 }
@@ -353,10 +362,10 @@
   font-size: 13px;
 }
 
+
 /* Style for available table listing */
 .rcn-vp-available-table {
   width: 343px;
-  border-bottom: 1px solid #c1c7cd;
   background-color: transparent;
   color: var(--e-global-color-secondary);
   list-style: none;
@@ -407,6 +416,14 @@
   align-items: center;
 }
 
+@media (max-width: 500px) {
+  .rcn-vp-available-table .rcn_vp-table-listing-body-action {
+    align-items: start;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
 .rcn-vp-available-table .rcn_vp-table-listing-body-add-to-cart-btn {
   transition: all 0.2s ease-in-out;
   display: block;
@@ -421,7 +438,6 @@
 
 .rcn-vp-added-to-cart-table {
   width: 343px;
-  border-bottom: 1px solid #c1c7cd;
   background-color: #6b7989;
   color: var(--e-global-color-text);
   list-style: none;
@@ -439,6 +455,7 @@
   padding-top: 10px;
   padding-bottom: 10px;
   background: transparent;
+  border-top: 0.5px solid #ffffff3d;
   cursor: pointer;
   font-size: 16px;
   font-weight: 500;
@@ -474,6 +491,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+@media (max-width: 500px) {
+  .rcn-vp-added-to-cart-table .rcn_vp-table-listing-body-action {
+    align-items: start;
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 
 .rcn-vp-added-to-cart-table .rcn_vp-table-listing-body-add-to-cart-btn {
@@ -527,7 +552,6 @@
 /* Styles for unavailable table listings */
 .rcn-vp-unavailable-table {
   width: 343px;
-  border-bottom: 1px solid #c1c7cd;
   background: rgba(81, 81, 81, 0.14);
   color: #7e7e84;
   list-style: none;
@@ -637,7 +661,6 @@
 /* Styles for status checking table listings */
 .rcn-vp-status-checking-table {
   width: 343px;
-  border-bottom: 1px solid #c1c7cd;
   background: rgba(81, 81, 81, 0.14);
   color: #7e7e84;
   list-style: none;
@@ -746,10 +769,6 @@
   color: #fff !important;
 } */
 
-.rcn-vp-selected-table i.fa-plus {
-  cursor: pointer;
-}
-
 @media (max-width: 550px) {
   .rcn-vtsb-e-column {
     width: 320px !important;
@@ -758,7 +777,7 @@
   .rcn-vp-available-table,
   .rcn-vp-added-to-cart-table,
   .rcn-vp-unavailable-table,
-  .rcn-vp-selected-table {
+  .rcn-vp-status-checking-table {
     width: 313px;
   }
 }

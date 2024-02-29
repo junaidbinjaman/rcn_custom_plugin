@@ -10,6 +10,7 @@
 
   $(function () {
     setTimeout(() => {
+
       $('.rcn_vp-table-listing-body').fadeOut();
       $('.rcn_vp-table-listing-head .fa-angle-up').hide();
       $('.rcn_vp-table-listing-body-action-spinner').hide();
@@ -23,6 +24,7 @@
             $(this).find('.fa-angle-up').toggle();
           });
       });
+      
     }, 200);
   });
 })(jQuery);

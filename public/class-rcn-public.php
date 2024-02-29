@@ -81,37 +81,4 @@ class Rcn_Public {
 			wp_localize_script( 'vendor-package', 'wp_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 		}
 	}
-
-	/**
-	 * This is the callback for init action hook.
-	 *
-	 * All the function that needs to go inside init hook on public side will take place inside this callback
-	 *
-	 * @return void
-	 */
-	public function initialize_rcn() {
-		add_shortcode( 'foobar', array( $this, 'foobar' ) );
-	}
-
-	/**
-	 * THis is a testing function.
-	 *
-	 * The function is temporary. It's used just to visualize the development
-	 *
-	 * @return void
-	 */
-	public function foobar() {
-		$product      = wc_get_product( 27760 );
-		$description  = $product->get_description();
-		$price        = $product->get_price();
-		$stock_status = $product->get_stock_status();
-
-		echo '<pre style="background: black">';
-		var_dump( 
-			'Description: ' . $description .
-			'Price: ' . $price . 
-			'Stock Status: ' . $stock_status
-		 );
-		echo '</pre>';
-	}
 }

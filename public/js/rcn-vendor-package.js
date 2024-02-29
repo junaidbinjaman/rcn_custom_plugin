@@ -107,6 +107,8 @@ function rcn_vpTableFloorHandler($) {
     localStorage.setItem('rcn_activeFloorNumber', $(this).val());
     rcn_floorSelectionHandler($);
   });
+
+  rcn_vpTableListingAccordingBox($);
 }
 
 /**
@@ -786,8 +788,8 @@ function rcn_floorSelectionHandler($) {
     {no: 31, id: 27790},
     {no: 32, id: 27791},
     {no: 33, id: 27792},
-    {no: 34, id: 27793},
-    {no: 35, id: 27794},
+    // {no: 34, id: 27793},
+    // {no: 35, id: 27794},
   ];
 
   // Toggle floor plan map/image
@@ -807,6 +809,7 @@ function rcn_floorSelectionHandler($) {
     rcn_vpTableListingHandler($, floorThreeTables);
   }
 
+  rcn_vpTableListingAccordingBox($);
   rcn_vpTableLocationIndicatorHandler($, 0);
 }
 
@@ -848,7 +851,7 @@ function rcn_vpTableListingHandler($, tables) {
     const table = tables[i];
 
     tableListingWrapper.append(
-      `<li data-is-unavailable="true" class="rcn-vp-unavailable-table rcn_vp-table-listing table-${table.no}" data-table-no="${table.no}" data-table-id="${table.id}">
+      `<li data-is-unavailable="true" class="rcn-vp-status-checking-table rcn_vp-table-listing table-${table.no}" data-table-no="${table.no}" data-table-id="${table.id}">
 				  <div class="rcn_vp-table-listing-head">
 					  <div class="rcn_vp-table-listing-head-left">
 						  <i aria-hidden="true" class="fas fa-angle-down"></i>
@@ -963,7 +966,11 @@ function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
       .append(rcn_vpPriceFormatter(price, 2));
 
     // If the table is already reserved
-    if (!status) return;
+    if (!status) {
+      tableElement.removeClass('rcn-vp-status-checking-table');
+      tableElement.addClass('rcn-vp-unavailable-table');
+      return;
+    }
 
     let cartItems = localStorage.getItem('rcn_vpCartData');
     cartItems = JSON.parse(cartItems);
@@ -973,14 +980,14 @@ function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
 
     // If the table is in cart
     if (isTableInCart) {
-      tableElement.removeClass('rcn-vp-unavailable-table');
+      tableElement.removeClass('rcn-vp-status-checking-table');
       tableElement.addClass('rcn-vp-added-to-cart-table');
       return;
     }
 
     // If the table is available
     if (status) {
-      tableElement.removeClass('rcn-vp-unavailable-table');
+      tableElement.removeClass('rcn-vp-status-checking-table');
       tableElement.addClass('rcn-vp-available-table');
       return;
     }
@@ -1026,15 +1033,16 @@ function rcn_tableActionHandler($, element) {
   const variationID = element.attr('data-table-id');
   const tableNo = element.attr('data-table-no');
 
-  let notification = {
-    type: 'info',
-    message: 'Adding item to cart',
-  };
-  rcn_vpCartVisualInteraction($, false, notification);
-
+  // Handle add to cart event
   $(element)
     .find('.rcn_vp-table-listing-body-add-to-cart-btn')
     .click('click', function () {
+      let notification = {
+        type: 'info',
+        message: 'Adding item to cart',
+      };
+
+      rcn_vpCartVisualInteraction($, false, notification);
       $(this).hide();
 
       $(element).find('.rcn_vp-table-listing-body-action-spinner').show();
@@ -1042,6 +1050,7 @@ function rcn_tableActionHandler($, element) {
       addTableToCart();
     });
 
+  // Handle remove from cart event
   $(element)
     .find('.rcn_vp-table-listing-body-remove-cart-btn')
     .click('click', function () {
@@ -1110,6 +1119,28 @@ function rcn_tableActionHandler($, element) {
       rcn_vpTriggerCartOnTabletMobile($);
     }
   }
+}
+
+/**
+ * Initializes table according boxes.
+ *
+ * @param {jQuery} $ - jQuery reference.
+ */
+function rcn_vpTableListingAccordingBox($) {
+  // This is assuming that this function is being called after the DOM is loaded
+  console.log('!!');
+
+  // Hide elements and set up event handlers directly
+  $('.rcn_vp-table-listing-body').fadeOut();
+  $('.rcn_vp-table-listing-head .fa-angle-up').hide();
+  $('.rcn_vp-table-listing-body-action-spinner').hide();
+
+  // Set up click event for table head
+  $('.rcn_vp-table-listing-head').on('click', function () {
+    $(this).siblings('.rcn_vp-table-listing-body').toggle();
+    $(this).find('.fa-angle-down').toggle();
+    $(this).find('.fa-angle-up').toggle();
+  });
 }
 
 /**
