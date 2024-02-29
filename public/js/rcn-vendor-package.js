@@ -418,16 +418,8 @@ function rcn_vpCartVisualInteraction(
         totalCartItems
       );
     }
-
-    return;
   }
 
-  /**
-   * Handles the creation of notification messages based on the notification type.
-   *
-   * @param {Object} notification - Object containing notification details (type and message).
-   * @returns {jQuery} - jQuery object representing the notification message.
-   */
   function notificationHandler(notification) {
     const msg = $('<p>');
 
@@ -586,8 +578,13 @@ function rcn_addProductToCart($, action = 'loadCart', cartItem) {
   }
 }
 
+/**
+ * Trigger cart popup on mobile and tablet after a product is added to cart
+ *
+ * @param {string} productID - ID of the product to be removed from the cart.
+ */
 function rcn_vpTriggerCartOnTabletMobile() {
-  const popupId = 27815
+  const popupId = 27815; // Elementor popup id
 
   let isNotDesktop = window.matchMedia(
     'only screen and (max-width: 1030px)'
@@ -802,7 +799,7 @@ function rcn_floorSelectionHandler($) {
 
   setTimeout(() => {
     rcn_vpTableListingAccordingBox($);
-  }, 200)
+  }, 200);
   rcn_vpTableLocationIndicatorHandler($, 0);
 }
 
@@ -832,6 +829,8 @@ function rcn_floorSelectionHandler($) {
 function rcn_vpTableListingHandler($, tables) {
   const tableListingContainer = $('#rcn-vp-table-listing-container');
   const tableListingWrapper = $('<ul>');
+  const spinnerUrl =
+    'https://realitycapturenetwork.com/wp-content/uploads/2024/02/Eclipse-1s-200px.gif';
 
   tableListingWrapper.addClass('rcn-vp-table-wrapper-ul');
   tableListingContainer.empty();
@@ -856,7 +855,7 @@ function rcn_vpTableListingHandler($, tables) {
 				  <div class="rcn_vp-table-listing-body">
 					  <div class="rcn_vp-table-listing-body-description">
               <img
-              src="https://realitycapturenetwork.com/wp-content/uploads/2024/02/Eclipse-1s-200px.gif" 
+              src="${spinnerUrl}" 
               width="30px"
               height="30px"
               />
@@ -865,7 +864,7 @@ function rcn_vpTableListingHandler($, tables) {
 						  <div>
                 <img 
                 class="rcn_vp-table-listing-body-action-spinner" 
-                src="https://realitycapturenetwork.com/wp-content/uploads/2024/02/Eclipse-1s-200px.gif" 
+                src="${spinnerUrl}" 
                 width="30px"
                 height="30px"
                 />
@@ -943,9 +942,7 @@ function rcn_tableDataHandler($, tables, tableListingContainer) {
       .find('.rcn_vp-table-listing-body-description')
       .html(response.description);
 
-    tableElement
-      .find('.rcn_vp-table-listing-body-action-price')
-      .html(price);
+    tableElement.find('.rcn_vp-table-listing-body-action-price').html(price);
 
     // If the table is already reserved
     if (!status) {
@@ -1071,6 +1068,12 @@ function rcn_tableActionHandler($, element) {
       element
         .removeClass('rcn-vp-available-table')
         .addClass('rcn-vp-unavailable-table');
+
+      let notification = {
+        type: 'info',
+        message: 'Item cannot be added to cart',
+      };
+      rcn_vpCartVisualInteraction($, false, notification, null, callback, 2);
     }
 
     // 1001 means, the table is available for reservation
@@ -1094,6 +1097,17 @@ function rcn_tableActionHandler($, element) {
       rcn_vpTriggerCartOnTabletMobile($);
     }
   }
+
+  function callback(
+    notificationContainerClass,
+    cartContainer,
+    disableScrollClass
+  ) {
+    setTimeout(() => {
+      $('.' + notificationContainerClass).remove();
+      cartContainer.removeClass(disableScrollClass);
+    }, 700);
+  }
 }
 
 /**
@@ -1103,7 +1117,6 @@ function rcn_tableActionHandler($, element) {
  * @returns {void} - No return value.
  */
 function rcn_vpTableListingAccordingBox($) {
-
   $('.rcn_vp-table-listing-body').fadeOut();
   $('.rcn_vp-table-listing-head .fa-angle-up').hide();
   $('.rcn_vp-table-listing-body-action-spinner').hide();
