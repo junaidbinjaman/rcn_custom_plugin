@@ -60,7 +60,6 @@ class Rcn_Public {
 	public function enqueue_styles() {
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rcn-public.css', array(), $this->version, 'all' );
-		wp_enqueue_style( 'custom-scrollbar-styles', '//cdn.jsdelivr.net/npm/simplebar@6.2.5/dist/simplebar.css', array(), $this->version, 'all' );
 
 		// 27500 is vendor package page id
 		if ( is_single( 27500 ) ) {
@@ -75,7 +74,6 @@ class Rcn_Public {
 	 */
 	public function enqueue_scripts() {
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rcn-public.js', array( 'jquery' ), $this->version, false );
-		wp_enqueue_script( 'custom-scrollbar-scripts', '//cdn.jsdelivr.net/npm/simplebar@6.2.5/dist/simplebar.min.js', array(), $this->version, false );
 
 		// 27500 is vendor package page id
 		if ( is_single( 27500 ) ) {
