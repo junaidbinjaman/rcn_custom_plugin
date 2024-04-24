@@ -1,0 +1,729 @@
+/**
+ * All of the CSS for your public-facing functionality should be
+ * included in this file.
+ */
+
+/**
+ * #.# Vendor Package General Styles
+ *
+ * The style that applies to each section of vendor package function
+ */
+
+.rcn-vp-general-button-class {
+  cursor: pointer;
+}
+
+/**
+ * #.# Vendor Package Step Styles
+ *
+ * The following section includes styles related to vendor package steps,
+ * such as step indicator circles at the top (e.g., 1 or 2).
+ */
+
+.rcn-vp-step-indicator h2 {
+  width: 75px;
+  height: 75px;
+  padding: 22px 30px;
+  border-radius: 100%;
+  background: var(--e-global-color-126a520);
+  text-align: center;
+}
+
+@media screen and (max-width: 770px) {
+  .rcn-vp-step-indicator h2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 65px;
+    height: 65px;
+  }
+}
+
+/**
+ * #.# Vendor Package Wrapper
+ *
+ * Two-column layout: Left column displays package listings with an 'Add to Cart' button,
+ * while the right column features the cart.
+ */
+
+.rcn-vp-content-wrapper {
+  width: 500px !important;
+  margin: auto;
+}
+
+@media screen and (max-width: 450px) {
+  .rcn-vp-content-wrapper {
+    width: 350px !important;
+  }
+}
+
+/**
+ * #.# Vendor Package Cart
+ *
+ * Styles for the vendor package cart, including media queries, are defined below.
+ * The left column features package listings with an 'Add to Cart' button.
+ */
+
+/* Cart container styles */
+.rcn-vpc {
+  height: 453px;
+}
+
+.rcn-vpciw {
+  height: 230px;
+  overflow-x: hidden;
+}
+
+.rcn-vpciw::-webkit-scrollbar {
+  width: 0px;
+}
+
+.rcn-vpciw::-webkit-scrollbar-track {
+  background-color: #f1f1f1;
+}
+
+.rcn-vpciw::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background-color: #888;
+}
+
+.rcn-vpciw::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+/* Cart listing styles */
+.rcn-vp-cart-name-header {
+  margin-right: 15px;
+}
+
+.rcn-vp-cart-quantity-header {
+  margin-right: 16px;
+}
+
+.rcn-vp-cart-price-header {
+  margin-right: 15px;
+}
+
+.rcn-vpciw ul {
+  margin-left: 0px;
+}
+
+.rcn-vpciw.disable-scroll ul {
+  height: 100%;
+  margin-bottom: 0px;
+  overflow: hidden;
+}
+
+.rcn-vp-cart-listing {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 10px 15px;
+  font-size: 13px;
+  line-height: 20px;
+  font-style: normal;
+  font-weight: 400;
+  color: #282b30;
+}
+
+.rcn-vp-cart-listing-remove {
+  cursor: pointer;
+}
+
+.rcn-vp-cart-listing-meta {
+  display: flex;
+  gap: 15px;
+}
+
+.rcn-vp-cart-name-header,
+.rcn-vp-cart-listing-name {
+  width: 170px !important;
+}
+
+.rcn-vp-cart-quantity-header,
+.rcn-vp-cart-listing-quantity {
+  width: 26px !important;
+}
+
+.rcn-vp-cart-price-header,
+.rcn-vp-cart-listing-price {
+  width: 80px !important;
+}
+
+.rcn-vp-cart-remove-header,
+.rcn-vp-cart-listing-remove {
+  width: 58px !important;
+}
+
+.rcn-vp-cart-listing-remove:active {
+  transform: scale(0.8);
+}
+
+/* Cart notification */
+.rcn-vp-cart-notification {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  box-shadow: 0px 1px 6px 0px rgba(0, 0, 0, 0.15);
+  top: 0;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  background: #ffffff9e;
+  text-align: center;
+}
+
+.rcn-vp-cart-info-notification {
+  color: var(--e-global-color-secondary);
+}
+
+.rcn-vp-success-notification {
+  color: var(--e-global-color-secondary);
+}
+
+.rcn-vp-error-notification {
+  color: var(--e-global-color-secondary);
+}
+
+.rcn-vp-cart-listing-label {
+  display: none;
+}
+
+/* Step switcher buttons */
+.rcn_vps-prev-button,
+.rcn_vps-next-button,
+.rcn_vps-checkout-button {
+  width: 170px !important;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  border-radius: 8px;
+  background-color: var(--e-global-color-primary);
+  text-align: center !important;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.rcn_vps-prev-button {
+  margin-right: auto !important;
+}
+
+.rcn_vps-next-button,
+.rcn_vps-checkout-button {
+  margin-left: auto !important;
+}
+
+@media (max-width: 500px) {
+  .rcn_pv-mobile-cart-nav-btn
+    span.elementor-button-icon.elementor-align-icon-left {
+    display: none;
+  }
+
+  .rcn_pv-mobile-cart-nav-btn
+    span.elementor-button-icon.elementor-align-icon-right {
+    display: none;
+  }
+}
+
+/* Tablet styles */
+@media (max-width: 1030px) {
+  .rcn-vp-cart-wrapper {
+    display: none !important;
+  }
+
+  .rcn-vpciw {
+    height: 220px;
+    overflow-x: hidden;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 767px) {
+  .rcn-vpciw {
+    height: 261px;
+  }
+
+  .rcn_vps-prev-button,
+  .rcn_vps-next-button,
+  .rcn_vps-checkout-button {
+    width: 150px !important;
+  }
+
+  .rcn-vp-cart-listing {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .rcn-vp-cart-listing-name {
+    width: 100% !important;
+    font-size: 13px;
+    line-height: 20px;
+    font-weight: 600;
+    color: var(--e-global-color-secondary);
+  }
+
+  .rcn-vp-cart-listing-meta {
+    width: 100%;
+    gap: 5px;
+  }
+
+  .rcn-vp-cart-listing-label,
+  .rcn-vp-cart-listing-quantity,
+  .rcn-vp-cart-listing-price,
+  .rcn-vp-cart-listing-remove {
+    display: inline-block;
+    margin-right: 2px;
+    font-size: 11px;
+    line-height: 18px;
+    font-weight: 400;
+    color: var(--e-global-color-126a520);
+  }
+
+  .rcn-vp-cart-listing-quantity {
+    width: 35px !important;
+  }
+
+  .rcn-vp-cart-listing-price {
+    width: 170px !important;
+  }
+
+  .rcn-vp-cart-listing-remove {
+    width: 58px !important;
+  }
+}
+
+/**
+ * #.# Vendor table listings
+ *
+ * The styles for vendor table listings along with media queries.
+ */
+
+/* Available on mobile and tab only */
+.rcn-vp-floor-selector-form {
+  max-width: 330px;
+  margin: auto;
+}
+
+.rcn-vp-floor-selector-form button {
+  display: none;
+}
+
+/* Vendor table listing box */
+.rcn-vp-table-wrapper-ul {
+  height: 430px;
+  overflow-y: scroll;
+  margin-bottom: 0px !important;
+}
+
+.rcn-vp-table-wrapper-ul::-webkit-scrollbar {
+  width: 5px;
+}
+
+.rcn-vp-table-wrapper-ul::-webkit-scrollbar-track {
+  background-color: #989ea4;
+}
+
+.rcn-vp-table-wrapper-ul::-webkit-scrollbar-thumb {
+  background: #444e5a;
+}
+
+.rcn-vtsb-e-column {
+  width: 350px !important;
+}
+
+@media (max-width: 1030px) {
+  .rcn-vp-floor-1-selector-btn,
+  .rcn-vp-floor-2-selector-btn,
+  .rcn-vp-floor-3-selector-btn {
+    display: none;
+  }
+}
+
+.rcn-vp-table-wrapper-ul {
+  margin-left: 0 !important;
+}
+
+.rcn_vp-table-listing-head {
+  border-top: 0.5px solid #8080803d;
+}
+
+.rcn_vp-table-listing-body {
+  border-top: 0.5px solid #8080803d;
+  text-align: left;
+}
+
+.rcn_vp-table-listing-body-description {
+  margin-bottom: 10px;
+}
+
+.rcn_vp-table-listing-body-remove-cart-btn {
+  text-decoration: underline;
+  font-size: 13px;
+}
+
+/* Styles for status checking table listings */
+.rcn-vp-status-checking-table {
+  width: 343px;
+  background: rgba(81, 81, 81, 0.14);
+  color: #7e7e84;
+  list-style: none;
+  font-size: 16px;
+  line-height: 23px;
+  font-weight: 500;
+}
+
+.rcn-vp-status-checking-table .rcn_vp-table-listing-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.rcn-vp-status-checking-table .rcn_vp-table-listing-head-left {
+  column-gap: 20px;
+}
+
+.rcn-vp-status-checking-table .rcn-vp-table-added-to-cart-indicator {
+  display: none;
+}
+
+.rcn-vp-status-checking-table .rcn_vp-table-status-reserved {
+  display: none;
+}
+
+.rcn-vp-status-checking-table .rcn_vp-table-status-checking {
+  display: block;
+}
+
+.rcn-vp-status-checking-table .rcn_vp-table-listing-body {
+  background: #fff;
+  padding: 20px 20px;
+  color: var(--e-global-color-secondary);
+}
+
+.rcn-vp-status-checking-table .rcn_vp-table-listing-body-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rcn-vp-status-checking-table .rcn_vp-table-listing-body-add-to-cart-btn {
+  transition: all 0.2s ease-in-out;
+  display: none;
+}
+
+.rcn-vp-status-checking-table .rcn_vp-table-listing-body-remove-cart-btn {
+  transition: all 0.2s ease-in-out;
+  display: none;
+}
+
+.rcn-vp-status-checking-table .rcn_vp-table-status-reserved {
+  display: none;
+}
+
+/* Style for available table listing */
+.rcn-vp-available-table {
+  width: 343px;
+  background-color: transparent;
+  color: var(--e-global-color-secondary);
+  list-style: none;
+  font-size: 16px;
+  line-height: 23px;
+  font-weight: 500;
+}
+
+.rcn-vp-available-table .rcn_vp-table-listing-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.rcn-vp-available-table .rcn_vp-table-listing-head-left {
+  column-gap: 20px;
+}
+
+.rcn-vp-available-table .rcn-vp-table-added-to-cart-indicator {
+  display: none;
+}
+
+.rcn-vp-available-table .rcn_vp-table-status-reserved {
+  display: none;
+}
+
+.rcn-vp-available-table .rcn_vp-table-status-checking {
+  display: none;
+}
+
+.rcn-vp-available-table .rcn_vp-table-listing-body {
+  background: #fff;
+  padding: 20px 20px;
+  color: var(--e-global-color-secondary);
+}
+
+.rcn-vp-available-table .rcn_vp-table-listing-body-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (max-width: 500px) {
+  .rcn-vp-available-table .rcn_vp-table-listing-body-action {
+    align-items: start;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.rcn-vp-available-table .rcn_vp-table-listing-body-add-to-cart-btn {
+  transition: all 0.2s ease-in-out;
+  display: block;
+}
+
+.rcn-vp-available-table .rcn_vp-table-listing-body-remove-cart-btn {
+  transition: all 0.2s ease-in-out;
+  display: none;
+}
+
+/* Styles for table added to cart listings */
+.rcn-vp-added-to-cart-table {
+  width: 343px;
+  background-color: #6b7989;
+  color: var(--e-global-color-text);
+  list-style: none;
+  font-size: 16px;
+  line-height: 23px;
+  font-weight: 500;
+}
+
+.rcn-vp-added-to-cart-table .rcn_vp-table-listing-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: transparent;
+  border-top: 0.5px solid #ffffff3d;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.rcn-vp-added-to-cart-table .rcn_vp-table-listing-head-left {
+  column-gap: 20px;
+}
+
+.rcn-vp-added-to-cart-table .rcn_vp-table-status-reserved {
+  display: none;
+}
+
+.rcn-vp-added-to-cart-table .rcn_vp-table-status-checking {
+  display: none;
+}
+
+.rcn-vp-added-to-cart-table .rcn-vp-table-added-to-cart-indicator {
+  display: block;
+  border: 2px solid #fff;
+  padding: 3px;
+  border-radius: 100px;
+  font-size: 13px;
+}
+
+.rcn-vp-added-to-cart-table .rcn_vp-table-listing-body {
+  background: #fff;
+  padding: 20px 20px;
+  color: var(--e-global-color-secondary);
+}
+
+.rcn-vp-added-to-cart-table .rcn_vp-table-listing-body-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (max-width: 500px) {
+  .rcn-vp-added-to-cart-table .rcn_vp-table-listing-body-action {
+    align-items: start;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+.rcn-vp-added-to-cart-table .rcn_vp-table-listing-body-add-to-cart-btn {
+  transition: all 0.2s ease-in-out;
+  display: none;
+}
+
+.rcn-vp-added-to-cart-table .rcn_vp-table-listing-body-remove-cart-btn {
+  display: block;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.rcn-vp-added-to-cart-table .rcn_vp-table-listing-body-remove-cart-btn:active {
+  transform: scale(0.9);
+}
+
+.rcn-vp-added-to-cart-table .rcn_vp-table-status-reserved {
+  display: none;
+}
+
+/* Styles for unavailable table listings */
+.rcn-vp-unavailable-table {
+  width: 343px;
+  background: rgba(81, 81, 81, 0.14);
+  color: #7e7e84;
+  list-style: none;
+  font-size: 16px;
+  line-height: 23px;
+  font-weight: 500;
+}
+
+.rcn-vp-unavailable-table .rcn_vp-table-listing-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.rcn-vp-unavailable-table .rcn_vp-table-listing-head-left {
+  column-gap: 20px;
+}
+
+.rcn-vp-unavailable-table .rcn-vp-table-added-to-cart-indicator {
+  display: none;
+}
+
+.rcn-vp-unavailable-table .rcn_vp-table-status-reserved {
+  display: block;
+}
+
+.rcn-vp-unavailable-table .rcn_vp-table-status-checking {
+  display: none;
+}
+
+.rcn-vp-unavailable-table .rcn_vp-table-listing-body {
+  background: #fff;
+  padding: 20px 20px;
+  color: var(--e-global-color-secondary);
+}
+
+.rcn-vp-unavailable-table .rcn_vp-table-listing-body-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.rcn-vp-unavailable-table .rcn_vp-table-listing-body-add-to-cart-btn {
+  transition: all 0.2s ease-in-out;
+  display: none;
+}
+
+.rcn-vp-unavailable-table .rcn_vp-table-listing-body-remove-cart-btn {
+  transition: all 0.2s ease-in-out;
+  display: none;
+}
+
+.rcn-vp-unavailable-table .rcn_vp-table-status-reserved {
+  display: block;
+}
+
+.rcn-vp-unavailable-table .rcn_vp-table-listing-body-action-price {
+  display: none;
+}
+
+/* Styles for selected table listings */
+.rcn-vp-selected-table {
+  background: var(--e-global-color-primary);
+  color: white !important;
+}
+
+@media (max-width: 550px) {
+  .rcn-vtsb-e-column {
+    width: 320px !important;
+  }
+
+  .rcn-vp-available-table,
+  .rcn-vp-added-to-cart-table,
+  .rcn-vp-unavailable-table,
+  .rcn-vp-status-checking-table {
+    width: 313px;
+  }
+}
+
+@keyframes animatedBackground {
+  0% {
+    transform: scale(0.6);
+    color: #006cfa;
+  }
+  20% {
+    transform: scale(0.8);
+  }
+  40% {
+    transform: scale(1);
+  }
+  60% {
+    transform: scale(0.8);
+  }
+  100% {
+    transform: scale(0.6);
+  }
+}
+
+.rcn-vp-table-location-indicator {
+  animation: animatedBackground 1.3s ease infinite;
+}
+
+/**
+ * #.# Vendor package add-ons
+ *
+ * The styles for vendor package addons.
+ */
+
+.rcn-vpaa-header {
+  cursor: pointer;
+}
+
+.rcn-vpaa-wrapper {
+  overflow: hidden;
+}
+
+.rcn-vpaa-header-active {
+  background-color: var(--e-global-color-primary);
+}
+
+.rcn-vpaa-header-active h2 {
+  color: #fff !important;
+}
+
+.rcn-vpaa-header-active i {
+  color: #fff;
+}
+
+.rc-vpaa-quantity button {
+  display: none;
+}
