@@ -93,3 +93,102 @@ function run_rcn() {
 	$plugin->run();
 }
 run_rcn();
+
+// phpcs:disabled
+
+/**
+ * 
+ *
+ * @since 1.0.0
+ * @param ElementorPro\Modules\Forms\Registrars\Form_Actions_Registrar $form_actions_registrar
+ * @return void
+ */
+function add_new_ping_action( $form_actions_registrar ) {
+
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-rcn-rcon-ar.php';
+
+	$form_actions_registrar->register( new \Rcn_Rcon_Ar() );
+
+}
+add_action( 'elementor_pro/forms/actions/register', 'add_new_ping_action' );
+
+function action_payment_complete( $order_id ) {
+    $order = wc_get_order( $order_id );
+    $ticket_ids = array( 27806, 27805, 27807 );
+    $is_added = get_post_meta( $order_id, 'allowed_attendees', true );
+
+    foreach ( $order->get_items() as $item_id => $item) {
+        // @noinspection
+        $product_id = $item->get_product_id();
+        $qty = $item->get_quantity();
+
+        if ( in_array( $product_id, $ticket_ids ) ) {
+            if ( empty( $is_added ) === true ) {
+                add_post_meta( $order_id, 'allowed_attendees', $qty );
+                add_post_meta( $order_id, 'registered_attendees', 0 );
+            }
+        }
+    }
+}
+
+add_action( 'woocommerce_thankyou', 'action_payment_complete' );
+
+function foobar() {
+    $page_id = 30440;
+    $order_id = $_GET['order-id'];
+
+    $allowed_attendees = get_post_meta( $order_id, 'allowed_attendees', true );
+    $registered_attendees = get_post_meta( $order_id, 'registered_attendees', true );
+    $allowed_attendees = intval( $allowed_attendees );
+    $registered_attendees = intval( $registered_attendees );
+
+    if ( is_admin() ) return;
+    if ( ! is_singular() ) return;
+    if ( ! is_page( $page_id ) ) return;
+
+
+    if ( empty( $allowed_attendees ) ) { ?>
+        <style>
+            .rcn-ar-invalid-url {
+                display: block !important;
+            }
+
+            .rcn-ar-valid-url {
+                display: none !important;
+            }
+        </style>
+        <?php
+        return;
+    }
+
+    if ($allowed_attendees <= $registered_attendees ) { ?>
+        <style>
+            .rcn-ar-form {
+                display: none !important;
+            }
+
+            .rcn-ar-notification {
+                display: block !important;
+            }
+        </style>
+        <?php
+        return;
+    }
+
+    if ( $registered_attendees === 0 ) { ?>
+        <style>
+            .rcn-ar-already-registered {
+                display: none !important;
+            }
+
+            .rcn-ar-no-register {
+                display: block !important;
+            }
+        </style>
+    <?php
+    }
+
+}
+
+add_action( 'wp', 'foobar' );
+

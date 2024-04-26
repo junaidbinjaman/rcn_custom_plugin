@@ -9,7 +9,16 @@
      */
   
     $(function () {
-        console.log(wp_ajax_object.ajax_url);
+        rcn_ar_registered_attendee_toggle_handler($);
     });
   })(jQuery);
+
+  function rcn_ar_registered_attendee_toggle_handler($) {
+    $('.rcn-ar-registered-attendee-listings .header').on('click', function() {
+        $(this).find('.up').toggle();
+        $(this).find('.down').toggle();
+        
+        $(this).siblings().toggle();
+    })
+  }
   
