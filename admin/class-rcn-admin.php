@@ -95,4 +95,18 @@ class Rcn_Admin {
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rcn-admin.js', array( 'jquery' ), $this->version, false );
 	}
+
+	/**
+	 * Registers a new "ping" action for Elementor Pro forms.
+	 * This function includes the required class file and registers an instance of the Rcn_Rcon_Ar class with the form actions registrar.
+	 *
+	 * @since 1.0.0
+	 * @param ElementorPro\Modules\Forms\Registrars\Form_Actions_Registrar $form_actions_registrar The registrar to which the action is added.
+	 * @return void
+	 */
+	public function rcn_ar_register_ar_action( $form_actions_registrar ) {
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-rcn-rcon-ar.php';
+
+		$form_actions_registrar->register( new \Rcn_Rcon_Ar() );
+	}
 }

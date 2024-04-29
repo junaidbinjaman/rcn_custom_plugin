@@ -96,45 +96,7 @@ run_rcn();
 
 // phpcs:disabled
 
-/**
- * 
- *
- * @since 1.0.0
- * @param ElementorPro\Modules\Forms\Registrars\Form_Actions_Registrar $form_actions_registrar
- * @return void
- */
-function add_new_ping_action( $form_actions_registrar ) {
-
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-rcn-rcon-ar.php';
-
-	$form_actions_registrar->register( new \Rcn_Rcon_Ar() );
-
-}
-add_action( 'elementor_pro/forms/actions/register', 'add_new_ping_action' );
-
-function action_payment_complete( $order_id ) {
-    $order = wc_get_order( $order_id );
-    $ticket_ids = array( 27806, 27805, 27807 );
-    $is_added = get_post_meta( $order_id, 'allowed_attendees', true );
-
-    foreach ( $order->get_items() as $item_id => $item) {
-        $product_id = $item->get_product_id();
-        $qty = $item->get_quantity();
-
-        if ( in_array( $product_id, $ticket_ids ) ) {
-            if ( empty( $is_added ) === true ) {
-                add_post_meta( $order_id, 'allowed_attendees', $qty );
-                add_post_meta( $order_id, 'registered_attendees', 0 );
-
-                echo '<script>location.href = "http://localhost:10019/attendee-registration/?order-id=' . $order_id . '"</script>';
-            }
-        }
-    }
-}
-
-add_action( 'woocommerce_thankyou', 'action_payment_complete' );
-
-function foobar() {
+function rcn_ar_url_validator() {
     $page_id = 30440;
     $order_id = $_GET['order-id'];
 
@@ -182,5 +144,24 @@ function foobar() {
 
 }
 
-add_action( 'wp', 'foobar' );
+add_action( 'wp', 'rcn_ar_url_validator' );
+
+
+function rcn_ar_add_registration_page_link_into_email($order, $sent_to_admin, $plain_text, $email) {
+    $ticket_ids = array( 27806, 27805, 27807 );
+    $order_id = $order->get_id();
+
+    foreach ( $order->get_items() as $item_id => $item ) {
+        $product_id = $item->get_product_id();
+        
+        if ( in_array( $product_id, $ticket_ids ) ) {
+            echo '<a href="http://localhost:10019/attendee-registration/?order-id='. $order_id . '">Register Attendees</a>'; 
+        }
+     }
+
+     echo "<h2>Hello, World! Goodbye Problems!</h2>";
+}
+
+add_action( 'woocommerce_email_after_order_table', 'rcn_ar_add_registration_page_link_into_email', 10, 4 );
+
 

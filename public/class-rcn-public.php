@@ -81,7 +81,57 @@ class Rcn_Public {
 			wp_localize_script( 'vendor-package', 'wp_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 		}
 
-		wp_enqueue_script( 'attendee-ticket', plugin_dir_url( __FILE__ ) . 'js/rcn-attendee-ticket.js', array( 'jquery' ), $this->version, 'all' );
-		wp_localize_script( 'attendee-ticket', 'wp_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
+		// 30440 is the attendee registration page id.
+		if ( is_page( 30440 ) ) {
+			wp_enqueue_script( 'attendee-ticket', plugin_dir_url( __FILE__ ) . 'js/rcn-attendee-ticket.js', array( 'jquery' ), $this->version, 'all' );
+		}
+	}
+
+	/**
+	 * Handles post-payment actions to register attendees.
+	 * Upon successful payment, this function checks if the purchased items include specific ticket IDs.
+	 * If yes, and attendees are not yet registered, it registers the attendees and redirects to the registration page.
+	 *
+	 * @since 1.0.0
+	 * @param int $order_id The ID of the order passed by the hook.
+	 * @return void
+	 */
+	public function rcn_ar_action_after_payment( $order_id ) {
+		$order = wc_get_order( $order_id );
+		if ( ! $order ) {
+			return; // Ensure the order exists to prevent errors.
+		}
+
+		$ticket_ids = array( 27806, 27805, 27807 );
+		$is_added   = get_post_meta( $order_id, 'allowed_attendees', true );
+
+		if ( ! empty( $is_added ) ) {
+			return; // Attendees already registered, exit early.
+		}
+
+		foreach ( $order->get_items() as $item ) {
+			/** @var WC_Order_Item_Product $item */ // phpcs:ignore
+			$product_id = $item->get_product_id();
+
+			if ( in_array( $product_id, $ticket_ids ) ) {
+				$quantity = $item->get_quantity();
+
+				add_post_meta( $order_id, 'allowed_attendees', $quantity );
+				add_post_meta( $order_id, 'registered_attendees', 0 );
+				$this->rcn_ar_redirect_to_registration_page( $order_id );
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Redirects to the attendee registration page.
+	 *
+	 * @param int $order_id The order ID used in the query parameter.
+	 */
+	private function rcn_ar_redirect_to_registration_page( $order_id ) {
+		$registration_url = get_page_link( '30440' );
+		wp_safe_redirect( $registration_url . '?order-id=' . $order_id );
+		exit; // Ensure no further execution after redirection.
 	}
 }
