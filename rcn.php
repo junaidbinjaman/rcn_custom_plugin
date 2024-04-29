@@ -118,7 +118,6 @@ function action_payment_complete( $order_id ) {
     $is_added = get_post_meta( $order_id, 'allowed_attendees', true );
 
     foreach ( $order->get_items() as $item_id => $item) {
-        // @noinspection
         $product_id = $item->get_product_id();
         $qty = $item->get_quantity();
 
@@ -126,6 +125,8 @@ function action_payment_complete( $order_id ) {
             if ( empty( $is_added ) === true ) {
                 add_post_meta( $order_id, 'allowed_attendees', $qty );
                 add_post_meta( $order_id, 'registered_attendees', 0 );
+
+                echo '<script>location.href = "http://localhost:10019/attendee-registration/?order-id=' . $order_id . '"</script>';
             }
         }
     }
@@ -167,25 +168,16 @@ function foobar() {
                 display: none !important;
             }
 
+            .rcn-ar-display-form-btn {
+                display: none !important;
+            }
+
             .rcn-ar-notification {
                 display: block !important;
             }
         </style>
         <?php
         return;
-    }
-
-    if ( $registered_attendees === 0 ) { ?>
-        <style>
-            .rcn-ar-already-registered {
-                display: none !important;
-            }
-
-            .rcn-ar-no-register {
-                display: block !important;
-            }
-        </style>
-    <?php
     }
 
 }
