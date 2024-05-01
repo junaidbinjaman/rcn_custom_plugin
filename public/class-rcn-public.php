@@ -92,21 +92,21 @@ class Rcn_Public {
 	 * Upon successful payment, this function checks if the purchased items include specific ticket IDs.
 	 * If yes, and attendees are not yet registered, it registers the attendees and redirects to the registration page.
 	 *
-	 * @since 1.0.0
+	 * @since 1.2.0
 	 * @param int $order_id The ID of the order passed by the hook.
 	 * @return void
 	 */
 	public function rcn_ar_action_after_payment( $order_id ) {
 		$order = wc_get_order( $order_id );
 		if ( ! $order ) {
-			return; // Ensure the order exists to prevent errors.
+			return;
 		}
 
 		$ticket_ids = array( 27806, 27805, 27807 );
 		$is_added   = get_post_meta( $order_id, 'allowed_attendees', true );
 
 		if ( ! empty( $is_added ) ) {
-			return; // Attendees already registered, exit early.
+			return;
 		}
 
 		foreach ( $order->get_items() as $item ) {
@@ -132,6 +132,114 @@ class Rcn_Public {
 	private function rcn_ar_redirect_to_registration_page( $order_id ) {
 		$registration_url = get_page_link( '30440' );
 		wp_safe_redirect( $registration_url . '?order-id=' . $order_id );
-		exit; // Ensure no further execution after redirection.
+		exit;
+	}
+
+	/**
+	 * Validates the attendee registration page URL based on order-id & attendee limits.
+	 *
+	 * @since 1.2.0
+	 */
+	public function rcn_ar_url_validator() {
+		$page_id = 30440;
+
+		if ( is_admin() || ! is_singular() || ! is_page( $page_id ) ) {
+			return;
+		}
+
+		$order_id = isset( $_GET['order-id'] ) ? intval( $_GET['order-id'] ) : 0;
+
+		$allowed_attendees    = intval( get_post_meta( $order_id, 'allowed_attendees', true ) );
+		$registered_attendees = intval( get_post_meta( $order_id, 'registered_attendees', true ) );
+
+		if ( 0 === $allowed_attendees || $allowed_attendees <= $registered_attendees ) {
+			$this->rcn_ar_visibility_handler( $allowed_attendees, $registered_attendees );
+		}
+	}
+
+	/**
+	 * Handles the page sections visibility.
+	 *
+	 * @param int $allowed_attendees The number of allowed attendees.
+	 * @param int $registered_attendees The number of registered attendees.
+	 * @since 1.2.0
+	 */
+	private function rcn_ar_visibility_handler( $allowed_attendees, $registered_attendees ) {
+		if ( 0 === $allowed_attendees ) {
+			?>
+		<style>
+			.rcn-ar-invalid-url {
+				display: block !important;
+			}
+
+			.rcn-ar-valid-url {
+				display: none !important;
+			}
+		</style>
+			<?php
+		} elseif ( $allowed_attendees <= $registered_attendees ) {
+			?>
+		<style>
+			.rcn-ar-form {
+				display: none !important;
+			}
+
+			.rcn-ar-display-form-btn {
+				display: none !important;
+			}
+
+			.rcn-ar-notification {
+				display: block !important;
+			}
+		</style>
+			<?php
+		}
+	}
+
+	/**
+	 * Add attendee registration page URL in the order confirmation email.
+	 *
+	 * This function checks if the order contains specific ticket products and appends a link to the attendee
+	 * registration page if applicable.
+	 *
+	 * @param WC_Order $order The order object.
+	 * @param bool     $sent_to_admin True if the email is sent to the admin.
+	 * @param bool     $plain_text Whether the email is in plain text.
+	 * @param WC_Email $email The email object.
+	 */
+	public function rcn_ar_add_registration_page_link_into_email( $order, $sent_to_admin, $plain_text, $email ) { // phpcs:ignore
+		$ticket_ids = array( 27806, 27805, 27807 );
+		$order_id   = $order->get_id();
+
+		foreach ( $order->get_items() as $item ) {
+			/** @var WC_Order_Item_Product $item */ // phpcs:ignore
+			$product_id = $item->get_product_id();
+
+			if ( in_array( $product_id, $ticket_ids, true ) ) {
+				$rcn_ar_page_url = add_query_arg( 'order-id', $order_id, get_page_link( 30440 ) );
+				$this->rcn_ar_render_link( $rcn_ar_page_url );
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Renders the link to the attendee registration page.
+	 *
+	 * @param string $url The URL to the registration page.
+	 */
+	private function rcn_ar_render_link( $url ) {
+		?>
+	<div style="margin-bottom: 50px;">
+		<a href="<?php echo esc_url( $url ); ?>"
+			style="color: white;
+					font-weight: normal;
+					text-decoration: underline;
+					background: #045cbe;
+					padding: 20px;">
+			Visit attendee registration page
+		</a>
+	</div>
+		<?php
 	}
 }
