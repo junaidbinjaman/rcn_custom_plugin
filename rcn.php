@@ -93,3 +93,16 @@ function run_rcn() {
 	$plugin->run();
 }
 run_rcn();
+
+// phpcs:disable
+
+function foobar__callback() {
+	$foobar = new Rcn_Utility();
+	$product_id = $foobar->register_attendee_slots( 30916 );
+
+	echo '<pre style="background: black">';
+	var_dump( $product_id );
+	echo '</pre>';
+}
+
+add_action( 'template_redirect', 'foobar__callback' );

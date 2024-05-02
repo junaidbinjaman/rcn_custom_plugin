@@ -501,4 +501,76 @@ class Rcn_Utility {
 			);
 		}
 	}
+
+	/**
+	 * The function register attendee slots in the database
+	 *
+	 * The function accepts the order id and registers allowed_attendees
+	 * and registered_attendees slot in the database
+	 *
+	 * @param int $order_id The order id.
+	 * @return mixed
+	 */
+	public function register_attendee_slots( $order_id ) {
+		$virtual_attendee        = 27807;
+		$conference_attendee     = 27806;
+		$vip_attendee            = 27805;
+		$order_id                = intval( $order_id );
+		$total_allowed_attendees = get_post_meta( $order_id, 'rcn_ar_total_allowed_ticket', true );
+
+		if ( ! empty( $total_allowed_attendees ) ) {
+			return array(
+				'status'         => false,
+				'attendee_count' => 0,
+				'message'        => 'Attendee slots are already generated',
+			);
+		}
+
+		$is_attendees_registered = array(
+			'status'         => false,
+			'attendee_count' => 0,
+			'message'        => '',
+		);
+
+		$order = wc_get_order( $order_id );
+		foreach ( $order->get_items() as $item_id => $item ) {
+			/** @var WC_Order_Item_Product $item */ // phpcs:ignore
+			$product_id  = $item->get_product_id();
+			$product_qty = $item->get_quantity();
+
+			if ( $product_id === $virtual_attendee ) {
+				add_post_meta( $order_id, 'allowed_virtual_attendees', $product_qty );
+				add_post_meta( $order_id, 'registered_virtual_attendees', 0 );
+
+				$is_attendees_registered['status']         = true;
+				$is_attendees_registered['attendee_count'] = $is_attendees_registered['attendee_count'] + $product_qty;
+				continue;
+			}
+
+			if ( $product_id === $conference_attendee ) {
+				add_post_meta( $order_id, 'allowed_conference_attendees', $product_qty );
+				add_post_meta( $order_id, 'registered_conference_attendees', 0 );
+
+				$is_attendees_registered['status']         = true;
+				$is_attendees_registered['attendee_count'] = $is_attendees_registered['attendee_count'] + $product_qty;
+				continue;
+			}
+
+			if ( $product_id === $vip_attendee ) {
+				add_post_meta( $order_id, 'allowed_vip_attendees', $product_qty );
+				add_post_meta( $order_id, 'registered_vip_attendees', 0 );
+
+				$is_attendees_registered['status']         = true;
+				$is_attendees_registered['attendee_count'] = $is_attendees_registered['attendee_count'] + $product_qty;
+				continue;
+			}
+		}
+
+		if ( false === $is_attendees_registered['status'] ) {
+			$total_allowed_attendees = $is_attendees_registered['attendee_count'];
+			add_post_meta( $order_id, 'total_allowed_attendees', $total_allowed_attendees );
+		}
+
+		return $is_attendees_registered;
+	}
 }
