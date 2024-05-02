@@ -98,11 +98,34 @@ run_rcn();
 
 function foobar__callback() {
 	$foobar = new Rcn_Utility();
-	$product_id = $foobar->register_attendee_slots( 30916 );
+	// $product_id = $foobar->register_attendee_slots( 30910 );
 
-	echo '<pre style="background: black">';
-	var_dump( $product_id );
-	echo '</pre>';
+	// echo '<pre style="background: black">';
+	// var_dump( $product_id );
+	// echo '</pre>';
+
+	add_shortcode( 'rcn_ar_get_ticket_data', 'rcn_ar_get_ticket_data__callback' );
 }
 
-add_action( 'template_redirect', 'foobar__callback' );
+function rcn_ar_get_ticket_data__callback ( $atts = [], $content = null, $tag = '' ) {
+	$atts = array_change_key_case( (array) $atts, CASE_LOWER );
+
+	$param = shortcode_atts(
+		array(
+			'order_id' => '0',
+			'meta' => 'allowed_attendees'
+		), $atts, $tag
+	);
+
+	$ticket_data = get_post_meta( $param['order_id'], $param['meta'], true );
+
+	if ( '0' !== $ticket_data && empty( $ticket_data ) ) {
+		$ticket_data = null;
+	}
+
+	return $ticket_data;
+}
+
+if( ! is_admin() ) {
+	add_action( 'template_redirect', 'foobar__callback' );
+}

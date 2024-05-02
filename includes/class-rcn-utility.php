@@ -512,21 +512,18 @@ class Rcn_Utility {
 	 * @return mixed
 	 */
 	public function register_attendee_slots( $order_id ) {
-		$virtual_attendee        = 27807;
-		$conference_attendee     = 27806;
-		$vip_attendee            = 27805;
 		$order_id                = intval( $order_id );
-		$total_allowed_attendees = get_post_meta( $order_id, 'rcn_ar_total_allowed_ticket', true );
+		$total_allowed_attendees = get_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', true );
 
 		if ( ! empty( $total_allowed_attendees ) ) {
 			return array(
 				'status'         => false,
 				'attendee_count' => 0,
-				'message'        => 'Attendee slots are already generated',
+				'message'        => 'Attendee slots are already generated for this order',
 			);
 		}
 
-		$is_attendees_registered = array(
+		$registration_status = array(
 			'status'         => false,
 			'attendee_count' => 0,
 			'message'        => '',
@@ -538,39 +535,66 @@ class Rcn_Utility {
 			$product_id  = $item->get_product_id();
 			$product_qty = $item->get_quantity();
 
-			if ( $product_id === $virtual_attendee ) {
-				add_post_meta( $order_id, 'allowed_virtual_attendees', $product_qty );
-				add_post_meta( $order_id, 'registered_virtual_attendees', 0 );
+			$is_registered = $this->register_attendee_slots__helper( $product_id, $order_id, $product_qty );
 
-				$is_attendees_registered['status']         = true;
-				$is_attendees_registered['attendee_count'] = $is_attendees_registered['attendee_count'] + $product_qty;
-				continue;
-			}
-
-			if ( $product_id === $conference_attendee ) {
-				add_post_meta( $order_id, 'allowed_conference_attendees', $product_qty );
-				add_post_meta( $order_id, 'registered_conference_attendees', 0 );
-
-				$is_attendees_registered['status']         = true;
-				$is_attendees_registered['attendee_count'] = $is_attendees_registered['attendee_count'] + $product_qty;
-				continue;
-			}
-
-			if ( $product_id === $vip_attendee ) {
-				add_post_meta( $order_id, 'allowed_vip_attendees', $product_qty );
-				add_post_meta( $order_id, 'registered_vip_attendees', 0 );
-
-				$is_attendees_registered['status']         = true;
-				$is_attendees_registered['attendee_count'] = $is_attendees_registered['attendee_count'] + $product_qty;
+			if ( $is_registered > 0 ) {
+				$registration_status['status']         = true;
+				$registration_status['attendee_count'] = $registration_status['attendee_count'] + $is_registered;
 				continue;
 			}
 		}
 
-		if ( false === $is_attendees_registered['status'] ) {
-			$total_allowed_attendees = $is_attendees_registered['attendee_count'];
-			add_post_meta( $order_id, 'total_allowed_attendees', $total_allowed_attendees );
+		if ( true === $registration_status['status'] ) {
+			$total_allowed_attendees        = $registration_status['attendee_count'];
+			$registration_status['message'] = 'Total ' . $total_allowed_attendees . ' slots generated';
+
+			add_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', $total_allowed_attendees );
+
+			return $registration_status;
 		}
 
-		return $is_attendees_registered;
+		$registration_status['message'] = 'No attendee ticket for R-CON exists in this order';
+		return $registration_status;
+	}
+
+	/**
+	 * The helper function of register_attendee_slots
+	 *
+	 * This function registered the slot in the database
+	 * and return product quantity if registered.
+	 * Otherwise, it returns 0.
+	 *
+	 * @param int $product_id The product id.
+	 * @param int $order_id The order id.
+	 * @param int $product_qty The product quantity.
+	 * @return int
+	 */
+	private function register_attendee_slots__helper( $product_id, $order_id, $product_qty ) {
+		$virtual_attendee    = 27807;
+		$conference_attendee = 27806;
+		$vip_attendee        = 27805;
+
+		if ( $product_id === $virtual_attendee ) {
+			add_post_meta( $order_id, 'allowed_virtual_attendees', $product_qty );
+			add_post_meta( $order_id, 'registered_virtual_attendees', 0 );
+
+			return $product_qty;
+		}
+
+		if ( $product_id === $conference_attendee ) {
+			add_post_meta( $order_id, 'allowed_conference_attendees', $product_qty );
+			add_post_meta( $order_id, 'registered_conference_attendees', 0 );
+
+			return $product_qty;
+		}
+
+		if ( $product_id === $vip_attendee ) {
+			add_post_meta( $order_id, 'allowed_vip_attendees', $product_qty );
+			add_post_meta( $order_id, 'registered_vip_attendees', 0 );
+
+			return $product_qty;
+		}
+
+		return 0;
 	}
 }
