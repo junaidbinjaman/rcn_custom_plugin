@@ -242,4 +242,42 @@ class Rcn_Public {
 	</div>
 		<?php
 	}
+
+	/**
+	 * The function returns number of total allowed/registered attendees
+	 *
+	 * @param array  $atts The shortcode attributes.
+	 * @param string $content The content inside the shortcode.
+	 * @param string $tag The shortcode tag.
+	 * @return int
+	 */
+	public function rcn_ar_get_ticket_data__callback( $atts = array(), $content = null, $tag = '' ) {
+		$atts = array_change_key_case( (array) $atts, CASE_LOWER );
+
+		$param = shortcode_atts(
+			array(
+				'order_id' => '0',
+				'meta'     => 'allowed_attendees',
+			),
+			$atts,
+			$tag
+		);
+
+		$ticket_data = get_post_meta( $param['order_id'], $param['meta'], true );
+
+		if ( '0' !== $ticket_data && empty( $ticket_data ) ) {
+			$ticket_data = null;
+		}
+
+		return $ticket_data;
+	}
+
+	/**
+	 * This function contains all the frontend shortcode functions.
+	 *
+	 * @return void
+	 */
+	public function shortcode_initializer() {
+		add_shortcode( 'rcn_ar_get_ticket_data', array( $this, 'rcn_ar_get_ticket_data__callback' ) );
+	}
 }

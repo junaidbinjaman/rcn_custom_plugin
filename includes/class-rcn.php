@@ -173,6 +173,7 @@ class Rcn {
 		$this->loader->add_action( 'woocommerce_thankyou', $plugin_public, 'rcn_ar_action_after_payment' );
 		$this->loader->add_action( 'wp', $plugin_public, 'rcn_ar_url_validator' );
 		$this->loader->add_action( 'woocommerce_email_after_order_table', $plugin_public, 'rcn_ar_add_registration_page_link_into_email', 10, 4 );
+		$this->loader->add_action( 'template_redirect', $plugin_public, 'shortcode_initializer' );
 	}
 
 	/**
