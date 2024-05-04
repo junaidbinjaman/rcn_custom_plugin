@@ -10,7 +10,7 @@
 
   $(function () {
     rcn_ar_initializeAttendeeToggle($);
-    rcn_ar_setupFormVisibilityToggle($);
+    rcn_ar_registrationSectionToggleHandler($)
   });
 })(jQuery);
 
@@ -29,36 +29,19 @@ function rcn_ar_initializeAttendeeToggle($) {
   });
 }
 
-function rcn_ar_form_toggle_handler($) {
-  $('.rcn-ar-display-form-btn').on('click', foobar);
+function rcn_ar_registrationSectionToggleHandler($) {
+  var ticketTypes = ['regular', 'virtual', 'vip'];
 
-  $('.rcn-ar-hide-form-btn').on('click', foobar);
-
-  function foobar() {
-    $('.rcn-ar-display-form-btn').toggle();
-    $('.rcn-ar-hide-form-btn').toggle();
-    $('.rcn-ar-form').toggle();
+  for (let i = 0; i < ticketTypes.length; i++) {
+    const type = ticketTypes[i];
+    togglerHelper(type)
   }
-}
 
-/**
- * Sets up click event handlers for showing and hiding a form.
- * This function adds functionality to buttons that control the visibility of the form and corresponding toggle buttons.
- *
- * @param {jQuery} $ - jQuery reference.
- */
-function rcn_ar_setupFormVisibilityToggle($) {
-  $('.rcn-ar-display-form-btn').on('click', toggleFormVisibility);
-
-  $('.rcn-ar-hide-form-btn').on('click', toggleFormVisibility);
-
-  /**
-   * Toggles the visibility of the form and the show/hide buttons.
-   */
-  function toggleFormVisibility() {
-    $('.rcn-ar-display-form-btn').toggle();
-    $('.rcn-ar-hide-form-btn').toggle();
-
-    $('.rcn-ar-form').toggle();
+  function togglerHelper(type) {
+    $(`.rcn-ar-register-${type}-attendee`).on('click', function () {
+      $('.rcn-ar-registration-section').hide();
+  
+      $(`.rcn-ar-${type}-attendee`).show();
+    });
   }
 }

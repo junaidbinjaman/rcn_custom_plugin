@@ -97,21 +97,17 @@ run_rcn();
 // phpcs:disable
 
 function foobar__callback() {
-	$foobar = new Rcn_Utility();
-	// $product_id = $foobar->register_attendee_slots( 30910 );
+	$foobar = get_post_meta( '30908', 'rcn_ar_total_allowed_tickets', true );
 
-	// echo '<pre style="background: black">';
-	// var_dump( $product_id );
-	// echo '</pre>';
-
+	if ( ! empty( $foobar ) ) {
+		echo $foobar;
+	} else {
+		echo 'Something went wrong';
+	}
 	
 }
 
 if( ! is_admin() ) {
 	add_action( 'template_redirect', 'foobar__callback' );
 }
-
-add_action( 'init', function() {
-    echo do_shortcode( '[rcn_ar_get_ticket_data order_id="30910" meta="allowed_conference_attendees"]' );
-});
 
