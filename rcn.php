@@ -97,20 +97,21 @@ run_rcn();
 // phpcs:disable
 
 function foobar__callback() {
-	$allowed_attendees    = get_post_meta( 30916, 'allowed_conference_attendees', true );
-	$registered_attendees = get_post_meta( 30916, 'registered_conference_attendees', true );
-	$allowed_attendees    = intval( $allowed_attendees );
-	$registered_attendees = intval( $registered_attendees );
+	// $allowed_attendees    = get_post_meta( 30916, 'allowed_conference_attendees', true );
+	// $registered_attendees = get_post_meta( 30916, 'registered_conference_attendees', true );
+	// $allowed_attendees    = intval( $allowed_attendees );
+	// $registered_attendees = intval( $registered_attendees );
 
-	echo '<pre>';
-	var_dump( is_page( 30440 ) );
-	echo '</pre>';
+	// echo '<pre>';
+	// var_dump( is_page( 30440 ) );
+	// echo '</pre>';
 
-	// update_post_meta( 30916, 'registered_conference_attendees', 10 );
+	// update_post_meta( 30916, 'allowed_conference_attendees', 10 );
+	// delete_post_meta( 30916, 'registered_virtual_attendees' );
 	
 }
 
 if( ! is_admin() ) {
-	// add_action( 'wp', 'foobar__callback' );
+	add_action( 'wp', 'foobar__callback' );
 }
 

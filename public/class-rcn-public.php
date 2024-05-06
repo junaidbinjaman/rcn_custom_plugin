@@ -211,15 +211,15 @@ class Rcn_Public {
 			),
 		);
 
-		$allowed_attendees    = get_post_meta( $ticket_id, 'allowed_conference_attendees', true );
-		$registered_attendees = get_post_meta( $ticket_id, 'registered_conference_attendees', true );
+		$allowed_attendees    = get_post_meta( $ticket_id, "allowed_{$ticket_type}_attendees", true );
+		$registered_attendees = get_post_meta( $ticket_id, "registered_{$ticket_type}_attendees", true );
 		$allowed_attendees    = intval( $allowed_attendees );
 		$registered_attendees = intval( $registered_attendees );
 
-		if ( $registered_attendees > $allowed_attendees ) {
+		if ( $registered_attendees >= $allowed_attendees ) {
 			$this->visibility_handler(
-				array( '.elementor-element.elementor-element-c27f289.rcn-ar-registration-form.e-flex.e-con-boxed.e-con.e-child' ),
-				array( '.elementor-element.elementor-element-d478bc5.rcn-ar-notifications.e-flex.e-con-boxed.e-con.e-child' )
+				array( ".rcn-ar-{$ticket_type}-attendee .rcn-ar-registration-form" ),
+				array( ".rcn-ar-{$ticket_type}-attendee .rcn-ar-notifications" )
 			);
 		}
 	}

@@ -72,35 +72,40 @@ class Rcn_Rcon_Ar extends \ElementorPro\Modules\Forms\Classes\Action_Base {
 			$fields[ $id ] = $field['value'];
 		}
 
-		$registered_attendees = get_post_meta( $fields['orderid'], 'registered_attendees', true );
+		$registered_attendees = get_post_meta( $fields['orderid'], "registered_{$fields['tickettypekey']}_attendees", true );
 		$registered_attendees = intval( $registered_attendees );
 
-		// Create post object.
 		$my_post = array(
 			'post_title'  => $fields['firstname'] . ' ' . $fields['lastname'],
 			'post_status' => 'publish',
 			'post_type'   => 'r-con-attendees',
 			'meta_input'  => array(
-				'orderid'    => $fields['orderid'],
-				'tickettype' => $fields['tickettype'],
-				'firstname'  => $fields['firstname'],
-				'lastname'   => $fields['lastname'],
-				'phone'      => $fields['phone'],
-				'email'      => $fields['email'],
-				'jobtitle'   => $fields['jobtitle'],
-				'company'    => $fields['company'],
-				'address'    => $fields['address'],
-				'linkedin'   => $fields['linkedin'],
-				'shirtsize'  => $fields['shirtsize'],
-				'happyhour'  => $fields['happyhour'],
-				'message'    => $fields['message'],
+				'orderid'        => $fields['orderid'],
+				'conferencecode' => $fields['conferencecode'],
+				'tickettype'     => $fields['tickettype'],
+				'firstname'      => $fields['firstname'],
+				'lastname'       => $fields['lastname'],
+				'phone'          => $fields['phone'],
+				'email'          => $fields['email'],
+				'jobtitle'       => $fields['jobtitle'],
+				'company'        => $fields['company'],
+				'address'        => $fields['address'],
+				'linkedin'       => $fields['linkedin'],
+				'shirtsize'      => $fields['shirtsize'],
+				'happyhour'      => $fields['happyhour'],
+				'message'        => $fields['message'],
 			),
 		);
 
 		// Insert the post into the database.
 		wp_insert_post( $my_post );
 
-		update_post_meta( $fields['orderid'], 'registered_attendees', $registered_attendees + 1 );
+		// update_post_meta( $fields['orderid'], "registered_{$fields['tickettypekey']}_attendees", $registered_attendees + 1 );.
+		?>
+		<script>
+			location.href = 'http://localhost:10019/attendee-registration/?order-id=30916'
+		</script>
+		<?php
 	}
 
 	/**
