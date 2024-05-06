@@ -97,17 +97,20 @@ run_rcn();
 // phpcs:disable
 
 function foobar__callback() {
-	$foobar = get_post_meta( '30908', 'rcn_ar_total_allowed_tickets', true );
+	$allowed_attendees    = get_post_meta( 30916, 'allowed_conference_attendees', true );
+	$registered_attendees = get_post_meta( 30916, 'registered_conference_attendees', true );
+	$allowed_attendees    = intval( $allowed_attendees );
+	$registered_attendees = intval( $registered_attendees );
 
-	if ( ! empty( $foobar ) ) {
-		echo $foobar;
-	} else {
-		echo 'Something went wrong';
-	}
+	echo '<pre>';
+	var_dump( is_page( 30440 ) );
+	echo '</pre>';
+
+	// update_post_meta( 30916, 'registered_conference_attendees', 10 );
 	
 }
 
 if( ! is_admin() ) {
-	add_action( 'template_redirect', 'foobar__callback' );
+	// add_action( 'wp', 'foobar__callback' );
 }
 

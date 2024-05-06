@@ -30,7 +30,7 @@ function rcn_ar_initializeAttendeeToggle($) {
 }
 
 function rcn_ar_registrationSectionToggleHandler($) {
-  var ticketTypes = ['regular', 'virtual', 'vip'];
+  var ticketTypes = ['conference', 'virtual', 'vip'];
 
   for (let i = 0; i < ticketTypes.length; i++) {
     const type = ticketTypes[i];

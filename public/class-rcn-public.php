@@ -140,7 +140,7 @@ class Rcn_Public {
 	 *
 	 * @since 1.2.0
 	 */
-	public function rcn_ar_url_validator() {
+	public function ar_is_url_valid() {
 		$page_id = 30440;
 
 		if ( is_admin() || ! is_singular() || ! is_page( $page_id ) ) {
@@ -149,52 +149,108 @@ class Rcn_Public {
 
 		$order_id = isset( $_GET['order-id'] ) ? intval( $_GET['order-id'] ) : 0;
 
-		$allowed_attendees    = intval( get_post_meta( $order_id, 'allowed_attendees', true ) );
-		$registered_attendees = intval( get_post_meta( $order_id, 'registered_attendees', true ) );
+		$total_allowed_tickets = intval( get_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', true ) );
 
-		if ( 0 === $allowed_attendees || $allowed_attendees <= $registered_attendees ) {
-			$this->rcn_ar_visibility_handler( $allowed_attendees, $registered_attendees );
+		if ( 0 === $total_allowed_tickets ) {
+			$this->visibility_handler(
+				array( 'rcn-ar-valid-url', 'rcn-ar-valid-url' ),
+				array( 'rcn-ar-invalid-url' )
+			);
 		}
 	}
 
 	/**
-	 * Handles the page sections visibility.
+	 * Check Order Items for Ticket Types and Manage Component Visibility
 	 *
-	 * @param int $allowed_attendees The number of allowed attendees.
-	 * @param int $registered_attendees The number of registered attendees.
-	 * @since 1.2.0
+	 * This function iterates through the order items, examining each for ticket types.
+	 * When a ticket type is found, it displays corresponding ticket data on the right sidebar
+	 * and invokes the appropriate function to handle component visibility for that ticket type.
+	 *
+	 * @return void
 	 */
-	private function rcn_ar_visibility_handler( $allowed_attendees, $registered_attendees ) {
-		if ( 0 === $allowed_attendees ) {
-			?>
-		<style>
-			.rcn-ar-invalid-url {
-				display: block !important;
-			}
+	public function ar_check_and_manage_ticket_types() {
+		$page_id = 30440;
 
-			.rcn-ar-valid-url {
-				display: none !important;
-			}
-		</style>
-			<?php
-		} elseif ( $allowed_attendees <= $registered_attendees ) {
-			?>
-		<style>
-			.rcn-ar-form {
-				display: none !important;
-			}
+		if ( is_admin() || ! is_singular() || ! is_page( $page_id ) ) {
+			return;
+		}
 
-			.rcn-ar-display-form-btn {
-				display: none !important;
-			}
+		$order_id   = isset( $_GET['order-id'] ) ? absint( $_GET['order-id'] ) : 0; // phpcs:ignore
+		$order      = wc_get_order( $order_id );
+		$ticket_ids = array(
+			'conference' => 27806,
+			'vip'        => 27805,
+			'virtual'    => 27807,
+		);
 
-			.rcn-ar-notification {
-				display: block !important;
+		foreach ( $order->get_items() as $item_id => $item ) {
+			/** @var WC_Order_Item_Product $item  */ // phpcs:ignore
+			$product_id = intval( $item->get_product_id() );
+
+			if ( in_array( $product_id, $ticket_ids, true ) ) {
+				$this->ar_ticket_component_visibility_handler(
+					array_search( $product_id, $ticket_ids, true ),
+					$order_id,
+				);
 			}
-		</style>
-			<?php
 		}
 	}
+
+	/**
+	 * Toggle components inside a ticket type section.
+	 *
+	 * @param string $ticket_type The ticket type.
+	 * @param int    $ticket_id The ticket product id.
+	 * @return void
+	 */
+	private function ar_ticket_component_visibility_handler( $ticket_type, $ticket_id ) {
+		$this->visibility_handler(
+			null,
+			array(
+				'.rcn-ar-' . $ticket_type . '-ticket-data',
+			),
+		);
+
+		$allowed_attendees    = get_post_meta( $ticket_id, 'allowed_conference_attendees', true );
+		$registered_attendees = get_post_meta( $ticket_id, 'registered_conference_attendees', true );
+		$allowed_attendees    = intval( $allowed_attendees );
+		$registered_attendees = intval( $registered_attendees );
+
+		if ( $registered_attendees > $allowed_attendees ) {
+			$this->visibility_handler(
+				array( '.elementor-element.elementor-element-c27f289.rcn-ar-registration-form.e-flex.e-con-boxed.e-con.e-child' ),
+				array( '.elementor-element.elementor-element-d478bc5.rcn-ar-notifications.e-flex.e-con-boxed.e-con.e-child' )
+			);
+		}
+	}
+
+
+	/**
+	 * Handles the page sections visibility.
+	 *
+	 * @param array $sections_to_hide The class names of the sections that you want to hide.
+	 * @param array $sections_to_display The class names of the sections that you want to display.
+	 * @since 1.2.0
+	 */
+	private function visibility_handler( $sections_to_hide, $sections_to_display ) {
+
+		if ( ! empty( $sections_to_hide ) ) {
+			echo '<style>';
+			foreach ( $sections_to_hide as $section ) {
+				echo esc_attr( $section ) . ' { display: none !important; }';
+			}
+			echo '</style>';
+		}
+
+		if ( ! empty( $sections_to_display ) ) {
+			echo '<style>';
+			foreach ( $sections_to_display as $section ) {
+				echo esc_attr( $section ) . ' { display: block !important; }';
+			}
+			echo '</style>';
+		}
+	}
+
 
 	/**
 	 * Add attendee registration page URL in the order confirmation email.
@@ -245,6 +301,8 @@ class Rcn_Public {
 
 	/**
 	 * The function returns number of total allowed/registered attendees
+	 *
+	 * The is a callback function of [rcn_ar_get_ticket_data] shortcode .
 	 *
 	 * @param array  $atts The shortcode attributes.
 	 * @param string $content The content inside the shortcode.
