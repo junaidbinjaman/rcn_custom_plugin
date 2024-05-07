@@ -10,7 +10,15 @@
 
   $(function () {
     rcn_ar_initializeAttendeeToggle($);
-    rcn_ar_registrationSectionToggleHandler($)
+    rcn_ar_registrationSectionToggleHandler($);
+    rcn_arPageReloadHandler($);
+
+    const isMobile = window.innerWidth < 650 ? true : false;
+    
+    if (isMobile) {
+      rcn_arOrderDataToggleHandler($);
+    }
+
   });
 })(jQuery);
 
@@ -34,14 +42,35 @@ function rcn_ar_registrationSectionToggleHandler($) {
 
   for (let i = 0; i < ticketTypes.length; i++) {
     const type = ticketTypes[i];
-    togglerHelper(type)
+    togglerHelper(type);
   }
 
   function togglerHelper(type) {
     $(`.rcn-ar-register-${type}-attendee`).on('click', function () {
       $('.rcn-ar-registration-section').hide();
-  
+
       $(`.rcn-ar-${type}-attendee`).show();
     });
+  }
+}
+
+function rcn_arPageReloadHandler($) {
+  $(document).on('submit_success', '.elementor-form', function (event, res) {
+    location.reload();
+  });
+}
+
+function rcn_arOrderDataToggleHandler($) {
+  $('.rcn-ar-register-btn').on('click', function (event) {
+    toggleHandler($);
+  });
+
+  $('.rcn-ar-back-to-order-data-btn a').on('click', function (event) {
+    toggleHandler($);
+    $('.rcn-ar-registration-section').hide();
+  });
+
+  function toggleHandler($) {
+    $('.rcn-ar-order-data, .rcn-ar-back-to-order-data-btn').toggle();
   }
 }

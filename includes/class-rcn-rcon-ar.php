@@ -100,12 +100,7 @@ class Rcn_Rcon_Ar extends \ElementorPro\Modules\Forms\Classes\Action_Base {
 		// Insert the post into the database.
 		wp_insert_post( $my_post );
 
-		// update_post_meta( $fields['orderid'], "registered_{$fields['tickettypekey']}_attendees", $registered_attendees + 1 );.
-		?>
-		<script>
-			location.href = 'http://localhost:10019/attendee-registration/?order-id=30916'
-		</script>
-		<?php
+		update_post_meta( $fields['orderid'], "registered_{$fields['tickettypekey']}_attendees", $registered_attendees + 1 );
 	}
 
 	/**

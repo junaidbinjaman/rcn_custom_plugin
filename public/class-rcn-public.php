@@ -97,30 +97,12 @@ class Rcn_Public {
 	 * @return void
 	 */
 	public function rcn_ar_action_after_payment( $order_id ) {
-		$order = wc_get_order( $order_id );
-		if ( ! $order ) {
-			return;
-		}
 
-		$ticket_ids = array( 27806, 27805, 27807 );
-		$is_added   = get_post_meta( $order_id, 'allowed_attendees', true );
+		$rcn_utility = new Rcn_Utility();
+		$result      = $rcn_utility->register_attendee_slots( $order_id );
 
-		if ( ! empty( $is_added ) ) {
-			return;
-		}
-
-		foreach ( $order->get_items() as $item ) {
-			/** @var WC_Order_Item_Product $item */ // phpcs:ignore
-			$product_id = $item->get_product_id();
-
-			if ( in_array( $product_id, $ticket_ids ) ) {
-				$quantity = $item->get_quantity();
-
-				add_post_meta( $order_id, 'allowed_attendees', $quantity );
-				add_post_meta( $order_id, 'registered_attendees', 0 );
-				$this->rcn_ar_redirect_to_registration_page( $order_id );
-				break;
-			}
+		if ( true === $result['status'] ) {
+			$this->rcn_ar_redirect_to_registration_page( $order_id );
 		}
 	}
 
@@ -147,16 +129,19 @@ class Rcn_Public {
 			return;
 		}
 
-		$order_id = isset( $_GET['order-id'] ) ? intval( $_GET['order-id'] ) : 0;
+		$order_id   = isset( $_GET['order-id'] ) ? absint( $_GET['order-id'] ) : 0; // phpcs:ignore
 
 		$total_allowed_tickets = intval( get_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', true ) );
 
 		if ( 0 === $total_allowed_tickets ) {
 			$this->visibility_handler(
-				array( 'rcn-ar-valid-url', 'rcn-ar-valid-url' ),
-				array( 'rcn-ar-invalid-url' )
+				array( '.rcn-ar-valid-url' ), // Sections to hide.
+				array( '.rcn-ar-invalid-url' ) // Sections to display.
 			);
+			return;
 		}
+
+		$this->ar_check_and_manage_ticket_types( $order_id );
 	}
 
 	/**
@@ -166,16 +151,10 @@ class Rcn_Public {
 	 * When a ticket type is found, it displays corresponding ticket data on the right sidebar
 	 * and invokes the appropriate function to handle component visibility for that ticket type.
 	 *
+	 * @param int $order_id The order id.
 	 * @return void
 	 */
-	public function ar_check_and_manage_ticket_types() {
-		$page_id = 30440;
-
-		if ( is_admin() || ! is_singular() || ! is_page( $page_id ) ) {
-			return;
-		}
-
-		$order_id   = isset( $_GET['order-id'] ) ? absint( $_GET['order-id'] ) : 0; // phpcs:ignore
+	private function ar_check_and_manage_ticket_types( $order_id ) {
 		$order      = wc_get_order( $order_id );
 		$ticket_ids = array(
 			'conference' => 27806,
@@ -200,10 +179,10 @@ class Rcn_Public {
 	 * Toggle components inside a ticket type section.
 	 *
 	 * @param string $ticket_type The ticket type.
-	 * @param int    $ticket_id The ticket product id.
+	 * @param int    $order_id The order id.
 	 * @return void
 	 */
-	private function ar_ticket_component_visibility_handler( $ticket_type, $ticket_id ) {
+	private function ar_ticket_component_visibility_handler( $ticket_type, $order_id ) {
 		$this->visibility_handler(
 			null,
 			array(
@@ -211,15 +190,15 @@ class Rcn_Public {
 			),
 		);
 
-		$allowed_attendees    = get_post_meta( $ticket_id, "allowed_{$ticket_type}_attendees", true );
-		$registered_attendees = get_post_meta( $ticket_id, "registered_{$ticket_type}_attendees", true );
+		$allowed_attendees    = get_post_meta( $order_id, "allowed_{$ticket_type}_attendees", true );
+		$registered_attendees = get_post_meta( $order_id, "registered_{$ticket_type}_attendees", true );
 		$allowed_attendees    = intval( $allowed_attendees );
 		$registered_attendees = intval( $registered_attendees );
 
 		if ( $registered_attendees >= $allowed_attendees ) {
 			$this->visibility_handler(
-				array( ".rcn-ar-{$ticket_type}-attendee .rcn-ar-registration-form" ),
-				array( ".rcn-ar-{$ticket_type}-attendee .rcn-ar-notifications" )
+				array( ".rcn-ar-{$ticket_type}-attendee .rcn-ar-registration-form" ), // Hide the form.
+				array( ".rcn-ar-{$ticket_type}-attendee .rcn-ar-notifications" ) // Display the notification.
 			);
 		}
 	}

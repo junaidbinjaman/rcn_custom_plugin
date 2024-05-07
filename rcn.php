@@ -106,7 +106,7 @@ function foobar__callback() {
 	// var_dump( is_page( 30440 ) );
 	// echo '</pre>';
 
-	// update_post_meta( 30916, 'allowed_conference_attendees', 10 );
+	// update_post_meta( 30918, 'allowed_vip_attendees', 2 );
 	// delete_post_meta( 30916, 'registered_virtual_attendees' );
 	
 }
