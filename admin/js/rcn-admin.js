@@ -31,62 +31,72 @@
 
   $(function () {
     setupEventHandlers($);
-	console.log(wp_ajax)
+    console.log(wp_ajax);
   });
 })(jQuery);
 
 function setupEventHandlers($) {
   var btn = $('.rcn-ar-admin-unique-url-generator-form .button-primary');
   var input = $('.rcn-ar-admin-unique-url-generator-form .regular-text');
-  var success = $('.rcn-ar-admin-unique-url-generator-notice-success');
-  var error = $('.rcn-ar-admin-unique-url-generator-notice-error');
-  var warning = $('.rcn-ar-admin-unique-url-generator-notice-warning');
 
   // Removing previous event handlers to avoid duplicate bindings
   btn.off('click').on('click', function () {
-    var value = parseInt(input.val(), 10);
-    console.log(value);
-    rcn_arAjaxHandler($);
+    var orderId = parseInt(input.val(), 10);
 
-    // Clear previous messages
-    success.hide();
-    error.hide();
-    warning.hide();
-
-    if (isNaN(value)) {
+    if (isNaN(orderId)) {
       console.error('Invalid input: not a number');
       return;
     }
 
-    var newElement = $('<p>');
-
-    if (value === 1) {
-      newElement.text('Hello, World! This is a success message');
-      success.empty().html(newElement).show();
-    } else if (value === 2) {
-      newElement.text('Oops! There is an error in your life!');
-      error.empty().html(newElement).show();
-    } else if (value === 3) {
-      newElement.text('This is a final warning!');
-      warning.empty().html(newElement).show();
-    }
+    rcn_arAjaxHandler($, orderId);
   });
 }
 
-function rcn_arAjaxHandler($) {
+function rcn_arAjaxHandler($, orderId) {
   $.ajax({
     type: 'POST',
     url: wp_ajax.url,
     data: {
       action: 'my_post_like',
-      nonce: wpAjax.nonce,
-      order_id: 3423,
+      nonce: wp_ajax.nonce,
+      order_id: orderId,
     },
     success: function (response) {
+      response = JSON.parse(response);
       console.log('Success:', response);
+      // rcn_arNotificationHandler($, response.status, response.message);
     },
     error: function (xhr, status, error) {
       console.log('Error:', error, xhr);
     },
   });
+}
+
+function rcn_arNotificationHandler($, status, message) {
+  var success = $('.rcn-ar-admin-unique-url-generator-notice-success');
+  var error = $('.rcn-ar-admin-unique-url-generator-notice-error');
+  var warning = $('.rcn-ar-admin-unique-url-generator-notice-warning');
+  var notificationParagraph = $('<p>');
+
+  success.hide();
+  error.hide();
+  warning.hide();
+
+  if (status === true) {
+    notificationParagraph.text(message);
+    success.empty().html(notificationParagraph).show();
+    return;
+  }
+
+  if (status === false) {
+    notificationParagraph.text(message);
+    error.empty().html(notificationParagraph).show();
+    return;
+  }
+
+  if (status === 'warning') {
+    notificationParagraph.text(message);
+    warning.empty().html(notificationParagraph).show();
+    return;
+  }
 }

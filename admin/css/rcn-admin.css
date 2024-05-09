@@ -3,6 +3,10 @@
  * included in this file.
  */
 
+ .rcn-ar-admin-unique-url-generator-form .regular-text{
+   margin-top: 5px;
+ }
+
  .rcn-ar-admin-unique-url-generator-form .button-primary {
     margin-top: 10px;
  }

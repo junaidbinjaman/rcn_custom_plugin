@@ -99,7 +99,7 @@ class Rcn_Admin {
 			'wp_ajax',
 			array(
 				'url'   => admin_url( 'admin-ajax.php' ),
-				'nonce' => wp_create_nonce( 'rcn_admin' ),
+				'nonce' => wp_create_nonce( 'rcn_admin_nonce' ),
 			)
 		);
 	}
