@@ -124,7 +124,10 @@ function rcn_ar_admin_generate_unique_url__callback() {
 	<div class="notice notice-success is-dismissible rcn-ar-admin-unique-url-generator-notice-success"></div>
 	<div class="notice notice-error is-dismissible rcn-ar-admin-unique-url-generator-notice-error"></div>
 	<div class="notice notice-warning is-dismissible rcn-ar-admin-unique-url-generator-notice-warning">d</div>
+
+	
 	<div class="input-text-wrap rcn-ar-admin-unique-url-generator-form">
+		<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor, reprehenderit praesentium pariatur placeat magnam doloremque sapiente veritatis dolore beatae voluptatum!</p>
 		<label for="">Order ID</label> <br />
 		<input name="input_id" type="text" id="input_id" class="regular-text" /> <br />
 		<button class="button button-primary">Generate URL</button>
@@ -153,7 +156,7 @@ function my_post_like() {
 	if ( $result['status'] === false ) {
 		echo wp_json_encode(
 			array(
-				'status'  => false,
+				'status'  => 'warning',
 				'message' => 'Ticket slots have not been generated. This could be due to the order not containing any tickets, or because the slots have already been generated previously.',
 			)
 		);
@@ -164,7 +167,7 @@ function my_post_like() {
 		echo wp_json_encode(
 			array(
 				'status'  => true,
-				'message' => 'The attendee registration URL is ' . get_permalink( 30440 ),
+				'message' => 'The attendee registration URL is ' . get_permalink( 30440 ) . "?order-id=" . $order_id,
 			)
 		);
 		exit;

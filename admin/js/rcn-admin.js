@@ -49,6 +49,7 @@ function setupEventHandlers($) {
     }
 
     rcn_arAjaxHandler($, orderId);
+    input.val('')
   });
 }
 
@@ -64,7 +65,7 @@ function rcn_arAjaxHandler($, orderId) {
     success: function (response) {
       response = JSON.parse(response);
       console.log('Success:', response);
-      // rcn_arNotificationHandler($, response.status, response.message);
+      rcn_arNotificationHandler($, response.status, response.message);
     },
     error: function (xhr, status, error) {
       console.log('Error:', error, xhr);
