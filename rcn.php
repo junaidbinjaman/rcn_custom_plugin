@@ -78,6 +78,8 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-rcn-utility.php';
  */
 require_once plugin_dir_path( __FILE__ ) . 'includes/rcn-ajax-callbacks.php';
 
+require_once plugin_dir_path( __FILE__ ) . 'test.php';
+
 /**
  * Begins execution of the plugin.
  *
@@ -108,10 +110,37 @@ function foobar__callback() {
 
 	// update_post_meta( 30918, 'allowed_vip_attendees', 2 );
 	// delete_post_meta( 30916, 'registered_virtual_attendees' );
-	
 }
 
 if( ! is_admin() ) {
 	add_action( 'wp', 'foobar__callback' );
 }
+
+function rcn_ar_handles_admin_dashboard_widgets() {
+	wp_add_dashboard_widget(
+		'rcn-ar-admin-generate-unique-url',
+		'Generate unique URL for attendees',
+		'rcn_ar_admin_generate_unique_url__callback'
+	);
+}
+
+function rcn_ar_admin_generate_unique_url__callback() {
+	?>
+	<div class="notice notice-success is-dismissible rcn-ar-admin-unique-url-generator-notice-success"></div>
+	<div class="notice notice-error is-dismissible rcn-ar-admin-unique-url-generator-notice-error"></div>
+	<div class="notice notice-warning is-dismissible rcn-ar-admin-unique-url-generator-notice-warning">d</div>
+	<table class="form-table rcn-ar-admin-unique-url-generator-form">
+	<tbody>
+		<tr>
+			<th scope="row"><label for="input_id">Order ID</label></th>
+			<td><input name="input_id" type="text" id="input_id" class="regular-text">
+			<button class="button button-primary">Generate URL</button>
+		</td>			
+		</tr>
+	</tbody>
+</table>
+	<?php
+}
+
+add_action( 'wp_dashboard_setup', 'rcn_ar_handles_admin_dashboard_widgets' );
 

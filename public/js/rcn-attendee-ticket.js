@@ -13,7 +13,7 @@
     rcn_ar_registrationSectionToggleHandler($);
     rcn_arPageReloadHandler($);
 
-    const isMobile = window.innerWidth < 650 ? true : false;
+    const isMobile = window.innerWidth < 1024 ? true : false;
     
     if (isMobile) {
       rcn_arOrderDataToggleHandler($);
