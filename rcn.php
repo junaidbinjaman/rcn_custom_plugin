@@ -144,3 +144,12 @@ function rcn_ar_admin_generate_unique_url__callback() {
 
 add_action( 'wp_dashboard_setup', 'rcn_ar_handles_admin_dashboard_widgets' );
 
+function my_post_like()
+{
+  echo "asdsa";
+  exit;
+}
+
+add_action( 'wp_ajax_my_post_like', 'my_post_like' );
+add_action( 'wp_ajax_nopriv_my_post_like', 'my_post_like' );
+
