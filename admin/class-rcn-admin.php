@@ -118,17 +118,15 @@ class Rcn_Admin {
 	}
 
 	/**
-	 * Registers a new "ping" action for Elementor Pro forms.
-	 * This function includes the required class file and registers an instance of the Rcn_Rcon_Ar class with the form actions registrar.
+	 * Register all rcn custom actions for elementor form
 	 *
-	 * @since 1.0.0
 	 * @param ElementorPro\Modules\Forms\Registrars\Form_Actions_Registrar $form_actions_registrar The registrar to which the action is added.
 	 * @return void
 	 */
-	public function rcn_ar_register_ar_action( $form_actions_registrar ) {
-		require_once plugin_dir_path( __DIR__ ) . 'includes/class-rcn-rcon-ar.php';
+	public function register_elementor_form_custom_actions( $form_actions_registrar ) {
+		require_once plugin_dir_path( __DIR__ ) . 'includes/elementor-custom-action-classes/class-rcn-ar-elementor-form-register-attendee-action.php';
 
-		$form_actions_registrar->register( new \Rcn_Rcon_Ar() );
+		$form_actions_registrar->register( new \Rcn_Ar_Elementor_Form_Register_Attendee_Action() );
 	}
 
 	/**
@@ -136,11 +134,11 @@ class Rcn_Admin {
 	 *
 	 * @return void
 	 */
-	public function rcn_ar_admin_dashboard_widgets_handler() {
+	public function ar_admin_dashboard_widgets_handler() {
 		wp_add_dashboard_widget(
 			'rcn-ar-admin-generate-unique-url',
 			'Generate unique URL for attendees',
-			array( $this, 'rcn_ar_admin_generate_unique_url__callback' )
+			array( $this, 'ar_admin_generate_unique_url__callback' )
 		);
 	}
 
@@ -149,7 +147,7 @@ class Rcn_Admin {
 	 *
 	 * @return void
 	 */
-	public function rcn_ar_admin_generate_unique_url__callback() {
+	public function ar_admin_generate_unique_url__callback() {
 		// Notice containers for success, error, and warning messages.
 		echo '<div class="notice notice-success is-dismissible rcn-ar-admin-unique-url-generator-notice-success"></div>';
 		echo '<div class="notice notice-error is-dismissible rcn-ar-admin-unique-url-generator-notice-error"></div>';

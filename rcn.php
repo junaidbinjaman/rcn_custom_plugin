@@ -78,8 +78,6 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/class-rcn-utility.php';
  */
 require_once plugin_dir_path( __FILE__ ) . 'includes/rcn-ajax-callbacks.php';
 
-require_once plugin_dir_path( __FILE__ ) . 'test.php';
-
 /**
  * Begins execution of the plugin.
  *

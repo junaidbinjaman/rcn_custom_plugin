@@ -154,8 +154,8 @@ class Rcn {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-		$this->loader->add_action( 'elementor_pro/forms/actions/register', $plugin_admin, 'rcn_ar_register_ar_action' );
-		$this->loader->add_action( 'wp_dashboard_setup', $plugin_admin, 'rcn_ar_admin_dashboard_widgets_handler' );
+		$this->loader->add_action( 'elementor_pro/forms/actions/register', $plugin_admin, 'register_elementor_form_custom_actions' );
+		$this->loader->add_action( 'wp_dashboard_setup', $plugin_admin, 'ar_admin_dashboard_widgets_handler' );
 		$this->loader->add_action( 'wp_ajax_ar_admin_url_generator', $plugin_admin, 'ar_admin_url_generator' );
 	}
 
@@ -172,9 +172,9 @@ class Rcn {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-		$this->loader->add_action( 'woocommerce_thankyou', $plugin_public, 'rcn_ar_action_after_payment' );
+		$this->loader->add_action( 'woocommerce_thankyou', $plugin_public, 'ar_action_after_payment' );
 		$this->loader->add_action( 'wp', $plugin_public, 'ar_is_url_valid' );
-		$this->loader->add_action( 'woocommerce_email_after_order_table', $plugin_public, 'rcn_ar_add_registration_page_link_into_email', 10, 4 );
+		$this->loader->add_action( 'woocommerce_email_after_order_table', $plugin_public, 'ar_add_registration_page_link_into_email', 10, 4 );
 		$this->loader->add_action( 'template_redirect', $plugin_public, 'shortcode_initializer' );
 	}
 

@@ -3,13 +3,10 @@
  * The elementor form custom action.
  *
  * The code on this file creates a new custom action on elementor form.
- * The action stores the attendee data into R-CON Attendee post type.
- *
- * @link       https://junaidbinjaman.com
- * @since      1.0.0
+ * The action stores the attendee data into R-CON Attendees post type.
  *
  * @package    Rcn
- * @subpackage Rcn/public
+ * @since v1.2.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -23,15 +20,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-class Rcn_Rcon_Ar extends \ElementorPro\Modules\Forms\Classes\Action_Base {
+class Rcn_Ar_Elementor_Form_Register_Attendee_Action extends \ElementorPro\Modules\Forms\Classes\Action_Base {
 
 	/**
 	 * Get action name.
 	 *
-	 * Retrieve ping action name.
+	 * Retrieve attendee_register action name.
 	 *
-	 * @since 1.0.0
-	 * @access public
 	 * @return string
 	 */
 	public function get_name() {
@@ -41,10 +36,8 @@ class Rcn_Rcon_Ar extends \ElementorPro\Modules\Forms\Classes\Action_Base {
 	/**
 	 * Get action label.
 	 *
-	 * Retrieve ping action label.
+	 * Retrieve Attendee Register action label.
 	 *
-	 * @since 1.0.0
-	 * @access public
 	 * @return string
 	 */
 	public function get_label() {
@@ -54,12 +47,10 @@ class Rcn_Rcon_Ar extends \ElementorPro\Modules\Forms\Classes\Action_Base {
 	/**
 	 * Run action.
 	 *
-	 * Ping an external server after form submission.
+	 * Save the form data into R-CON Attendees custom post type.
 	 *
-	 * @since 1.0.0
-	 * @access public
-	 * @param \ElementorPro\Modules\Forms\Classes\Form_Record  $record The param comment.
-	 * @param \ElementorPro\Modules\Forms\Classes\Ajax_Handler $ajax_handler The param comment.
+	 * @param \ElementorPro\Modules\Forms\Classes\Form_Record  $record Form input records.
+	 * @param \ElementorPro\Modules\Forms\Classes\Ajax_Handler $ajax_handler The ajax handler.
 	 */
 	public function run( $record, $ajax_handler ) {
 
@@ -106,10 +97,6 @@ class Rcn_Rcon_Ar extends \ElementorPro\Modules\Forms\Classes\Action_Base {
 	/**
 	 * Register action controls.
 	 *
-	 * Ping action has no input fields to the form widget.
-	 *
-	 * @since 1.0.0
-	 * @access public
 	 * @param \Elementor\Widget_Base $widget The param comment.
 	 */
 	public function register_settings_section( $widget ) {}
@@ -117,10 +104,6 @@ class Rcn_Rcon_Ar extends \ElementorPro\Modules\Forms\Classes\Action_Base {
 	/**
 	 * On export.
 	 *
-	 * Ping action has no fields to clear when exporting.
-	 *
-	 * @since 1.0.0
-	 * @access public
 	 * @param array $element The param comment.
 	 */
 	public function on_export( $element ) {}

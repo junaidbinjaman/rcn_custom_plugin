@@ -102,13 +102,13 @@ class Rcn_Public {
 	 * @param int $order_id The ID of the order passed by the hook.
 	 * @return void
 	 */
-	public function rcn_ar_action_after_payment( $order_id ) {
+	public function ar_action_after_payment( $order_id ) {
 
 		$rcn_utility = new Rcn_Utility();
 		$result      = $rcn_utility->register_attendee_slots( $order_id );
 
 		if ( true === $result['status'] ) {
-			$this->rcn_ar_redirect_to_registration_page( $order_id );
+			$this->ar_redirect_to_registration_page( $order_id );
 		}
 	}
 
@@ -117,7 +117,7 @@ class Rcn_Public {
 	 *
 	 * @param int $order_id The order ID used in the query parameter.
 	 */
-	private function rcn_ar_redirect_to_registration_page( $order_id ) {
+	private function ar_redirect_to_registration_page( $order_id ) {
 		$registration_url = get_page_link( '30440' );
 		wp_safe_redirect( $registration_url . '?order-id=' . $order_id );
 		exit;
@@ -248,7 +248,7 @@ class Rcn_Public {
 	 * @param bool     $plain_text Whether the email is in plain text.
 	 * @param WC_Email $email The email object.
 	 */
-	public function rcn_ar_add_registration_page_link_into_email( $order, $sent_to_admin, $plain_text, $email ) { // phpcs:ignore
+	public function ar_add_registration_page_link_into_email( $order, $sent_to_admin, $plain_text, $email ) { // phpcs:ignore
 		$ticket_ids = array( 27806, 27805, 27807 );
 		$order_id   = $order->get_id();
 
@@ -258,7 +258,7 @@ class Rcn_Public {
 
 			if ( in_array( $product_id, $ticket_ids, true ) ) {
 				$rcn_ar_page_url = add_query_arg( 'order-id', $order_id, get_page_link( 30440 ) );
-				$this->rcn_ar_render_link( $rcn_ar_page_url );
+				$this->ar_render_link( $rcn_ar_page_url );
 				break;
 			}
 		}
@@ -269,7 +269,7 @@ class Rcn_Public {
 	 *
 	 * @param string $url The URL to the registration page.
 	 */
-	private function rcn_ar_render_link( $url ) {
+	private function ar_render_link( $url ) {
 		?>
 	<div style="margin-bottom: 50px;">
 		<a href="<?php echo esc_url( $url ); ?>"
@@ -294,7 +294,7 @@ class Rcn_Public {
 	 * @param string $tag The shortcode tag.
 	 * @return int
 	 */
-	public function rcn_ar_get_ticket_data__callback( $atts = array(), $content = null, $tag = '' ) {
+	public function ar_get_ticket_data__callback( $atts = array(), $content = null, $tag = '' ) {
 		$atts = array_change_key_case( (array) $atts, CASE_LOWER );
 
 		$param = shortcode_atts(
@@ -321,6 +321,6 @@ class Rcn_Public {
 	 * @return void
 	 */
 	public function shortcode_initializer() {
-		add_shortcode( 'rcn_ar_get_ticket_data', array( $this, 'rcn_ar_get_ticket_data__callback' ) );
+		add_shortcode( 'rcn_ar_get_ticket_data', array( $this, 'ar_get_ticket_data__callback' ) );
 	}
 }
