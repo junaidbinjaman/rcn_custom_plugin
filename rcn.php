@@ -111,69 +111,43 @@ if ( ! is_admin() ) {
 	add_action( 'wp', 'foobar__callback' );
 }
 
-function rcn_ar_handles_admin_dashboard_widgets() {
-	wp_add_dashboard_widget(
-		'rcn-ar-admin-generate-unique-url',
-		'Generate unique URL for attendees',
-		'rcn_ar_admin_generate_unique_url__callback'
-	);
-}
+// function my_post_like() {
+// 	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'rcn_admin_nonce' ) ) {
+// 		echo wp_json_encode(
+// 			array(
+// 				'status'  => false,
+// 				'message' => 'The security check failed',
+// 			)
+// 		);
+// 		exit;
+// 	}
 
-function rcn_ar_admin_generate_unique_url__callback() {
-	?>
-	<div class="notice notice-success is-dismissible rcn-ar-admin-unique-url-generator-notice-success"></div>
-	<div class="notice notice-error is-dismissible rcn-ar-admin-unique-url-generator-notice-error"></div>
-	<div class="notice notice-warning is-dismissible rcn-ar-admin-unique-url-generator-notice-warning">d</div>
+// 	$order_id = isset( $_POST['order_id'] ) ? $_POST['order_id'] : 0;
 
-	
-	<div class="input-text-wrap rcn-ar-admin-unique-url-generator-form">
-		<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor, reprehenderit praesentium pariatur placeat magnam doloremque sapiente veritatis dolore beatae voluptatum!</p>
-		<label for="">Order ID</label> <br />
-		<input name="input_id" type="text" id="input_id" class="regular-text" /> <br />
-		<button class="button button-primary">Generate URL</button>
-	</div>
-	<?php
-}
+// 	$rcn_utility = new Rcn_Utility();
+// 	$result      = $rcn_utility->register_attendee_slots( $order_id );
 
-add_action( 'wp_dashboard_setup', 'rcn_ar_handles_admin_dashboard_widgets' );
+// 	if ( $result['status'] === false ) {
+// 		echo wp_json_encode(
+// 			array(
+// 				'status'  => 'warning',
+// 				'message' => 'Ticket slots have not been generated. This could be due to the order not containing any tickets, or because the slots have already been generated previously.',
+// 			)
+// 		);
+// 		exit;
+// 	}
 
-function my_post_like() {
-	if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'rcn_admin_nonce' ) ) {
-		echo wp_json_encode(
-			array(
-				'status'  => false,
-				'message' => 'The security check failed',
-			)
-		);
-		exit;
-	}
+// 	if ( $result['status'] === true ) {
+// 		echo wp_json_encode(
+// 			array(
+// 				'status'  => true,
+// 				'message' => 'The attendee registration URL is ' . get_permalink( 30440 ) . "?order-id=" . $order_id,
+// 			)
+// 		);
+// 		exit;
+// 	}
+// }
 
-	$order_id = isset( $_POST['order_id'] ) ? $_POST['order_id'] : 0;
-
-	$rcn_utility = new Rcn_Utility();
-	$result      = $rcn_utility->register_attendee_slots( $order_id );
-
-	if ( $result['status'] === false ) {
-		echo wp_json_encode(
-			array(
-				'status'  => 'warning',
-				'message' => 'Ticket slots have not been generated. This could be due to the order not containing any tickets, or because the slots have already been generated previously.',
-			)
-		);
-		exit;
-	}
-
-	if ( $result['status'] === true ) {
-		echo wp_json_encode(
-			array(
-				'status'  => true,
-				'message' => 'The attendee registration URL is ' . get_permalink( 30440 ) . "?order-id=" . $order_id,
-			)
-		);
-		exit;
-	}
-}
-
-add_action( 'wp_ajax_my_post_like', 'my_post_like' );
-add_action( 'wp_ajax_nopriv_my_post_like', 'my_post_like' );
+// add_action( 'wp_ajax_my_post_like', 'my_post_like' );
+// add_action( 'wp_ajax_nopriv_my_post_like', 'my_post_like' );
 

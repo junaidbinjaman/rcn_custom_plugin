@@ -31,7 +31,6 @@
 
   $(function () {
     setupEventHandlers($);
-    console.log(wp_ajax);
   });
 })(jQuery);
 
@@ -68,7 +67,7 @@ function rcn_arAjaxHandler($, orderId) {
       rcn_arNotificationHandler($, response.status, response.message);
     },
     error: function (xhr, status, error) {
-      console.log('Error:', error, xhr);
+      rcn_arNotificationHandler($, false, error);
     },
   });
 }
