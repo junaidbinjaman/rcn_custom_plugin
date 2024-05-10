@@ -156,8 +156,7 @@ class Rcn {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'elementor_pro/forms/actions/register', $plugin_admin, 'rcn_ar_register_ar_action' );
 		$this->loader->add_action( 'wp_dashboard_setup', $plugin_admin, 'rcn_ar_admin_dashboard_widgets_handler' );
-		$this->loader->add_action( 'wp_ajax_my_post_like', $plugin_admin, 'my_post_like' );
-		$this->loader->add_action( 'wp_ajax_nopriv_my_post_like', $plugin_admin, 'my_post_like' );
+		$this->loader->add_action( 'wp_ajax_ar_admin_url_generator', $plugin_admin, 'ar_admin_url_generator' );
 	}
 
 	/**

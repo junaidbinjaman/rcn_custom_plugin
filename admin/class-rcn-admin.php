@@ -71,7 +71,13 @@ class Rcn_Admin {
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rcn-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style(
+			$this->plugin_name,
+			plugin_dir_url( __FILE__ ) . 'css/rcn-admin.css',
+			array(),
+			fileatime( plugin_dir_path( __FILE__ ) . 'css/rcn-admin.css' ),
+			'all'
+		);
 	}
 
 	/**
@@ -154,16 +160,17 @@ class Rcn_Admin {
 		echo '<p>Enter the Order ID to generate a unique URL for the attendee registration. This input helps you manage and track order-specific URLs efficiently.</p>';
 		echo '<label for="input_id">Order ID:</label> <br />';
 		echo '<input name="input_id" type="text" id="input_id" class="regular-text" /> <br />';
-		echo '<button type="button" class="button button-primary">Generate URL</button>';
+		echo '<button type="button" class="button button-primary">Generate URL</button> <br />';
+		echo '<small class="rcn-ar-loader">Generating URL....</small>';
 		echo '</div>';
 	}
 
 	/**
-	 * Undocumented function
+	 * Generate RCON attendee registration page URL for admin.
 	 *
 	 * @return void
 	 */
-	public function my_post_like() {
+	public function ar_admin_url_generator() {
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'rcn_admin_nonce' ) ) {
 			echo wp_json_encode(
 				array(

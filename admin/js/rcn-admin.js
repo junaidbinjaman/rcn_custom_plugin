@@ -30,16 +30,21 @@
    */
 
   $(function () {
-    setupEventHandlers($);
+    rcn_arURLGeneratorBtnHandle($);
   });
 })(jQuery);
 
-function setupEventHandlers($) {
+/**
+ * The function handle the click event of attendee registration page url generator button
+ *
+ * @param {jQuery} $ The jQuery reference.
+ */
+function rcn_arURLGeneratorBtnHandle($) {
   var btn = $('.rcn-ar-admin-unique-url-generator-form .button-primary');
   var input = $('.rcn-ar-admin-unique-url-generator-form .regular-text');
+  var loader = $('.rcn-ar-admin-unique-url-generator-form .rcn-ar-loader');
 
-  // Removing previous event handlers to avoid duplicate bindings
-  btn.off('click').on('click', function () {
+  btn.on('click', function () {
     var orderId = parseInt(input.val(), 10);
 
     if (isNaN(orderId)) {
@@ -47,31 +52,52 @@ function setupEventHandlers($) {
       return;
     }
 
-    rcn_arAjaxHandler($, orderId);
-    input.val('')
+    loader.show();
+
+    rcn_arSlotRegistrationHandler($, orderId, loader);
   });
 }
 
-function rcn_arAjaxHandler($, orderId) {
+/**
+ * The function call the backend register_attendee_slots function by passing necessary data
+ * and displays relevant message on the dashboard based on response status.
+ *
+ * @param {jQuery} $ The jQuery reference
+ * @param {int} orderId The order Ideally
+ * @param {string} loader The loader message
+ */
+function rcn_arSlotRegistrationHandler($, orderId, loader) {
   $.ajax({
     type: 'POST',
     url: wp_ajax.url,
     data: {
-      action: 'my_post_like',
+      action: 'ar_admin_url_generator',
       nonce: wp_ajax.nonce,
       order_id: orderId,
     },
     success: function (response) {
       response = JSON.parse(response);
-      console.log('Success:', response);
+
       rcn_arNotificationHandler($, response.status, response.message);
     },
     error: function (xhr, status, error) {
       rcn_arNotificationHandler($, false, error);
     },
+    complete: function () {
+      loader.hide();
+      $('.rcn-ar-admin-unique-url-generator-form .regular-text').val('');
+    },
   });
 }
 
+/**
+ * The function handler the notification for admin attendee registration
+ *
+ * @param {jQuery} $ jQuery reference
+ * @param {boolean | string} status The response status
+ * @param {string} message The message to display in the notification body
+ * @returns {void}
+ */
 function rcn_arNotificationHandler($, status, message) {
   var success = $('.rcn-ar-admin-unique-url-generator-notice-success');
   var error = $('.rcn-ar-admin-unique-url-generator-notice-error');

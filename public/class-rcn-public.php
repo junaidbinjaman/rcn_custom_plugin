@@ -73,7 +73,13 @@ class Rcn_Public {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rcn-public.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script(
+			$this->plugin_name,
+			plugin_dir_url( __FILE__ ) . 'js/rcn-public.js',
+			array( 'jquery' ),
+			fileatime( plugin_dir_path( __FILE__ ) . 'js/rcn-public.js' ),
+			false
+		);
 
 		// 27500 is vendor package page id
 		if ( is_single( 27500 ) ) {
