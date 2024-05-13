@@ -37,7 +37,11 @@ function rcn_ar_initializeAttendeeToggle($) {
   });
 }
 
-function rcn_ar_registrationSectionToggleHandler($) {
+/**
+ * The function toggles the attendee registration form based on attendee type
+ * @param {jQuery} $ The jQuery reference.
+ */
+function rcn_arRegistrationSectionToggleHandler($) {
   var ticketTypes = ['conference', 'virtual', 'vip'];
 
   for (let i = 0; i < ticketTypes.length; i++) {
@@ -54,12 +58,20 @@ function rcn_ar_registrationSectionToggleHandler($) {
   }
 }
 
+/**
+ * The function reloads the page after completing the attendee registration
+ * @param {jQuery} $ The jQuery reference
+ */
 function rcn_arPageReloadHandler($) {
   $(document).on('submit_success', '.elementor-form', function (event, res) {
     location.reload();
   });
 }
 
+/**
+ * The function toggle order data section and attendee registration forms on mobile
+ * @param {jQuery} $ The jQuery reference
+ */
 function rcn_arOrderDataToggleHandler($) {
   $('.rcn-ar-register-btn').on('click', function (event) {
     toggleHandler($);
