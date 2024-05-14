@@ -24,8 +24,6 @@
  * Domain Path:       /languages
  */
 
-use Automattic\WooCommerce\StoreApi\Routes\V1\CartItems;
-
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;

@@ -2,9 +2,6 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       https://junaidbinjaman.com
- * @since      1.0.0
- *
  * @package    Rcn
  * @subpackage Rcn/public
  */
@@ -15,8 +12,7 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the public-facing stylesheet and JavaScript.
  *
- * @package    Rcn
- * @subpackage Rcn/public
+ * @since 1.0.0
  * @author     Junaid Bin Jaman <me@junaidbinjaman.com>
  */
 class Rcn_Public {
@@ -66,7 +62,6 @@ class Rcn_Public {
 			wp_enqueue_style( 'rcn-vendor-package', plugin_dir_url( __FILE__ ) . 'css/rcn-vendor-package.css', array(), $this->version, 'all' );
 		}
 	}
-
 	/**
 	 * The function enqueue public facing js code file.
 	 *
@@ -94,6 +89,61 @@ class Rcn_Public {
 	}
 
 	/**
+	 * The function returns attendee functionality data based on parameter
+	 *
+	 * @param int $ar_page_id page-id The attendee registration page id.
+	 * @param int $ar_order_id_parameter order-id-parameter The ticket/wc order id.
+	 * @param int $ar_ticket_ids ticket-ids The ticket/wc product ids.
+	 * @return array
+	 */
+	private function ar_data_processor( $ar_page_id = true, $ar_order_id_parameter = true, $ar_ticket_ids = true ) {
+		$page_id            = 30440;
+		$order_id_parameter = 'order-id';
+		$ticket_ids         = array(
+			'conference' => 27806,
+			'vip'        => 27805,
+			'virtual'    => 27807,
+		);
+
+		$data = array(
+			'page-id'            => $page_id,
+			'order-id-parameter' => $order_id_parameter,
+			'ticket-ids'         => $ticket_ids,
+		);
+
+		if ( ! $ar_page_id ) {
+			unset( $data['page-id'] );
+		}
+
+		if ( ! $ar_order_id_parameter ) {
+			unset( $data['order-id-parameter'] );
+		}
+
+		if ( ! $ar_ticket_ids ) {
+			unset( $data['ticket-ids'] );
+		}
+
+		return $data;
+	}
+
+	/**
+	 * This is a testing function.
+	 *
+	 * @return void
+	 */
+	public function foobar() {
+		$ar_data          = $this->ar_data_processor( true, true, false );
+		$ar_page_id       = $ar_data['page-id'];
+		$order_parameter  = $ar_data['order-id-parameter'];
+		$registration_url = get_page_link( $ar_page_id );
+
+		echo '<pre>';
+		var_dump( '' );
+		echo '</pre>';
+		wp_die();
+	}
+
+	/**
 	 * Handles post-payment actions to register attendees.
 	 * Upon successful payment, this function checks if the purchased items include specific ticket IDs.
 	 * If yes, and attendees are not yet registered, it registers the attendees and redirects to the registration page.
@@ -118,8 +168,20 @@ class Rcn_Public {
 	 * @param int $order_id The order ID used in the query parameter.
 	 */
 	private function ar_redirect_to_registration_page( $order_id ) {
-		$registration_url = get_page_link( '30440' );
-		wp_safe_redirect( $registration_url . '?order-id=' . $order_id );
+		$nonce            = wp_create_nonce( 'ar-registration-nonce' );
+		$ar_data          = $this->ar_data_processor( true, true, false );
+		$ar_page_id       = $ar_data['page-id'];
+		$order_parameter  = $ar_data['order-id-parameter'];
+		$registration_uri = get_page_link( $ar_page_id );
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					$order_parameter => $order_id,
+				),
+				$registration_uri
+			)
+		);
 		exit;
 	}
 
@@ -129,13 +191,15 @@ class Rcn_Public {
 	 * @since 1.2.0
 	 */
 	public function ar_is_url_valid() {
-		$page_id = 30440;
+		$ar_data            = $this->ar_data_processor( true, true, false );
+		$page_id            = $ar_data['page-id'];
+		$order_id_parameter = $ar_data['order-id-parameter'];
 
 		if ( is_admin() || ! is_singular() || ! is_page( $page_id ) ) {
 			return;
 		}
 
-		$order_id   = isset( $_GET['order-id'] ) ? absint( $_GET['order-id'] ) : 0; // phpcs:ignore
+		$order_id = isset( $_GET[$order_id_parameter] ) ? absint( $_GET[$order_id_parameter] ) : 0; // phpcs:ignore
 
 		$total_allowed_tickets = intval( get_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', true ) );
 
@@ -161,12 +225,9 @@ class Rcn_Public {
 	 * @return void
 	 */
 	private function ar_check_and_manage_ticket_types( $order_id ) {
+		$ar_data    = $this->ar_data_processor( false, false, true );
 		$order      = wc_get_order( $order_id );
-		$ticket_ids = array(
-			'conference' => 27806,
-			'vip'        => 27805,
-			'virtual'    => 27807,
-		);
+		$ticket_ids = $ar_data['ticket-ids'];
 
 		foreach ( $order->get_items() as $item_id => $item ) {
 			/** @var WC_Order_Item_Product $item  */ // phpcs:ignore
@@ -249,15 +310,24 @@ class Rcn_Public {
 	 * @param WC_Email $email The email object.
 	 */
 	public function ar_add_registration_page_link_into_email( $order, $sent_to_admin, $plain_text, $email ) { // phpcs:ignore
-		$ticket_ids = array( 27806, 27805, 27807 );
-		$order_id   = $order->get_id();
+		$ar_data            = $this->ar_data_processor();
+		$ticket_ids         = $ar_data['ticket-ids'];
+		$page_id            = $ar_data['page-id'];
+		$order_id_parameter = $ar_data['order-id-parameter'];
+		$order_id           = $order->get_id();
 
 		foreach ( $order->get_items() as $item ) {
 			/** @var WC_Order_Item_Product $item */ // phpcs:ignore
 			$product_id = $item->get_product_id();
 
 			if ( in_array( $product_id, $ticket_ids, true ) ) {
-				$rcn_ar_page_url = add_query_arg( 'order-id', $order_id, get_page_link( 30440 ) );
+				$rcn_ar_page_url = add_query_arg(
+					array(
+						$order_id_parameter => $order_id,
+					),
+					get_page_link( $page_id )
+				);
+
 				$this->ar_render_link( $rcn_ar_page_url );
 				break;
 			}

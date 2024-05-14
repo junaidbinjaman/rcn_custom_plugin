@@ -10,7 +10,7 @@
 
   $(function () {
     rcn_ar_initializeAttendeeToggle($);
-    rcn_ar_registrationSectionToggleHandler($);
+    rcn_arRegistrationSectionToggleHandler($);
     rcn_arPageReloadHandler($);
 
     const isMobile = window.innerWidth < 1024 ? true : false;

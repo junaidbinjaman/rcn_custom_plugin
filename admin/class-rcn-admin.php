@@ -165,6 +165,7 @@ class Rcn_Admin {
 
 	/**
 	 * Generate RCON attendee registration page URL for admin.
+	 * This is an ajax callback function
 	 *
 	 * @return void
 	 */
