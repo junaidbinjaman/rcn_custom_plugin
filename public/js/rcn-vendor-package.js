@@ -52,10 +52,6 @@ function rcn_vpCartInitializer($) {
       rcn_vpPrevNextButtonHandler($, 'prev');
     });
   });
-
-  $('.rcn_vp-product-add-to-cart-btn').click('click', function () {
-    rcn_vpTriggerCartOnTabletMobile($);
-  });
 }
 
 /**
@@ -540,6 +536,7 @@ function rcn_addProductToCart($, action = 'loadCart', cartItem) {
     cartArray = JSON.stringify(cartArray);
 
     localStorage.setItem('rcn_vpCartData', cartArray);
+    rcn_vpTriggerCartOnTabletMobile($);
   }
 
   function loadCartItems(response) {
@@ -1098,8 +1095,6 @@ function rcn_tableActionHandler($, element) {
       }
 
       rcn_addProductToCart($, 'updateCart', productData);
-
-      rcn_vpTriggerCartOnTabletMobile($);
     }
   }
 
@@ -1190,7 +1185,7 @@ function rcn_vpAddonsAccording($) {
  * @param {jQuery} $ - jQuery reference.
  */
 function rcn_vpAddonsStatusChecker($) {
-  const addonsIDs = [27798, 27800, 27801, 27802, 27803, 27804, 27797];
+  const addonsIDs = [27798, 27800, 27801, 27802, 27803, 27804, 27797, 30925, 30926, 30927, 30937, 30940, 30942];
 
   for (let i = 0; i < addonsIDs.length; i++) {
     const ID = addonsIDs[i];
