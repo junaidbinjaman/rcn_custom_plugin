@@ -7,8 +7,7 @@
    *
    * This enables to define handlers, for when the DOM is ready:
    */
-  $(function () {
 
-    
+  $(function () {
   });
 })(jQuery);

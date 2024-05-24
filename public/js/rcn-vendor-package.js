@@ -5,7 +5,7 @@
    */
   window.rcn_vpAjaxurl = wp_ajax_object.ajax_url;
   window.rcn_vpCategoryID = 497; // RCN vendor package category
-  window.productID = 27759; // table wrapper product where each table is a variation
+  window.productID = 27759; // The parent product id
 
   /**
    * All of the js/jQuery code for vendor-package reside in this file.
@@ -52,25 +52,27 @@ function rcn_vpCartInitializer($) {
       rcn_vpPrevNextButtonHandler($, 'prev');
     });
   });
+
+  $('.rcn_vp-product-add-to-cart-btn').click('click', function () {
+    rcn_vpTriggerCartOnTabletMobile($);
+  });
 }
 
 /**
- * Handles the floor selection functionality in the vendor package table.
+ * Handles the floor selection functionality in the vendor package table
+ * and table location indicator initialization
+ *
+ * Codes responsible for table listing resides inside this function as well
  *
  * @param {jQuery} $ - jQuery reference.
  */
 function rcn_vpTableFloorHandler($) {
-  const vtsb = $('.rcn-vtsb')[0];
   const floorSelectorForm = $('.rcn-vp-floor-selector-form form select'); // Appears on mobile and table
   let activeFloor;
-
-  new SimpleBar(vtsb, {autoHide: false});
 
   rcn_floorSelectionHandler($);
 
   $('.rcn-vp-floor-1-selector-btn').each(function () {
-    $(this).off('click');
-
     $(this).on('click', function () {
       localStorage.setItem('rcn_activeFloorNumber', 1);
       rcn_floorSelectionHandler($);
@@ -78,8 +80,6 @@ function rcn_vpTableFloorHandler($) {
   });
 
   $('.rcn-vp-floor-2-selector-btn').each(function () {
-    $(this).off('click');
-
     $(this).on('click', function () {
       localStorage.setItem('rcn_activeFloorNumber', 2);
       rcn_floorSelectionHandler($);
@@ -87,8 +87,6 @@ function rcn_vpTableFloorHandler($) {
   });
 
   $('.rcn-vp-floor-3-selector-btn').each(function () {
-    $(this).off('click');
-
     $(this).on('click', function () {
       localStorage.setItem('rcn_activeFloorNumber', 3);
       rcn_floorSelectionHandler($);
@@ -115,7 +113,6 @@ function rcn_vpAddonsHandler($) {
 
   rcn_vpAddonsStatusChecker($);
 
-  // Add "add to cart" functionality on add-ons add to cart btn
   $('.rc-vpaa-quantity').on('click', function () {
     const productID = $(this).attr('data-product-id');
     rcn_vpAddOnsAddToCart($, productID);
@@ -215,8 +212,6 @@ function rcn_vpStepSwitchHandler($, totalSteps) {
       status: false,
       message: 'Invalid active step',
     });
-
-    return;
   }
 
   // Sources for prev, next and checkout buttons
@@ -260,7 +255,7 @@ function rcn_vpStepSwitchHandler($, totalSteps) {
 
   const activeStepIndicators = stepIndicatorClasses.splice(0, activeStep + 1);
   const activeStepIndicatorsStyles = {
-    backgroundColor: '#0040E0',
+    backgroundColor: '#006cfa',
     cursor: 'pointer',
   };
 
@@ -287,6 +282,7 @@ function rcn_vpStepSwitchHandler($, totalSteps) {
  * @param {Array} cartItems - Array of cart items.
  * @param {function} callback - Callback function to be executed.
  * @param {number} callbackPriority - Priority level for the callback function.
+ * @returns {void} - The function doesn't return a value.
  */
 function rcn_vpCartVisualInteraction(
   $,
@@ -420,16 +416,8 @@ function rcn_vpCartVisualInteraction(
         totalCartItems
       );
     }
-
-    return;
   }
 
-  /**
-   * Handles the creation of notification messages based on the notification type.
-   *
-   * @param {Object} notification - Object containing notification details (type and message).
-   * @returns {jQuery} - jQuery object representing the notification message.
-   */
   function notificationHandler(notification) {
     const msg = $('<p>');
 
@@ -455,6 +443,7 @@ function rcn_vpCartVisualInteraction(
  *
  * @param {function} $ - jQuery reference.
  * @param {Array} cartItems - Array of cart items containing price information.
+ * @returns {void} - The function doesn't return a value.
  */
 function rcn_vpCartCalculator($, cartItems) {
   const priceElement = $('.rcn-vp-cart-total'); // The element that displays the cart total
@@ -481,6 +470,7 @@ function rcn_vpCartCalculator($, cartItems) {
  * @param {string} action - A flag('loadCart' or 'updateCart') specifies the action to perform.
  * @param {Object} cartItem - Object representing the product to be added to the cart.
  * @param {string} categoryID - ID of the product category.
+ * @returns {void} - The function doesn't return a value.
  */
 // prettier-ignore
 function rcn_addProductToCart($, action = 'loadCart', cartItem) {
@@ -589,10 +579,30 @@ function rcn_addProductToCart($, action = 'loadCart', cartItem) {
 }
 
 /**
+ * Trigger cart popup on mobile and tablet after a product is added to cart
+ *
+ * @param {string} productID - ID of the product to be removed from the cart.
+ * @returns {void} - The function doesn't return a value.
+ */
+function rcn_vpTriggerCartOnTabletMobile() {
+  const popupId = 27815; // Elementor popup id
+
+  let isNotDesktop = window.matchMedia(
+    'only screen and (max-width: 1030px)'
+  ).matches;
+
+  if (isNotDesktop) {
+    elementorProFrontend.modules.popup.showPopup({id: popupId});
+    rcn_vpCartInitializer(jQuery);
+  }
+}
+
+/**
  * Removes a product from the vp cart using AJAX and updates the cart visual interaction.
  *
  * @param {function} $ - jQuery reference.
  * @param {string} productID - ID of the product to be removed from the cart.
+ * @returns {void} - The function doesn't return a value.
  */
 function rcn_vpRemoveProductFromCart($, productID) {
   const ajaxurl = window.rcn_vpAjaxurl;
@@ -683,19 +693,15 @@ function rcn_vpRemoveProductFromCart($, productID) {
     }
 
     $('.rcn-vp-table-wrapper-ul li').each(function () {
-      const tableID = $(this)
-        .find('.rcn-vp-table-action')
-        .attr('data-table-id');
+      const tableID = $(this).attr('data-table-id');
 
       if (Number(tableID) === response.variation_id) {
+        $(this).find('.rcn_vp-table-listing-body-action-spinner').hide();
+        $(this).find('.rcn_vp-table-listing-body-remove-cart-btn').show();
+
         $(this)
-          .attr('data-is-unavailable', false)
-          .removeClass('rcn-vp-selected-table')
-          .addClass('rcn-vp-available-table')
-          .find('i')
-          .removeClass('fa-check')
-          .addClass('fa-plus')
-          .prop('disabled', false);
+          .removeClass('rcn-vp-added-to-cart-table')
+          .addClass('rcn-vp-available-table');
       }
     });
   }
@@ -725,7 +731,6 @@ function rcn_vpRemoveProductFromCart($, productID) {
  */
 function rcn_floorSelectionHandler($) {
   let floorNumber = localStorage.getItem('rcn_activeFloorNumber');
-  const productID = window.productID; // table wrapper product where each table is a variation
 
   if (!floorNumber) {
     localStorage.setItem('rcn_activeFloorNumber', 1);
@@ -741,6 +746,7 @@ function rcn_floorSelectionHandler($) {
     {no: 4, id: 27762},
     {no: 5, id: 27763},
   ];
+
   const floorTwoTables = [
     {no: 6, id: 27764},
     {no: 7, id: 27765},
@@ -773,8 +779,6 @@ function rcn_floorSelectionHandler($) {
     {no: 31, id: 27790},
     {no: 32, id: 27791},
     {no: 33, id: 27792},
-    {no: 34, id: 27793},
-    {no: 35, id: 27794},
   ];
 
   // Toggle floor plan map/image
@@ -783,16 +787,21 @@ function rcn_floorSelectionHandler($) {
   $('.rcn-vp-floor-3').toggle(floorNumber === 3);
 
   if (floorNumber === 1) {
-    rcn_vpTableListingHandler($, floorOneTables, productID);
+    rcn_vpTableListingHandler($, floorOneTables);
   }
 
   if (floorNumber === 2) {
-    rcn_vpTableListingHandler($, floorTwoTables, productID);
+    rcn_vpTableListingHandler($, floorTwoTables);
   }
 
   if (floorNumber === 3) {
-    rcn_vpTableListingHandler($, floorThreeTables, productID);
+    rcn_vpTableListingHandler($, floorThreeTables);
   }
+
+  setTimeout(() => {
+    rcn_vpTableListingAccordingBox($);
+  }, 200);
+  rcn_vpTableLocationIndicatorHandler($, 0);
 }
 
 /**
@@ -803,54 +812,87 @@ function rcn_floorSelectionHandler($) {
  *
  * Key Features:
  * - Initializes table listing functionality.
- * - Creates listings based on provided variation/table IDs.
+ * - Creates listing according boxes with different colors based on provided variation/table IDs.
  * - Handles table availability.
  *
  * When a table is available:
  * - Enables 'add to cart' for available tables.
- * - disable 'add to cart' for unavailable tables.
+ * - disable 'add to cart' for unavailable tables and displays reserved word.
  *
  * Click Handlers:
  * - Handles clicks on li tags.
- * - Handles clicks on the plus icon associated with available tables.
+ * - Handles clicks on the "Add to cart" and "Remove from cart" button.
  *
  * @param {jQuery} $ - jQuery reference.
  * @param {Array} tables - Array of variation/table IDs.
- * @param {number} productID - Product ID representing the vendor table.
  * @returns {void} - No return value.
  */
-function rcn_vpTableListingHandler($, tables, productID) {
-  // Initializes table listing functionality
+function rcn_vpTableListingHandler($, tables) {
   const tableListingContainer = $('#rcn-vp-table-listing-container');
-  const rcn_ajaxurl = window.rcn_vpAjaxurl;
   const tableListingWrapper = $('<ul>');
+  const spinnerUrl =
+    'https://realitycapturenetwork.com/wp-content/uploads/2024/02/Eclipse-1s-200px.gif';
 
   tableListingWrapper.addClass('rcn-vp-table-wrapper-ul');
-
-  let action = '<small class="rcn-vp-table-meta">Checking</small>';
-
   tableListingContainer.empty();
 
-  // Create listings based on provided variation/table IDs
   for (let i = 0; i < tables.length; i++) {
     const table = tables[i];
 
     tableListingWrapper.append(
-      `<li data-is-unavailable="true" class="rcn-vp-unavailable-table table-${table.no}" data-table-no="${table.no}">
-        Table - ${table.no}${action}
+      `<li data-is-unavailable="true" class="rcn-vp-status-checking-table rcn_vp-table-listing table-${table.no}" data-table-no="${table.no}" data-table-id="${table.id}">
+				  <div class="rcn_vp-table-listing-head">
+					  <div class="rcn_vp-table-listing-head-left">
+						  <i aria-hidden="true" class="fas fa-angle-down"></i>
+						  <i aria-hidden="true" class="fas fa-angle-up"></i>
+						  <span>Table - ${table.no}</span>
+					  </div>
+					  <div class="rcn_vp-table-listing-head-right">
+						  <i data-table-id="27770" aria-hidden="true" class="fas rcn-vp-table-added-to-cart-indicator fa-check"></i>
+						  <small class="rcn_vp-table-status-checking">Checking</small>
+						  <small class="rcn_vp-table-status-reserved">Reserved</small>
+					  </div>
+				  </div>
+				  <div class="rcn_vp-table-listing-body">
+					  <div class="rcn_vp-table-listing-body-description">
+              <img
+              src="${spinnerUrl}" 
+              width="30px"
+              height="30px"
+              />
+            </div>
+					  <div class="rcn_vp-table-listing-body-action">
+						  <div>
+                <img 
+                class="rcn_vp-table-listing-body-action-spinner" 
+                src="${spinnerUrl}" 
+                width="30px"
+                height="30px"
+                />
+							  <button class="rcn_vp-table-listing-body-add-to-cart-btn">Add To Cart</button>
+							  <div class="rcn_vp-table-listing-body-remove-cart-btn">
+								  Remove from cart
+							  </div>
+							  <small class="rcn_vp-table-status-reserved">Reserved</small>
+						  </div>
+						  <span class="rcn_vp-table-listing-body-action-price"></span>
+					  </div>
+				  </div>
       </li>`
     );
   }
 
-  rcn_tableAvailabilityHandler($, tables, tableListingContainer);
-
-  // Handles clicks on li tags
-  tableListingWrapper.on('click', 'li', function () {
-    rcn_handleClickOnLi($, $(this));
+  tableListingContainer.ready(function () {
+    $('.rcn_vp-table-listing').each(function () {
+      rcn_tableActionHandler($, $(this));
+    });
   });
 
-  tableListingWrapper.on('click', '.rcn-vp-table-action', function () {
-    rcn_tableActionHandler($, $(this));
+  rcn_tableDataHandler($, tables, tableListingContainer);
+
+  // Handles clicks on li tags/ table listings
+  tableListingWrapper.on('click', 'li', function () {
+    rcn_handleClickOnLi($, $(this));
   });
 
   tableListingContainer.append(tableListingWrapper);
@@ -861,24 +903,16 @@ function rcn_vpTableListingHandler($, tables, productID) {
  *
  * This function checks the availability of each table through an AJAX request,
  * and based on the response, it updates the UI elements of the tables in the targetDiv.
- * It also considers the reservation and cart status to apply proper styling.
+ * 
+ * The function also retrieves the table price and description and add them to the right place.
  *
  * @param {jQuery} $ - jQuery reference.
  * @param {Array} tables - Array of table objects with 'id' and 'no' properties.
  * @param {jQuery} tableListingContainer - jQuery selector for the target container.
  * @returns {void} - No return value.
  */
-function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
+function rcn_tableDataHandler($, tables, tableListingContainer) {
   const rcn_ajaxurl = window.rcn_vpAjaxurl;
-  const productID = window.productID;
-
-  function iconElement(iconClass, tableId) {
-    return `<i data-table-id="${tableId}" aria-hidden="true" class="fas ${iconClass} rcn-vp-table-action"></i>`;
-  }
-
-  function reservedElement(tableId) {
-    return `<span data-table-id="${tableId}" class="rcn-vp-reserved-table"><small>Reserved</small></span>`;
-  }
 
   for (let i = 0; i < tables.length; i++) {
     const table = tables[i];
@@ -887,8 +921,7 @@ function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
       type: 'POST',
       url: rcn_ajaxurl,
       data: {
-        action: 'is_table_available',
-        product_id: productID,
+        action: 'rcn_vp_get_table_data',
         variation_id: table.id,
       },
       success: function (response) {
@@ -902,37 +935,46 @@ function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
 
   function availableTableHandler(response, table) {
     response = JSON.parse(response);
+
     const status = response.status;
     const tableElement = $(tableListingContainer).find('.table-' + table.no);
 
-    const action = status
-      ? iconElement('fa-plus', table.id)
-      : reservedElement(table.id);
-    tableElement.find('small').replaceWith(() => $(action));
+    let price = Number(response.price);
+    price = '<strong>Price: </strong>' + rcn_vpPriceFormatter(price, 2);
+
+    tableElement
+      .find('.rcn_vp-table-listing-body-description')
+      .html(response.description);
+
+    tableElement.find('.rcn_vp-table-listing-body-action-price').html(price);
 
     // If the table is already reserved
-    if (!status) return;
+    if (!status) {
+      tableElement.removeClass('rcn-vp-status-checking-table');
+      tableElement.addClass('rcn-vp-unavailable-table');
+      return;
+    }
 
+    tableElement.attr('data-is-unavailable', false);
+
+    // If the table is in cart
     let cartItems = localStorage.getItem('rcn_vpCartData');
     cartItems = JSON.parse(cartItems);
     cartItems = cartItems ? cartItems.map((item) => item.id) : [];
 
     let isTableInCart = cartItems.includes(table.id);
 
-    // If the table is in cart
     if (isTableInCart) {
-      tableElement.removeClass('rcn-vp-unavailable-table');
-      tableElement.addClass('rcn-vp-selected-table');
-      tableElement.find('.fa-plus').replaceWith(() => $(iconElement('fa-check', table.id))); // prettier-ignore
-      tableElement.find('.rcn-vp-table-action').prop('disabled', true);
+      tableElement.removeClass('rcn-vp-status-checking-table');
+      tableElement.addClass('rcn-vp-added-to-cart-table');
       return;
     }
 
-    // If the table is not in cart
-    if (!isTableInCart) {
-      tableElement.removeClass('rcn-vp-unavailable-table');
+    // If the table is available and not in cart
+    if (status) {
+      tableElement.removeClass('rcn-vp-status-checking-table');
       tableElement.addClass('rcn-vp-available-table');
-      tableElement.attr('data-is-unavailable', false);
+      return;
     }
   }
 }
@@ -946,97 +988,105 @@ function rcn_tableAvailabilityHandler($, tables, tableListingContainer) {
  */
 function rcn_handleClickOnLi($, clickedItem) {
   const tableListingWrapper = $('.rcn-vp-table-wrapper-ul');
-  const isAvailable = clickedItem.data('is-unavailable') === false;
-  let cartItems = localStorage.getItem('rcn_vpCartData');
-  let isTableInCart;
+  const SelectedTableID = Number(clickedItem.attr('data-table-id'));
 
-  cartItems = JSON.parse(cartItems);
-  cartItems = cartItems ? cartItems.map((item) => item.id) : [];
+  tableListingWrapper
+    .find('.rcn_vp-table-listing')
+    .removeClass('rcn-vp-selected-table');
+  clickedItem.addClass('rcn-vp-selected-table');
 
-  tableListingWrapper.find('li').each(function () {
-    const table = $(this);
-    const tableID = table.find('.rcn-vp-table-action').attr('data-table-id');
-
-    isTableInCart = cartItems.includes(Number(tableID));
-
-    if (isTableInCart) return;
-
-    if (isAvailable && !isTableInCart) {
-      table
-        .removeClass('rcn-vp-selected-table')
-        .filter(':not(.rcn-vp-unavailable-table)')
-        .addClass('rcn-vp-available-table');
-
-      clickedItem.addClass('rcn-vp-selected-table');
-      clickedItem.removeClass('rcn-vp-available-table');
-    }
-  });
+  rcn_vpTableLocationIndicatorHandler($, SelectedTableID);
 }
 
 /**
- * Handles the click event on table action icons and performs actions based on server response.
+ * Handle click on table buttons.
  *
  * @param {jQuery} $ - jQuery reference.
  * @param {jQuery} actionBtn - the table add to cart actionBtn.
  * @returns {void} - No return value.
  */
-function rcn_tableActionHandler($, actionBtn) {
+function rcn_tableActionHandler($, element) {
   const rcn_ajaxurl = window.rcn_vpAjaxurl;
   const productID = window.productID;
-  const variationID = actionBtn.attr('data-table-id');
-  const tableNo = actionBtn.parent().attr('data-table-no');
-  const actionIcon = actionBtn;
+  const variationID = element.attr('data-table-id');
+  const tableNo = element.attr('data-table-no');
 
-  let notification = {
-    type: 'info',
-    message: 'Adding item to cart',
-  };
-
-  actionIcon.removeClass('fa-plus').addClass('fa-spinner');
-  rcn_vpCartVisualInteraction($, false, notification);
-
-  // Storing the current table listing element
-  const tableElement = actionBtn.parent();
-
-  $.ajax({
-    type: 'POST',
-    url: rcn_ajaxurl,
-    data: {
-      action: 'rcn_table_add_to_cart_handler',
-      product_id: productID,
-      variation_id: variationID,
-    },
-    success: function (response) {
-      tableAddToCartResponseHandler(response);
-    },
-    error: function (xhr, status, error) {
-      notification = {
+  // Handle add to cart event
+  $(element)
+    .find('.rcn_vp-table-listing-body-add-to-cart-btn')
+    .on('click', function () {
+      let notification = {
         type: 'info',
-        message: 'Something went wrong. Please refresh the page.',
+        message: 'Adding item to cart',
       };
-
       rcn_vpCartVisualInteraction($, false, notification);
-      console.log(xhr.responseText);
-    },
-  });
+
+      $(this).hide();
+      $(element).find('.rcn_vp-table-listing-body-action-spinner').show();
+
+      addTableToCart();
+    });
+
+  // Handle remove from cart event
+  $(element)
+    .find('.rcn_vp-table-listing-body-remove-cart-btn')
+    .click('click', function () {
+      $(this).hide();
+      $(element).find('.rcn_vp-table-listing-body-action-spinner').show();
+
+      rcn_vpRemoveProductFromCart($, variationID);
+    });
+
+  function addTableToCart() {
+    $.ajax({
+      type: 'POST',
+      url: rcn_ajaxurl,
+      data: {
+        action: 'rcn_table_add_to_cart_handler',
+        product_id: productID,
+        variation_id: variationID,
+      },
+      success: function (response) {
+        tableAddToCartResponseHandler(response);
+      },
+      error: function (xhr, status, error) {
+        notification = {
+          type: 'info',
+          message: 'Something went wrong. Please refresh the page.',
+        };
+
+        rcn_vpCartVisualInteraction($, false, notification);
+        console.log(xhr.responseText);
+      },
+    });
+  }
 
   function tableAddToCartResponseHandler(response) {
+    $(element).find('.rcn_vp-table-listing-body-action-spinner').hide();
+    $(element).find('.rcn_vp-table-listing-body-add-to-cart-btn').show();
+
     const result = JSON.parse(response);
 
     // 1002 means, the table is recently reserved by someone else
     if (result.availability_code === 1002) {
-      tableElement.removeClass('rcn-vp-selected-table');
-      tableElement.removeClass('rcn-vp-available-table');
-      tableElement.addClass('rcn-vp-unavailable-table');
-      tableElement.prop('disabled', true);
+      element
+        .removeClass('rcn-vp-available-table')
+        .addClass('rcn-vp-unavailable-table')
+        .attr('data-is-unavailable', true);
 
-      tableElement.attr('data-is-unavailable', true);
-
-      actionIcon.replaceWith($('<small>Reserved</small>'));
+      let notification = {
+        type: 'info',
+        message: 'Item cannot be added to cart',
+      };
+      rcn_vpCartVisualInteraction($, false, notification, null, callback, 2);
     }
 
     // 1001 means, the table is available for reservation
     if (result.availability_code === 1001) {
+      element
+        .removeClass('rcn-vp-available-table')
+        .addClass('rcn-vp-added-to-cart-table');
+
       const id = Number(variationID);
       const name = 'Table - ' + tableNo;
       const price = result.price;
@@ -1049,30 +1099,69 @@ function rcn_tableActionHandler($, actionBtn) {
 
       rcn_addProductToCart($, 'updateCart', productData);
 
-      actionIcon.removeClass('fa-spinner').addClass('fa-check');
-
-      tableElement.find('.rcn-vp-table-action').prop('disabled', true);
-      tableElement.attr('data-is-unavailable', true);
+      rcn_vpTriggerCartOnTabletMobile($);
     }
+  }
+
+  function callback(
+    notificationContainerClass,
+    cartContainer,
+    disableScrollClass
+  ) {
+    setTimeout(() => {
+      $('.' + notificationContainerClass).remove();
+      cartContainer.removeClass(disableScrollClass);
+    }, 700);
   }
 }
 
 /**
- * TODO: Implement the function to highlight table locations on the floor plan.
- * Note: This function is a placeholder and will be implemented in the next phase.
+ * Initializes table according boxes.
  *
  * @param {jQuery} $ - jQuery reference.
+ * @returns {void} - No return value.
  */
-function rcn_highlightTableOnFloorPlan($) {
-  console.log(
-    'Calling the function to highlight table locations on the floor plan'
-  );
+function rcn_vpTableListingAccordingBox($) {
+  $('.rcn_vp-table-listing-body').fadeOut();
+  $('.rcn_vp-table-listing-head .fa-angle-up').hide();
+  $('.rcn_vp-table-listing-body-action-spinner').hide();
+
+  $('.rcn_vp-table-listing-head').on('click', function () {
+    $(this).siblings('.rcn_vp-table-listing-body').toggle();
+    $(this).find('.fa-angle-down').toggle();
+    $(this).find('.fa-angle-up').toggle();
+  });
+}
+
+/**
+ * Highlight table locations on the floor plan image.
+ *
+ * @param {jQuery} $ - jQuery reference.
+ * @param {jQuery} tableID - The table ID.
+ * @returns {void} - No return value.
+ */
+function rcn_vpTableLocationIndicatorHandler($, tableID) {
+  const activeFloorNumber = localStorage.getItem('rcn_activeFloorNumber');
+
+  $('.rcn-vp-floor-' + activeFloorNumber)
+    .find('.rcn-vp-table-location-indicator')
+    .each(function () {
+      $(this).show();
+
+      let currentTableID = $(this).data('table-id');
+      currentTableID = Number(currentTableID);
+
+      if (currentTableID !== tableID) {
+        $(this).hide();
+      }
+    });
 }
 
 /**
  * Configures the custom accordion box used for displaying vendor package add-ons.
  *
  * @param {jQuery selector} $ - jQuery reference.
+ * @returns {void} - No return value.
  */
 function rcn_vpAddonsAccording($) {
   $('.rcn-vpaa-angle-down').show();
@@ -1189,7 +1278,8 @@ function rcn_vpAddOnsAddToCart($, productID) {
   });
 
   function addOnsAddedSuccessfully(response) {
-    if (response.status_code === 800800) { // the product is already added to cart.
+    if (response.status_code === 800800) {
+      // the product is already added to cart.
       cartNotification = {
         type: 'info',
         message: '',
