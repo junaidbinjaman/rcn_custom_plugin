@@ -91,3 +91,95 @@ function run_rcn() {
 	$plugin->run();
 }
 run_rcn();
+//phpcs:disable
+
+function set_html_content_type() {
+    return 'text/html';
+}
+
+// Add filter to set the content type to HTML
+add_filter('wp_mail_content_type', 'set_html_content_type');
+
+function foobar1() {
+	$content = '
+	        <div style="
+        width: 500px;
+        padding: 30px;
+        text-align: center;
+        border-radius: 8px;
+        box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.20);
+        ">
+            <img
+                width="120"
+                height="100%"
+                src="https://realitycapturenetwork.com/wp-content/uploads/2024/06/RCN_no-wordmark_blue.png"
+                alt="Logo"
+            >
+            <h4 style="
+            color: #000;
+            font-family: Montserrat;
+            font-size: 13px;
+            font-style: normal;
+            font-weight: 500;
+            line-height: normal;
+            ">Order ID: #31529</h4>
+
+            <hr  style="border: 0.5px solid #D2D4DE; width: 300px; margin: 20px auto;" />
+
+            <div>
+                <h2 style="
+                    color: #000;
+                    font-family: Montserrat;
+                    font-size: 15px;
+                    font-style: normal;
+                    font-weight: 700;
+                    line-height: normal;
+                    ">The Title Goes Here</h2>
+                <p style="
+                    color: #1A1A1A;
+                    text-align: center;
+                    font-family: Inter;
+                    font-size: 14px;
+                    font-weight: 400;
+                    line-height: normal;
+                    font-family: Montserrat;
+                    color: #818080;
+                ">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sequi a dolorem, molestias illo ex
+                    praesentium cupiditate, necessitatibus voluptatem quas modi culpa assumenda quo provident error nam
+                    esse minus eum vero.</p>
+                <button style="
+                    border-radius: 8px;
+                    background: #006CFA;
+                    color: var(--White, #FFF);
+                    text-align: center;
+                    font-family: Montserrat;
+                    font-size: 14px;
+                    font-style: normal;
+                    font-weight: 500;
+                    letter-spacing: 0.3px;
+                    text-transform: uppercase;
+                    border: none;
+                    padding: 15px 20px;
+                    margin-top: 10px;
+                ">VISIT REGISTRATION PAGE</button>
+                <hr  style="border: 0.5px solid #D2D4DE; width: 300px; margin: 30px auto;" />
+                <p style="
+                    color: #98A0A6;
+                    font-family: Montserrat;
+                    font-size: 11px;
+                    font-weight: 400;
+                    line-height: 16px;
+                    letter-spacing: 0.3px;
+                    text-decoration-line: none;
+                ">
+                    Reality Capture Network, LLC <br />
+                    3405 E Overland Rd #375, Meridian, ID 83642 <br />
+                    If you have any questions, feel free to contact us at team@realitycapturenetwork.com
+            </p>
+            </div>
+        </div>
+	';
+	wp_mail('junaid@allnextver.com', 'Testing email', $content);
+}
+
+add_action( 'init', 'foobar1' );

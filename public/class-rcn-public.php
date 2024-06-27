@@ -97,13 +97,13 @@ class Rcn_Public {
 	 * @return array
 	 */
 	private function ar_data_processor( $ar_page_id = true, $ar_order_id_parameter = true, $ar_ticket_ids = true ) {
-		$page_id            = 30440;
+		$page_id            = 30440; // Replace this attendee registration page id.
 		$order_id_parameter = 'order-id';
 		$ticket_ids         = array(
 			'conference' => 27806,
 			'vip'        => 27805,
 			'virtual'    => 27807,
-		);
+		); // The wc product ids which are acting as the conference ticket.
 
 		$data = array(
 			'page-id'            => $page_id,
