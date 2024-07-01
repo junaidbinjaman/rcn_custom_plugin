@@ -550,6 +550,8 @@ class Rcn_Utility {
 
 			add_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', $total_allowed_attendees );
 
+			$this->attendee_reg_page_link_emailer( $order_id );
+
 			return $registration_status;
 		}
 
@@ -596,5 +598,99 @@ class Rcn_Utility {
 		}
 
 		return 0;
+	}
+
+	/**
+	 * The function email the attendee registration page link
+	 * to the person who placed the order.
+	 *
+	 * @param int $order_id The order id.
+	 * @return void
+	 */
+	private function attendee_reg_page_link_emailer( $order_id ) {
+		$order  = wc_get_order( $order_id );
+		$scheme = isset( $_SERVER['HTTPS'] ) && 'on' === $_SERVER['HTTPS'] ? 'https' : 'http';
+		$host   = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+		$url    = $scheme . '://' . $host . '/attendee-registration';
+
+		$content = '
+		<center>
+        <div style="background-color: #f5f5f5; padding: 100px;">
+            <div style="
+            width: 500px;
+            padding: 30px;
+            background-color: #ffffff;
+            text-align: center;
+            border-radius: 8px;
+            box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.20);
+            ">
+                <img
+                    width="120"
+                    height="100%"
+                    src="https://realitycapturenetwork.com/wp-content/uploads/2024/06/RCN_no-wordmark_blue.png"
+                    alt="Logo"
+                >
+                <h4 style="
+                color: #000;
+                font-size: 13px;
+                font-weight: 500;
+                line-height: normal;
+                ">Order ID: #31529</h4>
+    
+                <hr  style="border: 0.5px solid #D2D4DE; width: 300px; margin: 20px auto;" />
+    
+                <div>
+                    <h2 style="
+                        color: #000;
+                        font-size: 15px;
+                        font-weight: 700;
+                        line-height: normal;
+                        letter-spacing: 0.3px;
+                        ">The Title Goes Here</h2>
+                    <p style="
+                        color: #1A1A1A;
+                        text-align: center;
+                        font-size: 14px;
+                        font-weight: 400;
+                        line-height: 21px;
+                        color: #818080;
+                        letter-spacing: 0.3px;
+                    ">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sequi a dolorem, molestias illo ex
+                        praesentium cupiditate, necessitatibus voluptatem quas modi culpa assumenda quo provident error nam
+                        esse minus eum vero.</p>
+                    <div style="margin-top: 30px;">
+                        <a href="' . $url . '" style="
+                        text-decoration: none;
+                        border-radius: 8px;
+                        background: #006CFA;
+                        color: #ffffff;
+                        text-align: center;
+                        font-size: 14px;
+                        font-weight: 500;
+                        letter-spacing: 0.3px;
+                        text-transform: uppercase;
+                        border: none;
+                        padding: 15px 20px;
+                        ">VISIT REGISTRATION PAGE</a>
+                    </div>
+                    <hr  style="border: 0.5px solid #D2D4DE; width: 300px; margin: 30px auto;" />
+                    <p style="
+                        color: #98A0A6;
+                        font-size: 11px;
+                        font-weight: 400;
+                        line-height: 16px;
+                        letter-spacing: 0.3px;
+                        text-decoration-line: none;
+                    ">
+                        Reality Capture Network, LLC <br />
+                        3405 E Overland Rd #375, Meridian, ID 83642 <br />
+                        If you have any questions, feel free to contact us at team@realitycapturenetwork.com
+                </p>
+                </div>
+            </div>
+        </div>
+    	</center>';
+
+		wp_mail( $order->get_billing_email(), 'Attendee Registration Page URL', $content );
 	}
 }
