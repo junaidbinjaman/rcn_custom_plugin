@@ -280,63 +280,6 @@ class Rcn_Public {
 		}
 	}
 
-
-	/**
-	 * Add attendee registration page URL in the order confirmation email.
-	 *
-	 * This function checks if the order contains specific ticket products and appends a link to the attendee
-	 * registration page if applicable.
-	 *
-	 * @param WC_Order $order The order object.
-	 * @param bool     $sent_to_admin True if the email is sent to the admin.
-	 * @param bool     $plain_text Whether the email is in plain text.
-	 * @param WC_Email $email The email object.
-	 */
-	public function ar_add_registration_page_link_into_email( $order, $sent_to_admin, $plain_text, $email ) { // phpcs:ignore
-		$ar_data            = $this->ar_data_processor();
-		$ticket_ids         = $ar_data['ticket-ids'];
-		$page_id            = $ar_data['page-id'];
-		$order_id_parameter = $ar_data['order-id-parameter'];
-		$order_id           = $order->get_id();
-
-		foreach ( $order->get_items() as $item ) {
-			/** @var WC_Order_Item_Product $item */ // phpcs:ignore
-			$product_id = $item->get_product_id();
-
-			if ( in_array( $product_id, $ticket_ids, true ) ) {
-				$rcn_ar_page_url = add_query_arg(
-					array(
-						$order_id_parameter => $order_id,
-					),
-					get_page_link( $page_id )
-				);
-
-				$this->ar_render_link( $rcn_ar_page_url );
-				break;
-			}
-		}
-	}
-
-	/**
-	 * Renders the link to the attendee registration page.
-	 *
-	 * @param string $url The URL to the registration page.
-	 */
-	private function ar_render_link( $url ) {
-		?>
-	<div style="margin-bottom: 50px;">
-		<a href="<?php echo esc_url( $url ); ?>"
-			style="color: white;
-					font-weight: normal;
-					text-decoration: underline;
-					background: #045cbe;
-					padding: 20px;">
-			Visit attendee registration page
-		</a>
-	</div>
-		<?php
-	}
-
 	/**
 	 * The function returns number of total allowed/registered attendees
 	 *
