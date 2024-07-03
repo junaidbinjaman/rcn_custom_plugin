@@ -611,7 +611,7 @@ class Rcn_Utility {
 		$order  = wc_get_order( $order_id );
 		$scheme = isset( $_SERVER['HTTPS'] ) && 'on' === $_SERVER['HTTPS'] ? 'https' : 'http';
 		$host   = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
-		$url    = $scheme . '://' . $host . '/attendee-registration';
+		$url    = $scheme . '://' . $host . '/attendee-registration/?order-id=' . $order_id;
 
 		$content = '
 		<center>

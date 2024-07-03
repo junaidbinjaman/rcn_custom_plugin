@@ -127,23 +127,6 @@ class Rcn_Public {
 	}
 
 	/**
-	 * This is a testing function.
-	 *
-	 * @return void
-	 */
-	public function foobar() {
-		$ar_data          = $this->ar_data_processor( true, true, false );
-		$ar_page_id       = $ar_data['page-id'];
-		$order_parameter  = $ar_data['order-id-parameter'];
-		$registration_url = get_page_link( $ar_page_id );
-
-		echo '<pre>';
-		var_dump( '' );
-		echo '</pre>';
-		wp_die();
-	}
-
-	/**
 	 * Handles post-payment actions to register attendees.
 	 * Upon successful payment, this function checks if the purchased items include specific ticket IDs.
 	 * If yes, and attendees are not yet registered, it registers the attendees and redirects to the registration page.
