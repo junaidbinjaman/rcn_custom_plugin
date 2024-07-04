@@ -82,8 +82,11 @@ class Rcn_Public {
 			wp_localize_script( 'vendor-package', 'wp_ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ) ) );
 		}
 
-		// 30440 is the attendee registration page id.
-		if ( is_page( 30440 ) ) {
+		// Retrieving the attendee registration page id.
+		$all_options = get_option( 'options', array() );
+		$ar_page_id  = isset( $all_options['attendee-registration-page'] ) ? $all_options['attendee-registration-page'] : false;
+
+		if ( is_page( $ar_page_id ) ) {
 			wp_enqueue_script( 'attendee-ticket', plugin_dir_url( __FILE__ ) . 'js/rcn-attendee-ticket.js', array( 'jquery' ), $this->version, 'all' );
 		}
 	}
@@ -97,13 +100,25 @@ class Rcn_Public {
 	 * @return array
 	 */
 	private function ar_data_processor( $ar_page_id = true, $ar_order_id_parameter = true, $ar_ticket_ids = true ) {
-		$page_id            = 30440; // Replace this attendee registration page id.
+		$all_options = get_option( 'options', array() );
+		$ar_page_id  = isset( $all_options['attendee-registration-page'] ) ? $all_options['attendee-registration-page'] : false;
+
+		// Conference attendee ticket ids.
+		$conference_attendee = isset( $all_options['conference-attendee-ticket'] ) ? $all_options['conference-attendee-ticket'] : false;
+		$virtual_attendee    = isset( $all_options['virtual-attendee-ticket'] ) ? $all_options['virtual-attendee-ticket'] : false;
+		$vip_attendee        = isset( $all_options['vip-attendee-ticket'] ) ? $all_options['vip-attendee-ticket'] : false;
+
+		$conference_attendee = intval( $conference_attendee );
+		$virtual_attendee    = intval( $virtual_attendee );
+		$vip_attendee        = intval( $vip_attendee );
+
+		$page_id            = $ar_page_id;
 		$order_id_parameter = 'order-id';
 		$ticket_ids         = array(
-			'conference' => 27806,
-			'vip'        => 27805,
-			'virtual'    => 27807,
-		); // The wc product ids which are acting as the conference ticket.
+			'conference' => $conference_attendee,
+			'virtual'    => $virtual_attendee,
+			'vip'        => $vip_attendee,
+		);
 
 		$data = array(
 			'page-id'            => $page_id,
@@ -318,5 +333,14 @@ class Rcn_Public {
 	 */
 	public function shortcode_initializer() {
 		add_shortcode( 'rcn_ar_get_ticket_data', array( $this, 'ar_get_ticket_data__callback' ) );
+	}
+
+	/**
+	 * Allow HTML email template
+	 *
+	 * @return string
+	 */
+	public function set_html_content_type() {
+		return 'text/html';
 	}
 }

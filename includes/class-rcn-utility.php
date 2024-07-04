@@ -572,9 +572,16 @@ class Rcn_Utility {
 	 * @return int
 	 */
 	private function register_attendee_slots__helper( $product_id, $order_id, $product_qty ) {
-		$virtual_attendee    = 27807;
-		$conference_attendee = 27806;
-		$vip_attendee        = 27805;
+		$all_options = get_option( 'options', array() );
+
+		// Conference attendee ticket ids.
+		$conference_attendee = isset( $all_options['conference-attendee-ticket'] ) ? $all_options['conference-attendee-ticket'] : false;
+		$virtual_attendee    = isset( $all_options['virtual-attendee-ticket'] ) ? $all_options['virtual-attendee-ticket'] : false;
+		$vip_attendee        = isset( $all_options['vip-attendee-ticket'] ) ? $all_options['vip-attendee-ticket'] : false;
+
+		$conference_attendee = intval( $conference_attendee );
+		$virtual_attendee    = intval( $virtual_attendee );
+		$vip_attendee        = intval( $vip_attendee );
 
 		if ( $product_id === $virtual_attendee ) {
 			add_post_meta( $order_id, 'allowed_virtual_attendees', $product_qty );

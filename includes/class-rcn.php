@@ -175,6 +175,7 @@ class Rcn {
 		$this->loader->add_action( 'woocommerce_thankyou', $plugin_public, 'ar_action_after_payment' );
 		$this->loader->add_action( 'wp', $plugin_public, 'ar_is_url_valid' );
 		$this->loader->add_action( 'template_redirect', $plugin_public, 'shortcode_initializer' );
+		$this->loader->add_filter( 'wp_mail_content_type', $plugin_public, 'set_html_content_type' );
 	}
 
 	/**

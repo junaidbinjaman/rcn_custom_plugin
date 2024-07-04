@@ -91,11 +91,3 @@ function run_rcn() {
 	$plugin->run();
 }
 run_rcn();
-//phpcs:disable
-
-function set_html_content_type() {
-    return 'text/html';
-}
-
-// Add filter to set the content type to HTML
-add_filter('wp_mail_content_type', 'set_html_content_type');
