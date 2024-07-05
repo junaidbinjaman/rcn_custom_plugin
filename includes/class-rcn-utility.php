@@ -575,9 +575,9 @@ class Rcn_Utility {
 		$all_options = get_option( 'options', array() );
 
 		// Conference attendee ticket ids.
-		$conference_attendee = isset( $all_options['conference-attendee-ticket'] ) ? $all_options['conference-attendee-ticket'] : false;
-		$virtual_attendee    = isset( $all_options['virtual-attendee-ticket'] ) ? $all_options['virtual-attendee-ticket'] : false;
-		$vip_attendee        = isset( $all_options['vip-attendee-ticket'] ) ? $all_options['vip-attendee-ticket'] : false;
+		$conference_attendee = isset( $all_options['conference-attendee'] ) ? $all_options['conference-attendee'] : false;
+		$virtual_attendee    = isset( $all_options['virtual-attendee'] ) ? $all_options['virtual-attendee'] : false;
+		$vip_attendee        = isset( $all_options['vip-attendee'] ) ? $all_options['vip-attendee'] : false;
 
 		$conference_attendee = intval( $conference_attendee );
 		$virtual_attendee    = intval( $virtual_attendee );
@@ -615,10 +615,18 @@ class Rcn_Utility {
 	 * @return void
 	 */
 	private function attendee_reg_page_link_emailer( $order_id ) {
-		$order  = wc_get_order( $order_id );
+		$order       = wc_get_order( $order_id );
+		$all_options = get_option( 'options', array() );
+
 		$scheme = isset( $_SERVER['HTTPS'] ) && 'on' === $_SERVER['HTTPS'] ? 'https' : 'http';
 		$host   = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
 		$url    = $scheme . '://' . $host . '/attendee-registration/?order-id=' . $order_id;
+
+		$subject    = isset( $all_options['ar-email-subject'] ) ? $all_options['ar-email-subject'] : false;
+		$heading    = isset( $all_options['ar-email-heading'] ) ? $all_options['ar-email-heading'] : false;
+		$body       = isset( $all_options['ar-email-body'] ) ? $all_options['ar-email-body'] : false;
+		$button_txt = isset( $all_options['ar-email-button-text'] ) ? $all_options['ar-email-button-text'] : false;
+		$footer     = isset( $all_options['ar-email-footer-copy'] ) ? $all_options['ar-email-footer-copy'] : false;
 
 		$content = '
 		<center>
@@ -653,7 +661,7 @@ class Rcn_Utility {
                         font-weight: 700;
                         line-height: normal;
                         letter-spacing: 0.3px;
-                        ">The Title Goes Here</h2>
+                        ">' . $heading . '</h2>
                     <p style="
                         color: #1A1A1A;
                         text-align: center;
@@ -662,9 +670,7 @@ class Rcn_Utility {
                         line-height: 21px;
                         color: #818080;
                         letter-spacing: 0.3px;
-                    ">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Sequi a dolorem, molestias illo ex
-                        praesentium cupiditate, necessitatibus voluptatem quas modi culpa assumenda quo provident error nam
-                        esse minus eum vero.</p>
+                    ">' . $body . '</p>
                     <div style="margin-top: 30px;">
                         <a href="' . $url . '" style="
                         text-decoration: none;
@@ -678,7 +684,7 @@ class Rcn_Utility {
                         text-transform: uppercase;
                         border: none;
                         padding: 15px 20px;
-                        ">VISIT REGISTRATION PAGE</a>
+                        ">' . $button_txt . '</a>
                     </div>
                     <hr  style="border: 0.5px solid #D2D4DE; width: 300px; margin: 30px auto;" />
                     <p style="
@@ -689,15 +695,13 @@ class Rcn_Utility {
                         letter-spacing: 0.3px;
                         text-decoration-line: none;
                     ">
-                        Reality Capture Network, LLC <br />
-                        3405 E Overland Rd #375, Meridian, ID 83642 <br />
-                        If you have any questions, feel free to contact us at team@realitycapturenetwork.com
+                        ' . $footer . '
                 </p>
                 </div>
             </div>
         </div>
     	</center>';
 
-		wp_mail( $order->get_billing_email(), 'Attendee Registration Page URL', $content );
+		wp_mail( $order->get_billing_email(), $subject, $content );
 	}
 }

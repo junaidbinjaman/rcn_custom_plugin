@@ -62,6 +62,7 @@ class Rcn_Public {
 			wp_enqueue_style( 'rcn-vendor-package', plugin_dir_url( __FILE__ ) . 'css/rcn-vendor-package.css', array(), $this->version, 'all' );
 		}
 	}
+
 	/**
 	 * The function enqueue public facing js code file.
 	 *
@@ -84,7 +85,7 @@ class Rcn_Public {
 
 		// Retrieving the attendee registration page id.
 		$all_options = get_option( 'options', array() );
-		$ar_page_id  = isset( $all_options['attendee-registration-page'] ) ? $all_options['attendee-registration-page'] : false;
+		$ar_page_id  = isset( $all_options['registration-page'] ) ? $all_options['registration-page'] : false;
 
 		if ( is_page( $ar_page_id ) ) {
 			wp_enqueue_script( 'attendee-ticket', plugin_dir_url( __FILE__ ) . 'js/rcn-attendee-ticket.js', array( 'jquery' ), $this->version, 'all' );
@@ -101,12 +102,12 @@ class Rcn_Public {
 	 */
 	private function ar_data_processor( $ar_page_id = true, $ar_order_id_parameter = true, $ar_ticket_ids = true ) {
 		$all_options = get_option( 'options', array() );
-		$ar_page_id  = isset( $all_options['attendee-registration-page'] ) ? $all_options['attendee-registration-page'] : false;
+		$ar_page_id  = isset( $all_options['registration-page'] ) ? $all_options['registration-page'] : false;
 
 		// Conference attendee ticket ids.
-		$conference_attendee = isset( $all_options['conference-attendee-ticket'] ) ? $all_options['conference-attendee-ticket'] : false;
-		$virtual_attendee    = isset( $all_options['virtual-attendee-ticket'] ) ? $all_options['virtual-attendee-ticket'] : false;
-		$vip_attendee        = isset( $all_options['vip-attendee-ticket'] ) ? $all_options['vip-attendee-ticket'] : false;
+		$conference_attendee = isset( $all_options['conference-attendee'] ) ? $all_options['conference-attendee'] : false;
+		$virtual_attendee    = isset( $all_options['virtual-attendee'] ) ? $all_options['virtual-attendee'] : false;
+		$vip_attendee        = isset( $all_options['vip-attendee'] ) ? $all_options['vip-attendee'] : false;
 
 		$conference_attendee = intval( $conference_attendee );
 		$virtual_attendee    = intval( $virtual_attendee );
