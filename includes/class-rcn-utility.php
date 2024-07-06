@@ -646,7 +646,7 @@ class Rcn_Utility {
                     alt="Logo"
                 >
     
-                <hr  style="border: 0.5px solid #006CFA; margin: 20px auto;" />
+                <hr  style="border: 0.5px solid #006CFA; margin: 20px auto; margin-bottom: 32px" />
     
                 <h2 style="
                     color: #000;
