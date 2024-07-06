@@ -646,7 +646,7 @@ class Rcn_Utility {
                     alt="Logo"
                 >
     
-                <hr  style="border: 0.5px solid #006CFA; width: 300px; margin: 20px auto;" />
+                <hr  style="border: 0.5px solid #006CFA; margin: 20px auto;" />
     
                 <h2 style="
                     color: #000;
@@ -694,7 +694,7 @@ class Rcn_Utility {
                     >' . $button_txt . '</a>
                 </p>
 
-                <hr  style="border: 0.5px solid #006CFA; width: 300px; margin: 30px auto;" />
+                <hr  style="border: 0.5px solid #006CFA; margin: 30px auto;" />
 
                 <p style="
                     color: #000000;
