@@ -629,15 +629,15 @@ class Rcn_Utility {
 		$footer     = isset( $all_options['ar-email-footer-copy'] ) ? $all_options['ar-email-footer-copy'] : false;
 
 		$content = '
-		<center>
+<center>
         <div style="background-color: #f5f5f5; padding: 100px;">
             <div style="
-            width: 500px;
-            padding: 30px;
-            background-color: #ffffff;
-            text-align: center;
-            border-radius: 8px;
-            box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.20);
+                width: 500px;
+                padding: 30px;
+                background-color: #ffffff;
+                text-align: center;
+                border-radius: 8px;
+                box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.20);
             ">
                 <img
                     width="120"
@@ -645,62 +645,72 @@ class Rcn_Utility {
                     src="https://realitycapturenetwork.com/wp-content/uploads/2024/06/RCN_no-wordmark_blue.png"
                     alt="Logo"
                 >
+    
+                <hr  style="border: 0.5px solid #006CFA; width: 300px; margin: 20px auto;" />
+    
+                <h2 style="
+                    color: #000;
+                    font-family: \'Montserrat\', Helvetica, sans-serif;
+                    font-size: 15px;
+                    font-weight: 700;
+                    line-height: normal;
+                    letter-spacing: 0.3px;
+                "> ' . $heading . ' </h2>
+
                 <h4 style="
-                color: #000;
-                font-size: 13px;
-                font-weight: 500;
-                line-height: normal;
-                ">Order ID: #31529</h4>
-    
-                <hr  style="border: 0.5px solid #D2D4DE; width: 300px; margin: 20px auto;" />
-    
-                <div>
-                    <h2 style="
-                        color: #000;
-                        font-size: 15px;
-                        font-weight: 700;
-                        line-height: normal;
-                        letter-spacing: 0.3px;
-                        ">' . $heading . '</h2>
-                    <p style="
-                        color: #1A1A1A;
-                        text-align: center;
-                        font-size: 14px;
-                        font-weight: 400;
-                        line-height: 21px;
-                        color: #818080;
-                        letter-spacing: 0.3px;
-                    ">' . $body . '</p>
-                    <div style="margin-top: 30px;">
-                        <a href="' . $url . '" style="
-                        text-decoration: none;
-                        border-radius: 8px;
-                        background: #006CFA;
-                        color: #ffffff;
-                        text-align: center;
-                        font-size: 14px;
-                        font-weight: 500;
-                        letter-spacing: 0.3px;
-                        text-transform: uppercase;
-                        border: none;
-                        padding: 15px 20px;
-                        ">' . $button_txt . '</a>
-                    </div>
-                    <hr  style="border: 0.5px solid #D2D4DE; width: 300px; margin: 30px auto;" />
-                    <p style="
-                        color: #98A0A6;
-                        font-size: 11px;
-                        font-weight: 400;
-                        line-height: 16px;
-                        letter-spacing: 0.3px;
-                        text-decoration-line: none;
-                    ">
-                        ' . $footer . '
+                    color: #000;
+                    font-family: \'Montserrat\', Helvetica, sans-serif;
+                    font-size: 14px;
+                    font-weight: 500;
+                    line-height: normal;
+                ">Order ID: #' . $order_id . '</h4>
+
+                <p style="
+                    color: #000000;
+                    text-align: center;
+                    font-family: \'Montserrat\', Helvetica, sans-serif;
+                    font-size: 14px;
+                    font-weight: 400;
+                    line-height: 21px;
+                    letter-spacing: 0.3px;
+                ">' . $body . '</p>
+
+
+                <p style="
+                margin: 30px 0px;
+                padding-bottom: 20px;
+                ">
+                    <a 
+                    href=" ' . $url . ' "
+                    style="padding: 15px 20px;
+                    background: #006cfa;
+                    color: white;
+                    text-decoration: none;
+                    font-family: \'Montserrat\', Helvetica, sans-serif;
+                    border-radius: 8px;
+					font-weight: 500;
+					letter-spacing: 0.3px;
+					"
+                    >' . $button_txt . '</a>
                 </p>
-                </div>
+
+                <hr  style="border: 0.5px solid #006CFA; width: 300px; margin: 30px auto;" />
+
+                <p style="
+                    color: #000000;
+                    font-family: \'Montserrat\', Helvetica, sans-serif;
+                    font-size: 11px;
+                    font-weight: 400;
+                    line-height: 16px;
+                    letter-spacing: 0.3px;
+                    text-decoration-line: none;
+                ">
+                    ' . $footer . '
+                </p>
+
             </div>
         </div>
-    	</center>';
+    </center>';
 
 		wp_mail( $order->get_billing_email(), $subject, $content );
 	}
