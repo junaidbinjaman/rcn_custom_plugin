@@ -629,24 +629,22 @@ class Rcn_Utility {
 		$footer     = isset( $all_options['ar-email-footer-copy'] ) ? $all_options['ar-email-footer-copy'] : false;
 
 		$content = '
-<center>
-        <div style="background-color: #f5f5f5; padding: 100px;">
+		<center>
+        <div style="background-color: #f5f5f5; padding-top: 25px; padding-bottom: 25px;">
             <div style="
                 width: 500px;
-                padding: 30px;
                 background-color: #ffffff;
                 text-align: center;
                 border-radius: 8px;
                 box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.20);
             ">
-                <img
-                    width="120"
-                    height="100%"
-                    src="https://realitycapturenetwork.com/wp-content/uploads/2024/06/RCN_no-wordmark_blue.png"
-                    alt="Logo"
-                >
-    
-                <hr  style="border: 0.5px solid #006CFA; margin: 20px auto; margin-bottom: 32px" />
+            <img 
+            src="https://realitycapturenetwork.com/wp-content/uploads/2024/07/R-CON-2024_Attendee-Registration-Banner-small.jpg"
+            style="border-top-left-radius: 8px; border-top-right-radius: 8px;"
+            width="100%"
+            alt="Banner">
+
+            <div style="padding: 30px; padding-top: 15px" >
     
                 <h2 style="
                     color: #000;
@@ -655,7 +653,7 @@ class Rcn_Utility {
                     font-weight: 700;
                     line-height: normal;
                     letter-spacing: 0.3px;
-                "> ' . $heading . ' </h2>
+                ">' . $heading . '</h2>
 
                 <h4 style="
                     color: #000;
@@ -663,7 +661,7 @@ class Rcn_Utility {
                     font-size: 14px;
                     font-weight: 500;
                     line-height: normal;
-                ">Order ID: #' . $order_id . '</h4>
+                ">Order ID: #31529</h4>
 
                 <p style="
                     color: #000000;
@@ -681,16 +679,16 @@ class Rcn_Utility {
                 padding-bottom: 20px;
                 ">
                     <a 
-                    href=" ' . $url . ' "
+                    href="' . $url . '"
                     style="padding: 15px 20px;
                     background: #006cfa;
                     color: white;
                     text-decoration: none;
                     font-family: \'Montserrat\', Helvetica, sans-serif;
                     border-radius: 8px;
-					font-weight: 500;
-					letter-spacing: 0.3px;
-					"
+                    font-weight: 500;
+                    letter-spacing: 0.3px;
+                    "
                     >' . $button_txt . '</a>
                 </p>
 
@@ -708,6 +706,7 @@ class Rcn_Utility {
                     ' . $footer . '
                 </p>
 
+            </div>
             </div>
         </div>
     </center>';

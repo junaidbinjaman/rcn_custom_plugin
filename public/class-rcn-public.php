@@ -334,6 +334,30 @@ class Rcn_Public {
 	 */
 	public function shortcode_initializer() {
 		add_shortcode( 'rcn_ar_get_ticket_data', array( $this, 'ar_get_ticket_data__callback' ) );
+		add_shortcode( 'get_url_parameter', array( $this, 'get_url_parameter__callback' ) );
+	}
+
+	/**
+	 * Retrieve the url parameter value.
+	 *
+	 * @param array  $atts The array contains all shortcode attributes.
+	 * @param mixed  $content The content inside the shortcode opening and closing.
+	 * @param string $tag The shortcode tag itself.
+	 * @return mixed
+	 */
+	public function get_url_parameter__callback( $atts = array(), $content, $tag ) {
+		$atts = array_change_key_case( $atts, CASE_LOWER );
+
+		$rcn_atts = shortcode_atts(
+			array(
+				'parameter' => 'order-id',
+			),
+			$atts,
+			$tag
+		);
+
+		$url_parameter_value = isset( $_GET[ esc_html( $rcn_atts['parameter'] ) ] ) ? sanitize_text_field( wp_unslash( $_GET[ esc_html( $rcn_atts['parameter'] ) ] ) ) : '';
+		return $url_parameter_value;
 	}
 
 	/**
