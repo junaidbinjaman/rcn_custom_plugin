@@ -15,7 +15,7 @@
  * Plugin Name:       RCN Custom Plugin
  * Plugin URI:        https://realitycapturenetwork.com
  * Description:       Introducing the RCN-exclusive plugin, meticulously crafted with tailored RCN custom codes and specialized functions to enhance your experience uniquely. Designed exclusively for RCN, this plugin brings a world of customized possibilities to your fingertips.
- * Version:           1.2.0
+ * Version:           2.0.0
  * Author:            Junaid Bin Jaman
  * Author URI:        https://junaidbinjaman.com/
  * License:           GPL-2.0+
