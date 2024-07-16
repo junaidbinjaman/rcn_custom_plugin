@@ -501,4 +501,216 @@ class Rcn_Utility {
 			);
 		}
 	}
+
+	/**
+	 * The function register attendee slots in the database
+	 *
+	 * The function accepts the order id and registers allowed_attendees
+	 * and registered_attendees slot in the database
+	 *
+	 * @param int $order_id The order id.
+	 * @return mixed
+	 */
+	public function register_attendee_slots( $order_id ) {
+		$order_id                = intval( $order_id );
+		$total_allowed_attendees = get_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', true );
+
+		if ( ! empty( $total_allowed_attendees ) ) {
+			return array(
+				'status'         => false,
+				'attendee_count' => 0,
+				'message'        => 'Attendee slots are already generated for this order',
+			);
+		}
+
+		$registration_status = array(
+			'status'         => false,
+			'attendee_count' => 0,
+			'message'        => '',
+		);
+
+		$order = wc_get_order( $order_id );
+		foreach ( $order->get_items() as $item_id => $item ) {
+			/** @var WC_Order_Item_Product $item */ // phpcs:ignore
+			$product_id  = $item->get_product_id();
+			$product_qty = $item->get_quantity();
+
+			$is_registered = $this->register_attendee_slots__helper( $product_id, $order_id, $product_qty );
+
+			if ( $is_registered > 0 ) {
+				$registration_status['status']         = true;
+				$registration_status['attendee_count'] = $registration_status['attendee_count'] + $is_registered;
+				continue;
+			}
+		}
+
+		if ( true === $registration_status['status'] ) {
+			$total_allowed_attendees        = $registration_status['attendee_count'];
+			$registration_status['message'] = 'Total ' . $total_allowed_attendees . ' slots generated';
+
+			add_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', $total_allowed_attendees );
+
+			$this->attendee_reg_page_link_emailer( $order_id );
+
+			return $registration_status;
+		}
+
+		$registration_status['message'] = 'No attendee ticket for R-CON exists in this order';
+		return $registration_status;
+	}
+
+	/**
+	 * The helper function of register_attendee_slots
+	 *
+	 * This function registered the slot in the database
+	 * and return product quantity if registered.
+	 * Otherwise, it returns 0.
+	 *
+	 * @param int $product_id The product id.
+	 * @param int $order_id The order id.
+	 * @param int $product_qty The product quantity.
+	 * @return int
+	 */
+	private function register_attendee_slots__helper( $product_id, $order_id, $product_qty ) {
+		$all_options = get_option( 'options', array() );
+
+		// Conference attendee ticket ids.
+		$conference_attendee = isset( $all_options['conference-attendee'] ) ? $all_options['conference-attendee'] : false;
+		$virtual_attendee    = isset( $all_options['virtual-attendee'] ) ? $all_options['virtual-attendee'] : false;
+		$vip_attendee        = isset( $all_options['vip-attendee'] ) ? $all_options['vip-attendee'] : false;
+
+		$conference_attendee = intval( $conference_attendee );
+		$virtual_attendee    = intval( $virtual_attendee );
+		$vip_attendee        = intval( $vip_attendee );
+
+		if ( $product_id === $virtual_attendee ) {
+			add_post_meta( $order_id, 'allowed_virtual_attendees', $product_qty );
+			add_post_meta( $order_id, 'registered_virtual_attendees', 0 );
+
+			return $product_qty;
+		}
+
+		if ( $product_id === $conference_attendee ) {
+			add_post_meta( $order_id, 'allowed_conference_attendees', $product_qty );
+			add_post_meta( $order_id, 'registered_conference_attendees', 0 );
+
+			return $product_qty;
+		}
+
+		if ( $product_id === $vip_attendee ) {
+			add_post_meta( $order_id, 'allowed_vip_attendees', $product_qty );
+			add_post_meta( $order_id, 'registered_vip_attendees', 0 );
+
+			return $product_qty;
+		}
+
+		return 0;
+	}
+
+	/**
+	 * The function email the attendee registration page link
+	 * to the person who placed the order.
+	 *
+	 * @param int $order_id The order id.
+	 * @return void
+	 */
+	private function attendee_reg_page_link_emailer( $order_id ) {
+		$order       = wc_get_order( $order_id );
+		$all_options = get_option( 'options', array() );
+
+		$scheme = isset( $_SERVER['HTTPS'] ) && 'on' === $_SERVER['HTTPS'] ? 'https' : 'http';
+		$host   = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+		$url    = $scheme . '://' . $host . '/attendee-registration/?order-id=' . $order_id;
+
+		$subject    = isset( $all_options['ar-email-subject'] ) ? $all_options['ar-email-subject'] : false;
+		$heading    = isset( $all_options['ar-email-heading'] ) ? $all_options['ar-email-heading'] : false;
+		$body       = isset( $all_options['ar-email-body'] ) ? $all_options['ar-email-body'] : false;
+		$button_txt = isset( $all_options['ar-email-button-text'] ) ? $all_options['ar-email-button-text'] : false;
+		$footer     = isset( $all_options['ar-email-footer-copy'] ) ? $all_options['ar-email-footer-copy'] : false;
+
+		$content = '
+		<center>
+        <div style="background-color: #f5f5f5; padding-top: 25px; padding-bottom: 25px;">
+            <div style="
+                width: 500px;
+                background-color: #ffffff;
+                text-align: center;
+                border-radius: 8px;
+                box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.20);
+            ">
+            <img 
+            src="https://realitycapturenetwork.com/wp-content/uploads/2024/07/R-CON-2024_Attendee-Registration-Banner-small.jpg"
+            style="border-top-left-radius: 8px; border-top-right-radius: 8px;"
+            width="100%"
+            alt="Banner">
+
+            <div style="padding: 30px; padding-top: 15px" >
+    
+                <h2 style="
+                    color: #000;
+                    font-family: \'Montserrat\', Helvetica, sans-serif;
+                    font-size: 15px;
+                    font-weight: 700;
+                    line-height: normal;
+                    letter-spacing: 0.3px;
+                ">' . $heading . '</h2>
+
+                <h4 style="
+                    color: #000;
+                    font-family: \'Montserrat\', Helvetica, sans-serif;
+                    font-size: 14px;
+                    font-weight: 500;
+                    line-height: normal;
+                ">Order ID: #31529</h4>
+
+                <p style="
+                    color: #000000;
+                    text-align: center;
+                    font-family: \'Montserrat\', Helvetica, sans-serif;
+                    font-size: 14px;
+                    font-weight: 400;
+                    line-height: 21px;
+                    letter-spacing: 0.3px;
+                ">' . $body . '</p>
+
+
+                <p style="
+                margin: 30px 0px;
+                padding-bottom: 20px;
+                ">
+                    <a 
+                    href="' . $url . '"
+                    style="padding: 15px 20px;
+                    background: #006cfa;
+                    color: white;
+                    text-decoration: none;
+                    font-family: \'Montserrat\', Helvetica, sans-serif;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    letter-spacing: 0.3px;
+                    "
+                    >' . $button_txt . '</a>
+                </p>
+
+                <hr  style="border: 0.5px solid #006CFA; margin: 30px auto;" />
+
+                <p style="
+                    color: #000000;
+                    font-family: \'Montserrat\', Helvetica, sans-serif;
+                    font-size: 11px;
+                    font-weight: 400;
+                    line-height: 16px;
+                    letter-spacing: 0.3px;
+                    text-decoration-line: none;
+                ">
+                    ' . $footer . '
+                </p>
+
+            </div>
+            </div>
+        </div>
+    </center>';
+
+		wp_mail( $order->get_billing_email(), $subject, $content );
+	}
 }

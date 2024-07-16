@@ -2,3 +2,26 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+
+ /** -----------------------------
+ Attendee Registration widget on dashboard
+  ----------------------------- */
+ .rcn-ar-admin-unique-url-generator-form .regular-text {
+   margin-top: 5px;
+ }
+
+ .rcn-ar-admin-unique-url-generator-form .button-primary {
+    margin-top: 10px;
+ }
+
+ .rcn-ar-admin-unique-url-generator-notice-success,
+ .rcn-ar-admin-unique-url-generator-notice-error,
+ .rcn-ar-admin-unique-url-generator-notice-warning {
+    display: none;
+ }
+
+ .rcn-ar-loader {
+   display: none;
+   color: lightgray;
+
+ }

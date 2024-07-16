@@ -1,17 +1,36 @@
 {
     "cSpell.words": [
+        "absint",
+        "ABSPATH",
         "ajaxurl",
         "atfv",
         "atfvqsf",
+        "atts",
+        "conferencecode",
+        "elementor",
+        "firstname",
+        "happyhour",
         "instock",
+        "Jaman",
+        "jobtitle",
         "jsdelivr",
+        "Junaid",
+        "lastname",
         "nopriv",
         "oosc",
         "oosi",
+        "orderid",
         "phpcs",
         "qsapces",
+        "Rcon",
+        "shirtsize",
+        "shortcode",
         "simplebar",
         "singlebar",
+        "subpackage",
+        "tickettype",
+        "tickettypekey",
+        "unslash",
         "vatatc",
         "vatatcb",
         "vatatcs",
@@ -22,6 +41,21 @@
         "vpciw",
         "vsc",
         "vtsb",
+        "woocommerce",
+        "WPINC",
         "wppb"
-    ]
+    ],
+
+    // Place your settings in this file to overwrite the default settings
+    // PHPCS
+    "phpcs.enable": true,
+    "phpcs.standard": "WordPress",
+    "phpcs.executablePath": "./vendor/bin/phpcs",
+    "phpcs.composerJsonPath": "composer.json",
+
+    "phpcbf.enable": true,
+    "phpcbf.executablePath": "./vendor/bin/phpcbf",
+    "phpcbf.documentFormattingProvider": true,
+    "phpcbf.onsave": false,
+    "phpcbf.standard": "WordPress"
 }

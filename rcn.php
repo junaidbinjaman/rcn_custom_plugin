@@ -15,7 +15,7 @@
  * Plugin Name:       RCN Custom Plugin
  * Plugin URI:        https://realitycapturenetwork.com
  * Description:       Introducing the RCN-exclusive plugin, meticulously crafted with tailored RCN custom codes and specialized functions to enhance your experience uniquely. Designed exclusively for RCN, this plugin brings a world of customized possibilities to your fingertips.
- * Version:           1.1.0
+ * Version:           1.2.0
  * Author:            Junaid Bin Jaman
  * Author URI:        https://junaidbinjaman.com/
  * License:           GPL-2.0+
@@ -23,8 +23,6 @@
  * Text Domain:       rcn
  * Domain Path:       /languages
  */
-
-use Automattic\WooCommerce\StoreApi\Routes\V1\CartItems;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
