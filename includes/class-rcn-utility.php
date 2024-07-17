@@ -508,10 +508,11 @@ class Rcn_Utility {
 	 * The function accepts the order id and registers allowed_attendees
 	 * and registered_attendees slot in the database
 	 *
-	 * @param int $order_id The order id.
+	 * @param int     $order_id The order id.
+	 * @param boolean $admin_call Is this function called from admin panel.
 	 * @return mixed
 	 */
-	public function register_attendee_slots( $order_id ) {
+	public function register_attendee_slots( $order_id, $admin_call = false ) {
 		$order_id                = intval( $order_id );
 		$total_allowed_attendees = get_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', true );
 
@@ -550,7 +551,9 @@ class Rcn_Utility {
 
 			add_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', $total_allowed_attendees );
 
-			$this->attendee_reg_page_link_emailer( $order_id );
+			if ( $admin_call ) {
+				$this->attendee_reg_page_link_emailer( $order_id );
+			}
 
 			return $registration_status;
 		}
@@ -618,9 +621,8 @@ class Rcn_Utility {
 		$order       = wc_get_order( $order_id );
 		$all_options = get_option( 'options', array() );
 
-		$scheme = isset( $_SERVER['HTTPS'] ) && 'on' === $_SERVER['HTTPS'] ? 'https' : 'http';
-		$host   = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
-		$url    = $scheme . '://' . $host . '/attendee-registration/?order-id=' . $order_id;
+		$ar_register_page_id = isset( $all_options['registration-page'] ) ? $all_options['registration-page'] : false;
+		$url                 = $ar_register_page_id ? get_permalink( $ar_register_page_id ) . '?order-id=' . $order_id : false;
 
 		$subject    = isset( $all_options['ar-email-subject'] ) ? $all_options['ar-email-subject'] : false;
 		$heading    = isset( $all_options['ar-email-heading'] ) ? $all_options['ar-email-heading'] : false;
