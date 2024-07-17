@@ -91,3 +91,5 @@ function run_rcn() {
 	$plugin->run();
 }
 run_rcn();
+
+// phpcs:disabled
