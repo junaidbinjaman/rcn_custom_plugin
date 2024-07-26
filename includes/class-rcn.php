@@ -157,6 +157,7 @@ class Rcn {
 		$this->loader->add_action( 'elementor_pro/forms/actions/register', $plugin_admin, 'register_elementor_form_custom_actions' );
 		$this->loader->add_action( 'wp_dashboard_setup', $plugin_admin, 'ar_admin_dashboard_widgets_handler' );
 		$this->loader->add_action( 'wp_ajax_ar_admin_url_generator', $plugin_admin, 'ar_admin_url_generator' );
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu_init' );
 	}
 
 	/**

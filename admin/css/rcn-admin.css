@@ -3,25 +3,76 @@
  * included in this file.
  */
 
- /** -----------------------------
+/** -----------------------------
  Attendee Registration widget on dashboard
   ----------------------------- */
- .rcn-ar-admin-unique-url-generator-form .regular-text {
-   margin-top: 5px;
- }
+.rcn-ar-admin-unique-url-generator-form .regular-text {
+    margin-top: 5px;
+}
 
- .rcn-ar-admin-unique-url-generator-form .button-primary {
+.rcn-ar-admin-unique-url-generator-form .button-primary {
     margin-top: 10px;
- }
+}
 
- .rcn-ar-admin-unique-url-generator-notice-success,
- .rcn-ar-admin-unique-url-generator-notice-error,
- .rcn-ar-admin-unique-url-generator-notice-warning {
+.rcn-ar-admin-unique-url-generator-notice-success,
+.rcn-ar-admin-unique-url-generator-notice-error,
+.rcn-ar-admin-unique-url-generator-notice-warning {
     display: none;
- }
+}
 
- .rcn-ar-loader {
-   display: none;
-   color: lightgray;
+.rcn-ar-loader {
+    display: none;
+    color: lightgray;
+}
 
- }
+.rcon-dashboard-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.r-con-dashboard-unregistered-attendee {
+    width: 300px;
+    background: #ffffff;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.r-con-dashboard-unregistered-attendee .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #818181;
+}
+
+.r-con-dashboard-unregistered-attendee .header .dashicons-update{
+    cursor: pointer;
+}
+
+.r-con-dashboard-unregistered-attendee .header p {
+    margin: 0px;
+}
+
+.r-con-dashboard-unregistered-attendee .body p {
+    font-size: 18px;
+    color: #838383;
+}
+
+.r-con-dashboard-unregistered-attendee .body h3 {
+    font-size: 55px;
+    line-height: 62px;
+    margin: 0px;
+}
+
+.r-con-dashboard-unregistered-attendee .body span {
+    font-size: 55px;
+    margin-right: 38px;
+}
+
+.r-con-dashboard-unregistered-attendee .footer {
+  text-align: end;
+  cursor: pointer;
+  color: #818181 !important;
+}

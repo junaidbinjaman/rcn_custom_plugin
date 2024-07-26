@@ -205,4 +205,113 @@ class Rcn_Admin {
 			exit;
 		}
 	}
+
+	/**
+	 * The function initializes the admin menu/submenu.
+	 *
+	 * @return void
+	 */
+	public function admin_menu_init() {
+		add_submenu_page(
+			'index.php',
+			__( 'R-CON Dashboard', 'rcn' ),
+			__( 'R-CON Dashboard', 'rcn' ),
+			'manage_options',
+			'r-con-dashboard',
+			array( $this, 'rcon_dashboard__callback' ),
+		);
+	}
+
+	/**
+	 * R-CON Dashboard HTML
+	 *
+	 * @return void
+	 */
+	public function rcon_dashboard__callback() {
+		?>
+		<div class="wrap">
+			<h2>R-CON Dashboard</h2>
+			<div class="rcon-dashboard-wrapper">
+				<?php $this->rcon_dashboard_total_unregistered_attendees_widget(); ?>
+				<?php $this->rcon_dashboard_total_registered_attendees_widget(); ?>
+				<?php $this->rcon_dashboard_total_attendees_widget(); ?>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * The widget shows the number of total unregistered attendees
+	 *
+	 * @return void
+	 */
+	private function rcon_dashboard_total_unregistered_attendees_widget() {
+		?>
+		<div class="r-con-dashboard-unregistered-attendee">
+			<div class="header">
+				<p>Refreshed 5 hrs ago.</p>
+				<div>
+					<span class="dashicons dashicons-update"></span>
+				</div>
+			</div>
+			<div class="body">
+				<p>Total Unregistered Attendees</p>	
+				<h3><span class="dashicons dashicons-admin-users"></span>150</h3>
+			</div>
+			<div class="footer">
+				<span class="dashicons dashicons-arrow-right-alt2"></span>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * The widget shows the number of total registered attendees
+	 *
+	 * @return void
+	 */
+	private function rcon_dashboard_total_registered_attendees_widget() {
+		?>
+		<div class="r-con-dashboard-unregistered-attendee">
+			<div class="header">
+				<p>Refreshed 3 mins ago.</p>
+				<div>
+					<span class="dashicons dashicons-update"></span>
+				</div>
+			</div>
+			<div class="body">
+				<p>Total Registered Attendees</p>	
+				<h3><span class="dashicons dashicons-admin-users"></span>350</h3>
+			</div>
+			<div class="footer">
+				<span class="dashicons dashicons-arrow-right-alt2"></span>
+			</div>
+		</div>
+		<?php
+	}
+
+	/**
+	 * The widget shows the number of total registered attendees
+	 *
+	 * @return void
+	 */
+	private function rcon_dashboard_total_attendees_widget() {
+		?>
+		<div class="r-con-dashboard-unregistered-attendee">
+			<div class="header">
+				<p>Refreshed 26 mins ago.</p>
+				<div>
+					<span class="dashicons dashicons-update"></span>
+				</div>
+			</div>
+			<div class="body">
+				<p>Total Attendees</p>	
+				<h3><span class="dashicons dashicons-admin-users"></span>500</h3>
+			</div>
+			<div class="footer">
+				<span class="dashicons dashicons-arrow-right-alt2"></span>
+			</div>
+		</div>
+		<?php
+	}
 }
