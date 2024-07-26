@@ -629,6 +629,14 @@ class Rcn_Utility {
 		$body       = isset( $all_options['ar-email-body'] ) ? $all_options['ar-email-body'] : false;
 		$button_txt = isset( $all_options['ar-email-button-text'] ) ? $all_options['ar-email-button-text'] : false;
 		$footer     = isset( $all_options['ar-email-footer-copy'] ) ? $all_options['ar-email-footer-copy'] : false;
+		$replay_to  = isset( $all_options['reply-to'] ) ? $all_options['reply-to'] : false;
+		$ccs        = isset( $all_options['cc'] ) ? $all_options['cc'] : false;
+
+		$header [] = 'From: ' . $replay_to;
+
+		foreach ( $ccs as $cc ) {
+			$header[] = 'Cc: ' . $cc['email'];
+		}
 
 		$content = '
 		<center>
@@ -710,9 +718,9 @@ class Rcn_Utility {
 
             </div>
             </div>
-        </div>
-    </center>';
+        	</div>
+    	</center>';
 
-		wp_mail( $order->get_billing_email(), $subject, $content );
+		wp_mail( $order->get_billing_email(), $subject, $content, $header );
 	}
 }
