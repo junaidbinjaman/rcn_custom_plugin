@@ -182,8 +182,11 @@ class Rcn_Admin {
 
 		$order_id = isset( $_POST['order_id'] ) ? sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : 0;
 
-		$rcn_utility = new Rcn_Utility();
-		$result      = $rcn_utility->register_attendee_slots( $order_id );
+		$all_options = get_option( 'options', array() );
+
+		$rcn_utility             = new Rcn_Utility();
+		$result                  = $rcn_utility->register_attendee_slots( $order_id );
+		$ar_registration_page_id = isset( $all_options['registration-page'] ) ? $all_options['registration-page'] : false;
 
 		if ( false === $result['status'] ) {
 			echo wp_json_encode(
@@ -199,7 +202,7 @@ class Rcn_Admin {
 			echo wp_json_encode(
 				array(
 					'status'  => true,
-					'message' => 'The attendee registration URL is ' . get_permalink( 30440 ) . '?order-id=' . $order_id,
+					'message' => 'The attendee registration URL is ' . get_permalink( $ar_registration_page_id ) . '?order-id=' . $order_id,
 				)
 			);
 			exit;

@@ -154,7 +154,7 @@ class Rcn_Public {
 	public function ar_action_after_payment( $order_id ) {
 
 		$rcn_utility = new Rcn_Utility();
-		$result      = $rcn_utility->register_attendee_slots( $order_id );
+		$result      = $rcn_utility->register_attendee_slots( $order_id, true );
 
 		if ( true === $result['status'] ) {
 			$this->ar_redirect_to_registration_page( $order_id );
