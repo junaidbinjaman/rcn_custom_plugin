@@ -713,4 +713,18 @@ class Rcn_Utility {
 
 		wp_mail( $order->get_billing_email(), $subject, $content );
 	}
+
+	/**
+	 * R-CON dashboard callback.
+	 *
+	 * @return void
+	 */
+	public function rcon_dashboard() {
+
+		echo '<pre>';
+		var_dump( 'Hello World' );
+		echo '</pre>';
+
+		wp_die();
+	}
 }
