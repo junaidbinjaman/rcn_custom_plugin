@@ -727,14 +727,37 @@ class Rcn_Utility {
 	/**
 	 * R-CON dashboard callback.
 	 *
-	 * @return void
+	 * @return array
 	 */
 	public function rcon_dashboard() {
 
-		echo '<pre>';
-		var_dump( 'Hello World' );
-		echo '</pre>';
+		$all_orders                       = wc_get_orders( array( 'limit' => -1 ) );
+		$unregistered_attendees_num       = 0;
+		$unregistered_attendee_order_data = array();
 
-		wp_die();
+		foreach ( $all_orders as $key => $order ) {
+			$order_id               = $order->get_id();
+			$total_ticket_purchased = intval( get_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', true ) );
+
+			if ( ! isset( $total_ticket_purchased ) ) {
+				continue;
+			}
+
+			$registered_virtual_attendee        = intval( get_post_meta( $order_id, 'registered_virtual_attendees', true ) );
+			$registered_conference_attendee     = intval( get_post_meta( $order_id, 'registered_conference_attendees', true ) );
+			$registered_vip_attendees           = intval( get_post_meta( $order_id, 'registered_vip_attendees', true ) );
+			$unregistered_attendee_of_the_order = ( $registered_virtual_attendee + $registered_conference_attendee + $registered_vip_attendees );
+
+			$unregistered_attendees_num += $total_ticket_purchased - $unregistered_attendee_of_the_order;
+
+			if ( $unregistered_attendee_of_the_order > 0 ) {
+				array_push( $unregistered_attendee_order_data, $order );
+			}
+		}
+
+		return array(
+			'num_of_unregistered_attendees'    => $unregistered_attendees_num,
+			'unregistered_attendee_order_data' => $unregistered_attendee_order_data,
+		);
 	}
 }

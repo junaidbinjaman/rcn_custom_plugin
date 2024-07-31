@@ -40,16 +40,25 @@ class Rcn_Admin {
 	private $version;
 
 	/**
+	 * Initializes the RCN Utility function.
+	 *
+	 * @var object
+	 */
+	private $rcn_utility;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
 	 * @param      string $plugin_name       The name of this plugin.
 	 * @param      string $version    The version of this plugin.
+	 * @param      object $rcn_utility The rcn utility class initializer.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( $plugin_name, $version, $rcn_utility ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
+		$this->rcn_utility = $rcn_utility;
 	}
 
 	/**
@@ -184,8 +193,7 @@ class Rcn_Admin {
 
 		$all_options = get_option( 'options', array() );
 
-		$rcn_utility             = new Rcn_Utility();
-		$result                  = $rcn_utility->register_attendee_slots( $order_id );
+		$result                  = $this->rcn_utility->register_attendee_slots( $order_id );
 		$ar_registration_page_id = isset( $all_options['registration-page'] ) ? $all_options['registration-page'] : false;
 
 		if ( false === $result['status'] ) {
@@ -231,6 +239,7 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	public function rcon_dashboard__callback() {
+		$unregistered_attendee_data = $this->rcn_utility->rcon_dashboard()
 		?>
 		<div class="wrap">
 			<h2>R-CON Dashboard</h2>
@@ -238,6 +247,10 @@ class Rcn_Admin {
 				<?php $this->rcon_dashboard_total_unregistered_attendees_widget(); ?>
 				<?php $this->rcon_dashboard_total_registered_attendees_widget(); ?>
 				<?php $this->rcon_dashboard_total_attendees_widget(); ?>
+			</div>
+			<div class="rcon-dashboard-wrapper-detail">
+				<h2>Total Order <?php echo esc_html( count( $unregistered_attendee_data['unregistered_attendee_order_data'] ) ); ?></h2>
+				<p>The orders that has yet available attendee slots to register.</p>
 			</div>
 		</div>
 		<?php
@@ -249,6 +262,7 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	private function rcon_dashboard_total_unregistered_attendees_widget() {
+		$unregistered_attendee_data = $this->rcn_utility->rcon_dashboard();
 		?>
 		<div class="r-con-dashboard-unregistered-attendee">
 			<div class="header">
@@ -259,7 +273,9 @@ class Rcn_Admin {
 			</div>
 			<div class="body">
 				<p>Total Unregistered Attendees</p>	
-				<h3><span class="dashicons dashicons-admin-users"></span>150</h3>
+				<h3><span class="dashicons dashicons-admin-users"></span>
+					<?php echo esc_html( $unregistered_attendee_data['num_of_unregistered_attendees'] ); ?>
+				</h3>
 			</div>
 			<div class="footer">
 				<span class="dashicons dashicons-arrow-right-alt2"></span>
