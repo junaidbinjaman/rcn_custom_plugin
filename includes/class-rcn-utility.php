@@ -750,7 +750,12 @@ class Rcn_Utility {
 
 			$unregistered_attendees_num += $total_ticket_purchased - $unregistered_attendee_of_the_order;
 
-			if ( $unregistered_attendee_of_the_order > 0 ) {
+			/**
+			 * Number of attendees yet to register in this order
+			 */
+			$unregistered_attendees_num_of_order = $total_ticket_purchased - $unregistered_attendee_of_the_order;
+
+			if ( $unregistered_attendees_num_of_order > 0 ) {
 				array_push( $unregistered_attendee_order_data, $order );
 			}
 		}

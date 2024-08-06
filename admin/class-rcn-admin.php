@@ -239,7 +239,8 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	public function rcon_dashboard__callback() {
-		$unregistered_attendee_data = $this->rcn_utility->rcon_dashboard()
+		$unregistered_attendee_data = $this->rcn_utility->rcon_dashboard();
+		$unregistered_attendee_no   = $unregistered_attendee_data['unregistered_attendee_order_data'];
 		?>
 		<div class="wrap">
 			<h2>R-CON Dashboard</h2>
@@ -249,11 +250,50 @@ class Rcn_Admin {
 				<?php $this->rcon_dashboard_total_attendees_widget(); ?>
 			</div>
 			<div class="rcon-dashboard-wrapper-detail">
-				<h2>Total Order <?php echo esc_html( count( $unregistered_attendee_data['unregistered_attendee_order_data'] ) ); ?></h2>
+				<h2>Total Order <?php echo esc_html( count( $unregistered_attendee_no ) ); ?></h2>
 				<p>The orders that has yet available attendee slots to register.</p>
+				<?php $this->unregistered_order_list_column( $unregistered_attendee_no ); ?>
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Unregister order list colum
+	 *
+	 * The list contains all the order that has yet available attendee slots
+	 *
+	 * @param  array $order_list The order list.
+	 * @return void
+	 */
+	private function unregistered_order_list_column( $order_list ) {
+		foreach ( $order_list as $order ) {
+			$order_id                   = $order->get_ID();
+			$unregistered_attendees_num = 0;
+			$total_ticket_purchased     = intval( get_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', true ) );
+
+			$registered_virtual_attendee        = intval( get_post_meta( $order_id, 'registered_virtual_attendees', true ) );
+			$registered_conference_attendee     = intval( get_post_meta( $order_id, 'registered_conference_attendees', true ) );
+			$registered_vip_attendees           = intval( get_post_meta( $order_id, 'registered_vip_attendees', true ) );
+			$unregistered_attendee_of_the_order = ( $registered_virtual_attendee + $registered_conference_attendee + $registered_vip_attendees );
+
+			$unregistered_attendees_num += $total_ticket_purchased - $unregistered_attendee_of_the_order;
+			$order_edit_page_url         = admin_url( 'post.php?post=' . $order_id . '&action=edit' );
+			?>
+			<div class="r-con-dashboard-unregistered-attendee-list">
+				<p>#<?php echo esc_html( $order_id ); ?></p>
+				<p>
+					<?php
+					echo esc_html( $order->get_billing_first_name() );
+					echo '&nbsp;';
+					echo esc_html( $order->get_billing_last_name() );
+					?>
+				</p>
+				<p>Available slots <strong><?php echo esc_html( $unregistered_attendees_num ); ?></strong></p>
+				<p><a href="<?php echo esc_url( $order_edit_page_url ); ?>">View More</a></p>
+			</div>
+			<?php
+		}
 	}
 
 	/**
