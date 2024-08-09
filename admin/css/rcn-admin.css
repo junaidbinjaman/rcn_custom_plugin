@@ -77,6 +77,15 @@
   color: #818181 !important;
 }
 
+.r-con-dashboard-unregistered-attendee .footer a {
+    text-decoration: none;
+}
+
+.rcon-dashboard-wrapper-detail {
+    margin-top: 50px;
+    max-width: 600px;
+}
+
 .r-con-dashboard-unregistered-attendee-list {
     background: #fff;
     display: flex;

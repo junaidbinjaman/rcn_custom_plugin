@@ -9,6 +9,8 @@
  * @subpackage Rcn/admin
  */
 
+use ElementorPro\Modules\Forms\Fields\Number;
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -223,6 +225,9 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	public function admin_menu_init() {
+		/**
+		 * R-CON Dashboard for admin.
+		 */
 		add_submenu_page(
 			'index.php',
 			__( 'R-CON Dashboard', 'rcn' ),
@@ -231,6 +236,36 @@ class Rcn_Admin {
 			'r-con-dashboard',
 			array( $this, 'rcon_dashboard__callback' ),
 		);
+
+		/**
+		 * This admin menu page contains a list of all the order
+		 * That has yet available attendee slots to register.
+		 */
+
+		add_menu_page(
+			__( 'Order List', 'rcn' ),
+			'',
+			'manage_options',
+			'order-listings',
+			array( $this, 'order_listings_with_available_slots' )
+		);
+	}
+
+	/**
+	 * The orders that has yet available slots to register attendees
+	 *
+	 * @return void
+	 */
+	public function order_listings_with_available_slots() {
+		$unregistered_attendee_data = $this->rcn_utility->rcon_dashboard();
+		$unregistered_attendee_no   = $unregistered_attendee_data['unregistered_attendee_order_data'];
+		?>
+		<div class="rcon-dashboard-wrapper-detail">
+			<h2>Total Order <?php echo esc_html( count( $unregistered_attendee_no ) ); ?></h2>
+			<p>The orders that has yet available attendee slots to register.</p>
+			<?php $this->unregistered_order_list_column( $unregistered_attendee_no ); ?>
+		</div>
+		<?php
 	}
 
 	/**
@@ -239,8 +274,6 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	public function rcon_dashboard__callback() {
-		$unregistered_attendee_data = $this->rcn_utility->rcon_dashboard();
-		$unregistered_attendee_no   = $unregistered_attendee_data['unregistered_attendee_order_data'];
 		?>
 		<div class="wrap">
 			<h2>R-CON Dashboard</h2>
@@ -248,11 +281,6 @@ class Rcn_Admin {
 				<?php $this->rcon_dashboard_total_unregistered_attendees_widget(); ?>
 				<?php $this->rcon_dashboard_total_registered_attendees_widget(); ?>
 				<?php $this->rcon_dashboard_total_attendees_widget(); ?>
-			</div>
-			<div class="rcon-dashboard-wrapper-detail">
-				<h2>Total Order <?php echo esc_html( count( $unregistered_attendee_no ) ); ?></h2>
-				<p>The orders that has yet available attendee slots to register.</p>
-				<?php $this->unregistered_order_list_column( $unregistered_attendee_no ); ?>
 			</div>
 		</div>
 		<?php
@@ -266,7 +294,7 @@ class Rcn_Admin {
 	 * @param  array $order_list The order list.
 	 * @return void
 	 */
-	private function unregistered_order_list_column( $order_list ) {
+	public function unregistered_order_list_column( $order_list ) {
 		foreach ( $order_list as $order ) {
 			$order_id                   = $order->get_ID();
 			$unregistered_attendees_num = 0;
@@ -302,7 +330,8 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	private function rcon_dashboard_total_unregistered_attendees_widget() {
-		$unregistered_attendee_data = $this->rcn_utility->rcon_dashboard();
+		$unregistered_attendee_data               = $this->rcn_utility->rcon_dashboard();
+		$orders_with_available_slots_listing_page = admin_url( 'index.php?page=order-listings' );
 		?>
 		<div class="r-con-dashboard-unregistered-attendee">
 			<div class="header">
@@ -318,7 +347,9 @@ class Rcn_Admin {
 				</h3>
 			</div>
 			<div class="footer">
+				<a href="<?php echo esc_url( $orders_with_available_slots_listing_page ); ?>">
 				<span class="dashicons dashicons-arrow-right-alt2"></span>
+				</a>
 			</div>
 		</div>
 		<?php
@@ -330,6 +361,7 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	private function rcon_dashboard_total_registered_attendees_widget() {
+		$attendee_listing_url = admin_url( '/edit.php?post_type=r-con-attendees' );
 		?>
 		<div class="r-con-dashboard-unregistered-attendee">
 			<div class="header">
@@ -340,13 +372,32 @@ class Rcn_Admin {
 			</div>
 			<div class="body">
 				<p>Total Registered Attendees</p>	
-				<h3><span class="dashicons dashicons-admin-users"></span>350</h3>
+				<h3><span class="dashicons dashicons-admin-users"></span>
+					<?php echo esc_html( $this->found_registered_attendees_num() ); ?>
+				</h3>
 			</div>
 			<div class="footer">
-				<span class="dashicons dashicons-arrow-right-alt2"></span>
+				<a href="<?php echo esc_url( $attendee_listing_url ); ?>">
+					<span class="dashicons dashicons-arrow-right-alt2"></span>
+				</a>
 			</div>
 		</div>
 		<?php
+	}
+
+	/**
+	 * The function returns the number of attendees that has been already registered.
+	 *
+	 * @return int
+	 */
+	private function found_registered_attendees_num() {
+		$args = array(
+			'post_type' => 'r-con-attendees',
+		);
+
+		$registered_rcon_attendees = new WP_Query( $args );
+
+		return $registered_rcon_attendees->found_posts;
 	}
 
 	/**
@@ -355,6 +406,11 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	private function rcon_dashboard_total_attendees_widget() {
+		$unregistered_attendee_data = $this->rcn_utility->rcon_dashboard();
+		$registered_attendee_no     = intval( $this->found_registered_attendees_num() );
+		$unregistered_attendee_no   = intval( $unregistered_attendee_data['num_of_unregistered_attendees'] );
+
+		$total_attendees = $registered_attendee_no + $unregistered_attendee_no;
 		?>
 		<div class="r-con-dashboard-unregistered-attendee">
 			<div class="header">
@@ -365,7 +421,9 @@ class Rcn_Admin {
 			</div>
 			<div class="body">
 				<p>Total Attendees</p>	
-				<h3><span class="dashicons dashicons-admin-users"></span>500</h3>
+				<h3><span class="dashicons dashicons-admin-users"></span>
+				<?php echo esc_html( $total_attendees ); ?>
+				</h3>
 			</div>
 			<div class="footer">
 				<span class="dashicons dashicons-arrow-right-alt2"></span>
