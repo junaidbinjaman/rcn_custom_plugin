@@ -159,6 +159,9 @@ class Rcn {
 		$this->loader->add_action( 'wp_dashboard_setup', $plugin_admin, 'ar_admin_dashboard_widgets_handler' );
 		$this->loader->add_action( 'wp_ajax_ar_admin_url_generator', $plugin_admin, 'ar_admin_url_generator' );
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu_init' );
+		$this->loader->add_action( 'wp_ajax_foobar', $plugin_admin, 'foobar' );
+		$this->loader->add_action( 'wp_ajax_nopriv_foobar', $plugin_admin, 'foobar' );
+		// $this->loader->add_action( 'init', $plugin_admin, 'foobar' );
 	}
 
 	/**

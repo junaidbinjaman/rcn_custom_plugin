@@ -126,3 +126,38 @@ function rcn_arNotificationHandler($, status, message) {
     return;
   }
 }
+
+/**
+ * The function calls a backend function to send reminder to all the emails of the order
+ * where there are still available slots
+ */
+function rconAttendeeRegisterReminderHandler() {
+  let $ = jQuery;
+  jQuery('.rcon-dashboard-notification').show();
+  jQuery('.rcon-dashboard-notification').css('display', 'flex');
+
+  var emailSubject = jQuery('.rcon-dashboard-unregistered-attendee-email-reminder #email-subject').val();
+  var emailBody = jQuery('.rcon-dashboard-unregistered-attendee-email-reminder #email-body').val();
+
+  $.ajax({
+    type: 'post',
+    url: wp_ajax.url,
+    data: {
+      action: 'foobar',
+      nonce: wp_ajax.nonce,
+      emailSubject,
+      emailBody
+    },
+    success: function(response) {
+      // response = JSON.parse(response);
+      console.log(response);
+      jQuery('.rcon-dashboard-notification').find('img').hide();
+      jQuery('.rcon-dashboard-notification').html('<h1 style="color: green">Reminder sent successfully</h1>');
+    },
+    error: function(xhr, status, error) {
+      console.log(error);
+      jQuery('.rcon-dashboard-notification').html('<h1 style="color: red">Something went wrong</h1>');
+    }
+  })
+  
+}

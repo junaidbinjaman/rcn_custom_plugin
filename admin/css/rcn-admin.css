@@ -26,10 +26,10 @@
 }
 
 .rcon-dashboard-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
 }
 
 .r-con-dashboard-unregistered-attendee {
@@ -47,7 +47,7 @@
     color: #818181;
 }
 
-.r-con-dashboard-unregistered-attendee .header .dashicons-update{
+.r-con-dashboard-unregistered-attendee .header .dashicons-update {
     cursor: pointer;
 }
 
@@ -72,9 +72,9 @@
 }
 
 .r-con-dashboard-unregistered-attendee .footer {
-  text-align: end;
-  cursor: pointer;
-  color: #818181 !important;
+    text-align: end;
+    cursor: pointer;
+    color: #818181 !important;
 }
 
 .r-con-dashboard-unregistered-attendee .footer a {
@@ -94,4 +94,55 @@
     border-radius: 8px;
     margin-bottom: 10px;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 2px 0px;
+}
+
+.rcon-dashboard-unregistered-attendee-email-reminder {
+    background: #ffffff;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 30px;
+    width: 660px;
+}
+
+.rcon-dashboard-unregistered-attendee-email-reminder .header {
+    color: #818181;
+}
+
+.rcon-dashboard-unregistered-attendee-email-reminder .body {
+    position: relative;
+}
+
+.rcon-dashboard-unregistered-attendee-email-reminder .body input,
+.rcon-dashboard-unregistered-attendee-email-reminder .body textarea {
+    width: 100%;
+}
+
+.rcon-dashboard-unregistered-attendee-email-reminder .body textarea {
+    height: 100px;
+}
+
+.rcon-dashboard-unregistered-attendee-email-reminder .footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.rcon-dashboard-unregistered-attendee-email-reminder .footer a {
+    text-decoration: none;
+}
+
+.rcon-dashboard-unregistered-attendee-email-reminder .footer span {
+    margin-left: 10px;
+}
+
+.rcon-dashboard-unregistered-attendee-email-reminder .rcon-dashboard-notification {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #f5f5f5cf;
+    top: 0;
+    left: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
 }
