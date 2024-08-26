@@ -263,7 +263,12 @@ class Rcn_Admin {
 		<div class="rcon-dashboard-wrapper-detail">
 			<h2>Total Order <?php echo esc_html( count( $unregistered_attendee_no ) ); ?></h2>
 			<p>The orders that has yet available attendee slots to register.</p>
-			<?php $this->unregistered_order_list_column( $unregistered_attendee_no ); ?>
+			<form>
+				<?php $this->unregistered_order_list_column( $unregistered_attendee_no ); ?>
+			</form>
+			<div class="rcon-unregistered-attendee-reminder">
+				<span class="dashicons dashicons-edit"></span>
+			</div>
 		</div>
 		<?php
 	}
@@ -308,14 +313,25 @@ class Rcn_Admin {
 
 			$unregistered_attendees_num += $total_ticket_purchased - $unregistered_attendee_of_the_order;
 			$order_edit_page_url         = admin_url( 'post.php?post=' . $order_id . '&action=edit' );
+
+			$billing_email_address = $order->get_billing_email();
+			$billing_first_name    = $order->get_billing_first_name();
+			$billing_last_name     = $order->get_billing_last_name();
 			?>
 			<div class="r-con-dashboard-unregistered-attendee-list">
+				<div class="checkbox-wrapper">
+					<input
+					type="checkbox"
+					data-billing-email="<?php echo esc_attr( $billing_email_address ); ?>"
+					data-order-id="<?php echo esc_attr( $order_id ); ?>"
+					>
+				</div>
 				<p>#<?php echo esc_html( $order_id ); ?></p>
 				<p>
 					<?php
-					echo esc_html( $order->get_billing_first_name() );
+					echo esc_html( $billing_first_name );
 					echo '&nbsp;';
-					echo esc_html( $order->get_billing_last_name() );
+					echo esc_html( $billing_last_name );
 					?>
 				</p>
 				<p>Available slots <strong><?php echo esc_html( $unregistered_attendees_num ); ?></strong></p>
@@ -449,6 +465,13 @@ class Rcn_Admin {
 				<h2>Email Reminder</h2>
 				<p>Send an email reminder to all billing email addresses for orders with available slots for attendee registration.</p>
 				<p>The reminder will be sent to <?php echo esc_html( count( $unregistered_attendee_no ) ); ?> email</p>
+				<p class="shortcode_guides">
+					<strong>Short codes</strong> <br />
+					<code>{order_id}</code>: Order ID. <br />
+					<code>{first_name}</code>: Billing first name. <br />
+					<code>{last_name}</code>: Billing last name. <br />
+					<code>{email_address}</code>: Billing email address. <br />
+				</p>
 			</div>
 			<form class="body">
 				<p>
@@ -513,6 +536,35 @@ class Rcn_Admin {
 			break;
 		}
 
-		wp_send_json_success( 200 );
+		wp_send_json_success( 'The emails are sent successfully', 200 );
+	}
+
+	/**
+	 * Send the attendee registration reminder email to the selected orders
+	 * that has yet available attendee slots to register
+	 *
+	 * @return void
+	 */
+	public function send_reminder_to_selected_order() {
+		check_ajax_referer( 'rcn_admin_nonce', 'nonce' );
+
+		$sanitized_data = array();
+
+		if ( isset( $_POST['selectedOrderData'] ) && is_array( $_POST['selectedOrderData'] ) ) {
+			foreach( $_POST['selectedOrderData'] as $order_data ) { //phpcs:ignore
+				$sanitized_order_data = array();
+
+				$sanitized_order_data['order_id'] = sanitize_text_field( wp_unslash( $order_data['orderId'] ) );
+				$sanitized_order_data['email']    = sanitize_text_field( wp_unslash( $order_data['email'] ) );
+
+				$sanitized_data[] = $sanitized_order_data;
+			}
+		}
+
+		foreach ( $sanitized_data as $order ) {
+			wp_mail( $order['email'], 'Test reminder', 'This is a test reminder', array( 'Content-Type: text/html; charset=UTF-8' ) );
+		}
+
+		wp_send_json_success( 'Data logged successfully.' );
 	}
 }

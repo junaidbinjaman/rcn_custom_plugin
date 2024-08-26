@@ -161,7 +161,8 @@ class Rcn {
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu_init' );
 		$this->loader->add_action( 'wp_ajax_foobar', $plugin_admin, 'foobar' );
 		$this->loader->add_action( 'wp_ajax_nopriv_foobar', $plugin_admin, 'foobar' );
-		// $this->loader->add_action( 'init', $plugin_admin, 'foobar' );
+		$this->loader->add_action( 'wp_ajax_attendee_reg_reminder', $plugin_admin, 'send_reminder_to_selected_order' );
+		$this->loader->add_action( 'wp_ajax_nopriv_attendee_reg_reminder', $plugin_admin, 'send_reminder_to_selected_order' );
 	}
 
 	/**
