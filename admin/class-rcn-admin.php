@@ -269,6 +269,40 @@ class Rcn_Admin {
 			<div class="rcon-unregistered-attendee-reminder">
 				<span class="dashicons dashicons-edit"></span>
 			</div>
+			<div class="modal">
+				<span class="dashicons dashicons-no-alt rcon-close-modal-btn"></span>
+				<div class="rcon-selected-order-reminder-email-instruction">
+					<h2>Email Reminder</h2>
+					<p>Send an email reminder to all billing email addresses for orders with available slots for attendee registration.</p>
+					<p class="email-count"></p>
+					<p class="shortcode_guides">
+						<strong>Short codes</strong> <br />
+						<code>{order_id}</code>: Order ID. <br />
+						<code>{first_name}</code>: Billing first name. <br />
+						<code>{last_name}</code>: Billing last name. <br />
+						<code>{email_address}</code>: Billing email address. <br />
+						<code>{br}</code>: The line break. <br />
+					</p>
+				</div>
+				<form class="rcon-selected-order-reminder-email-form">
+					<p>
+						<label for="email-subject">Subject</label><br />
+						<input type="text" name="email-subject" id="email-subject">
+					</p>
+					<p>
+						<label for="email-body">Email Body</label><br />
+						<textarea name="email-body" id="email-body"></textarea>
+					</p>
+					<p>
+						<a href="#" class="button button-secondary">Send Reminder</a>
+					</p>
+					<div class="notification">
+						<p class="sending">Sending emails. Please wait...</p>
+						<p class="sent">Emails are sent successfully</p>
+					</div>
+				</form>
+			</div>
+			<div class="overlay"></div>
 		</div>
 		<?php
 	}
@@ -471,6 +505,7 @@ class Rcn_Admin {
 					<code>{first_name}</code>: Billing first name. <br />
 					<code>{last_name}</code>: Billing last name. <br />
 					<code>{email_address}</code>: Billing email address. <br />
+					<code>{br}</code>: The line break. <br />
 				</p>
 			</div>
 			<form class="body">
@@ -520,14 +555,16 @@ class Rcn_Admin {
 			$billing_email      = $order->get_billing_email();
 			$billing_first_name = $order->get_billing_first_name();
 			$billing_last_name  = $order->get_billing_last_name();
+			$line_break         = '<br />';
 
 			$order_id_pattern   = '/\{order_id\}/';
 			$first_name_pattern = '/\{first_name\}/';
 			$last_name_pattern  = '/\{last_name\}/';
 			$email_pattern      = '/\{email_address\}/';
+			$line_break_pattern = '/\{br\}/';
 
-			$patterns     = array( $order_id_pattern, $first_name_pattern, $last_name_pattern, $email_pattern );
-			$replacements = array( $order_id, $billing_first_name, $billing_last_name, $billing_email );
+			$patterns     = array( $order_id_pattern, $first_name_pattern, $last_name_pattern, $email_pattern, $line_break_pattern );
+			$replacements = array( $order_id, $billing_first_name, $billing_last_name, $billing_email, $line_break );
 
 			$email_subject = preg_replace( $patterns, $replacements, $email_subject );
 			$email_body    = preg_replace( $patterns, $replacements, $email_body );
@@ -548,6 +585,8 @@ class Rcn_Admin {
 	public function send_reminder_to_selected_order() {
 		check_ajax_referer( 'rcn_admin_nonce', 'nonce' );
 
+		$email_subject  = isset( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : null;
+		$email_body     = isset( $_POST['emailBody'] ) ? sanitize_text_field( wp_unslash( $_POST['emailBody'] ) ) : null;
 		$sanitized_data = array();
 
 		if ( isset( $_POST['selectedOrderData'] ) && is_array( $_POST['selectedOrderData'] ) ) {
@@ -561,8 +600,26 @@ class Rcn_Admin {
 			}
 		}
 
-		foreach ( $sanitized_data as $order ) {
-			wp_mail( $order['email'], 'Test reminder', 'This is a test reminder', array( 'Content-Type: text/html; charset=UTF-8' ) );
+		foreach ( $sanitized_data as $order_data ) {
+			$order              = wc_get_order( $order_data['order_id'] );
+			$order_id           = $order->get_ID();
+			$billing_email      = $order->get_billing_email();
+			$billing_first_name = $order->get_billing_first_name();
+			$billing_last_name  = $order->get_billing_last_name();
+			$line_break         = '<br />';
+
+			$order_id_pattern   = '/\{order_id\}/';
+			$first_name_pattern = '/\{first_name\}/';
+			$last_name_pattern  = '/\{last_name\}/';
+			$email_pattern      = '/\{email_address\}/';
+			$line_break_pattern = '/\{br\}/';
+
+			$patterns     = array( $order_id_pattern, $first_name_pattern, $last_name_pattern, $email_pattern, $line_break_pattern );
+			$replacements = array( $order_id, $billing_first_name, $billing_last_name, $billing_email, $line_break );
+
+			$email_subject = preg_replace( $patterns, $replacements, $email_subject );
+			$email_body    = preg_replace( $patterns, $replacements, $email_body );
+			wp_mail( $order_data['email'], $email_subject, $email_body, array( 'Content-Type: text/html; charset=UTF-8' ) );
 		}
 
 		wp_send_json_success( 'Data logged successfully.' );

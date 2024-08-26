@@ -178,3 +178,57 @@
 .rcon-unregistered-attendee-reminder span:active {
     transform: scale(0.4);
 }
+
+.modal {
+    position: fixed;
+    top: 20%;
+    left: 30%;
+    width: 660px;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    z-index: 2;
+    display: none;
+}
+
+.rcon-close-modal-btn {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    right: 10px;
+    font-size: 30px;
+    transition: all 0.1s ease-in-out;
+}
+
+.rcon-close-modal-btn:active {
+    transform: scale(0.8);
+}
+
+.overlay {
+    position: absolute;
+    background: #ccccccc7;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: none;
+}
+
+.rcon-selected-order-reminder-email-form input,
+.rcon-selected-order-reminder-email-form textarea {
+    width: 100%;
+}
+
+.rcon-selected-order-reminder-email-form textarea {
+    height: 130px;
+}
+
+.rcon-selected-order-reminder-email-form .notification .sending {
+    display: none;
+}
+
+.rcon-selected-order-reminder-email-form .notification .sent {
+    color: green;
+    display: none;
+}

@@ -31,6 +31,7 @@
 
     $(function () {
         rcn_arURLGeneratorBtnHandle($);
+        rconSelectedUnregisteredAttendeeReminderToRegister($);
     });
 })(jQuery);
 
@@ -127,6 +128,78 @@ function rcn_arNotificationHandler($, status, message) {
     }
 }
 
+function rconSelectedUnregisteredAttendeeReminderToRegister($) {
+    var selectedOrderData = [];
+
+    $('.rcon-unregistered-attendee-reminder').on('click', function () {
+        selectedOrderData.length = 0;
+
+        $(
+            '.r-con-dashboard-unregistered-attendee-list .checkbox-wrapper input:checked'
+        ).each(function () {
+            var orderId = $(this).attr('data-order-id');
+            var email = $(this).attr('data-billing-email');
+
+            selectedOrderData.push({orderId, email});
+        });
+
+        const selectedOrders = selectedOrderData.length;
+        let emailCountMessage = 'The reminder will be sent to <strong>'+ selectedOrders +'</strong> email';
+
+        if (selectedOrders === 0) {
+            emailCountMessage = '<span style="color: red;"><strong>NO ORDER SELECTED.</strong> Please select at least 1 order to continue</span>';
+            $('.rcon-selected-order-reminder-email-form a.button').attr('disabled', true);
+        }
+
+        if (selectedOrders !== 0) {
+            $('.rcon-selected-order-reminder-email-form a.button').attr('disabled', false);
+        }
+
+        $('.rcon-selected-order-reminder-email-instruction .email-count').html(
+            emailCountMessage
+        );
+
+        $(this).find('.dashicons-edit').fadeOut('fast');
+        $('.modal').fadeIn('fast');
+        $('.overlay').fadeIn('fast');
+    });
+
+    $('.rcon-close-modal-btn').on('click', function () {
+        $('.rcon-unregistered-attendee-reminder .dashicons-edit').fadeIn();
+        $('.modal').fadeOut('fast');
+        $('.overlay').fadeOut('fast');
+    });
+
+    $('.rcon-selected-order-reminder-email-form a.button').on(
+        'click',
+        function () {
+            $('.rcon-selected-order-reminder-email-form .notification .sent').fadeOut('fast')
+            $('.rcon-selected-order-reminder-email-form .notification .sending').fadeIn('slow');
+
+            var subject = $(
+                '.rcon-selected-order-reminder-email-form input'
+            ).val();
+            var emailBody = $(
+                '.rcon-selected-order-reminder-email-form textarea'
+            ).val();
+
+            console.log(
+                'Subject: ',
+                subject,
+                'Email: ',
+                emailBody,
+                selectedOrderData
+            );
+            sendReminderToSelectedOrders(
+                $,
+                subject,
+                emailBody,
+                selectedOrderData
+            );
+        }
+    );
+}
+
 /**
  * The function calls a backend function to send reminder to all the emails of the order
  * where there are still available slots
@@ -168,31 +241,26 @@ function rconAttendeeRegisterReminderHandler() {
     });
 }
 
-function sendReminderToSelectedOrders() {
-    var $ = jQuery;
-    var selectedOrderData = [];
-
-    $(
-        '.r-con-dashboard-unregistered-attendee-list .checkbox-wrapper input:checked'
-    ).each(function () {
-        var orderId = $(this).attr('data-order-id');
-        var email = $(this).attr('data-billing-email');
-
-        selectedOrderData.push({orderId, email});
-    });
-
-    console.log(selectedOrderData);
-
+function sendReminderToSelectedOrders(
+    $,
+    subject,
+    emailBody,
+    selectedOrderData
+) {
     $.ajax({
         type: 'POST',
         url: wp_ajax.url,
         data: {
             action: 'attendee_reg_reminder',
             nonce: wp_ajax.nonce,
+            subject: subject,
+            emailBody: emailBody,
             selectedOrderData: selectedOrderData,
         },
         success: function (res) {
             console.log(res);
+            $('.rcon-selected-order-reminder-email-form .notification .sending').fadeOut('fast')
+            $('.rcon-selected-order-reminder-email-form .notification .sent').fadeIn('slow')
         },
         error: function (xhr, status, status) {
             console.log(status);
