@@ -172,7 +172,7 @@
     padding: 30px;
     font-size: 26px;
     cursor: pointer;
-    transition: all .1s ease-in-out;
+    transition: all 0.1s ease-in-out;
 }
 
 .rcon-unregistered-attendee-reminder span:active {
@@ -231,4 +231,74 @@
 .rcon-selected-order-reminder-email-form .notification .sent {
     color: green;
     display: none;
+}
+
+.rcon-unregistered-attendee-reminder-form {
+    margin-top: 30px;
+}
+
+.rcon-unregistered-attendee-reminder-form .shortcode-guides {
+    line-height: 30px;
+}
+
+.rcon-unregistered-attendee-reminder-form form.body {
+    position: relative;
+}
+
+.rcon-unregistered-attendee-reminder-form input {
+    width: 100%;
+    max-width: 500px;
+}
+
+.rcon-unregistered-attendee-reminder-form textarea {
+    width: 100%;
+    max-width: 500px;
+    height: 130px;
+}
+
+.rcon-unregistered-attendee-reminder-form .notifications .loading,
+.rcon-unregistered-attendee-reminder-form .notifications .success,
+.rcon-unregistered-attendee-reminder-form .notifications .error {
+    display: none;
+}
+
+.rcon-attendee-ticket-data-container {
+    display: flex;
+    gap: 20px;
+    padding-top: 20px;
+}
+
+.rcon-attendee-ticket-data-container .rcon-attendee-ticket-data-box {
+    background: white;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    width: 150px;
+}
+
+.rcon-attendee-ticket-data-container .rcon-attendee-ticket-data-box {
+    text-align: center;
+}
+
+.rcon-attendee-ticket-data-container-title {
+    margin-top: 20px !important;
+}
+
+.rcon-attendee-ticket-data-container .rcon-attendee-ticket-data-box p {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.rcon-attendee-ticket-data-container .rcon-attendee-ticket-data-box li {
+    font-size: 10px;
+    border-bottom: 1px solid #00000036;
+    padding-bottom: 10px;
+    width: 80px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.rcon-attendee-ticket-data-container .rcon-attendee-ticket-data-box span {
+    font-size: 25px;
+    font-weight: bold;
 }

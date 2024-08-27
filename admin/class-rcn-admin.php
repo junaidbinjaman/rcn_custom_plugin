@@ -624,4 +624,148 @@ class Rcn_Admin {
 
 		wp_send_json_success( 'Data logged successfully.' );
 	}
+
+	/**
+	 * All custom meta boxes goes inside this function
+	 *
+	 * @return void
+	 */
+	public function custom_meta_boxes_init() {
+		$current_screen = get_current_screen()->id;
+
+		if ( 'shop_order' === $current_screen && 'woocommerce_shop_wc-order' ) {
+			add_meta_box(
+				'rcon-attendee-data',
+				'R-CON Attendee Data',
+				array( $this, 'rcon_attendee_data_callback' ),
+				$current_screen,
+				'normal',
+				'high'
+			);
+		}
+	}
+
+	/**
+	 * The widget displays the r-con attendee data
+	 * inside shop order edit screen
+	 *
+	 * @param Object $post The WP post object.
+	 * @return void
+	 */
+	public function rcon_attendee_data_callback( $post ) {
+		$order_id = $post->ID;
+
+		$rcn_ar_total_allowed_tickets = get_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', true );
+
+		$allowed_conference_attendees    = get_post_meta( $order_id, 'allowed_conference_attendees', true );
+		$registered_conference_attendees = get_post_meta( $order_id, 'registered_conference_attendees', true );
+		$allowed_conference_attendees    = empty( $allowed_conference_attendees ) ? 0 : $allowed_conference_attendees;
+		$registered_conference_attendees = empty( $registered_conference_attendees ) ? 0 : $registered_conference_attendees;
+
+		$allowed_virtual_attendees    = get_post_meta( $order_id, 'allowed_virtual_attendees', true );
+		$registered_virtual_attendees = get_post_meta( $order_id, 'registered_virtual_attendees', true );
+		$allowed_virtual_attendees    = empty( $allowed_virtual_attendees ) ? 0 : $allowed_virtual_attendees;
+		$registered_virtual_attendees = empty( $registered_virtual_attendees ) ? 0 : $registered_virtual_attendees;
+
+		$allowed_vip_attendees    = get_post_meta( $order_id, 'allowed_vip_attendees', true );
+		$registered_vip_attendees = get_post_meta( $order_id, 'registered_vip_attendees', true );
+		$allowed_vip_attendees    = empty( $allowed_vip_attendees ) ? 0 : $allowed_vip_attendees;
+		$registered_vip_attendees = empty( $registered_vip_attendees ) ? 0 : $registered_vip_attendees;
+
+		?>
+		<h2 class="rcon-attendee-ticket-data-container-title">R-CON Attendee Ticket Info</h2>
+		<div class="rcon-attendee-ticket-data-container">
+			<div class="rcon-attendee-ticket-data-box">
+				<p>Total Tickets</p>
+				<ul>
+					<li><span><?php echo esc_html( $rcn_ar_total_allowed_tickets ); ?></span> <br /> Purchased</li>
+					<li><span><?php echo esc_html( 'X' ); ?></span> <br /> Registered</li>
+				</ul>
+			</div>
+
+			<div class="rcon-attendee-ticket-data-box">
+				<p>Conference Attendees</p>
+				<ul>
+					<li><span><?php echo esc_html( $allowed_conference_attendees ); ?></span> <br /> Purchased</li>
+					<li><span><?php echo esc_html( $registered_conference_attendees ); ?></span> <br /> Registered</li>
+				</ul>
+			</div>
+
+			<div class="rcon-attendee-ticket-data-box">
+				<p>Virtual Attendees</p>
+				<ul>
+					<li><span><?php echo esc_html( $allowed_virtual_attendees ); ?></span> <br /> Purchased</li>
+					<li><span><?php echo esc_html( $registered_virtual_attendees ); ?></span> <br /> Registered</li>
+				</ul>
+			</div>
+
+			<div class="rcon-attendee-ticket-data-box">
+				<p>VIP Attendees</p>
+				<ul>
+					<li><span><?php echo esc_html( $allowed_vip_attendees ); ?></span> <br /> Purchased</li>
+					<li><span><?php echo esc_html( $registered_vip_attendees ); ?></span> <br /> Registered</li>
+				</ul>
+			</div>
+		</div>
+
+		<?php $this->rcon_unregistered_attendee_reminder_form(); ?>
+		<?php
+	}
+
+	/**
+	 * The form that send the registration minder
+	 *
+	 * @return void
+	 */
+	public function rcon_unregistered_attendee_reminder_form() {
+		?>
+		<div class="rcon-unregistered-attendee-reminder-form">
+			<div class="header">
+				<strong>Email Reminder</strong>
+				<p>Send an email reminder to all billing email addresses for orders with available slots for attendee registration.</p>
+				<p>The reminder will be sent to <?php echo esc_html( '' ); ?> email</p>
+				<p class="shortcode-guides">
+					<strong>Short codes</strong> <br />
+					<code>{order_id}</code>: Order ID. <br />
+					<code>{first_name}</code>: Billing first name. <br />
+					<code>{last_name}</code>: Billing last name. <br />
+					<code>{email_address}</code>: Billing email address. <br />
+					<code>{br}</code>: The line break. <br />
+				</p>
+			</div>
+			<form class="body">
+				<p>
+					<label for="email-subject">Subject</label><br />
+					<input type="text" name="email-subject" id="email-subject">
+				</p>
+				<p>
+					<label for="email-body">Email Body</label><br />
+					<textarea name="email-body" id="email-body"></textarea>
+				</p>
+				<p>
+					<a href="#" onclick="rconAttendeeRegisterReminderHandler()"  class="button button-secondary">Send Reminder</a>
+				</p>
+				<div class="notifications">
+					<div class="loading">
+						<p>Sending email. Please Wait</p>
+					</div>
+
+					<div class="success">
+						<p>Reminder sent successfully</p>
+					</div>
+
+					<div class="error">
+						<p>Oops! Looks like, something went wrong. Not to worry but to contact becca</p>
+					</div>
+				</div>
+			</form>
+			<div class="footer">
+				<a href="<?php echo esc_url( '' ); ?>">
+					<small>Click on the arrow if you want to send reminder to the selected orders only</small>
+					<span class="dashicons dashicons-arrow-right-alt2"></span>
+				</a>
+			</div>
+		</div>
+		<?php
+	}
 }

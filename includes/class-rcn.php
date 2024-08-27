@@ -163,6 +163,7 @@ class Rcn {
 		$this->loader->add_action( 'wp_ajax_nopriv_foobar', $plugin_admin, 'foobar' );
 		$this->loader->add_action( 'wp_ajax_attendee_reg_reminder', $plugin_admin, 'send_reminder_to_selected_order' );
 		$this->loader->add_action( 'wp_ajax_nopriv_attendee_reg_reminder', $plugin_admin, 'send_reminder_to_selected_order' );
+		$this->loader->add_action( 'add_meta_boxes', $plugin_admin, 'custom_meta_boxes_init' );
 	}
 
 	/**
