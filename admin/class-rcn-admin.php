@@ -542,7 +542,7 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	public function foobar() {
-		$unregistered_attendee_data  = $this->rcn_utility->rcon_dashboard();
+		$unregistered_attendee_data  = $this->rcn_utility->rcon_orders_with_available_attendee_slots();
 		$orders_with_available_slots = $unregistered_attendee_data['unregistered_attendee_order_data'];
 
 		check_ajax_referer( 'rcn_admin_nonce', 'nonce' );
@@ -708,17 +708,26 @@ class Rcn_Admin {
 			</div>
 		</div>
 
-		<?php $this->rcon_unregistered_attendee_reminder_form(); ?>
+		<?php $this->rcon_unregistered_attendee_reminder_form( 'single', $order_id ); ?>
 		<?php
 	}
 
 	/**
 	 * The form that send the registration minder
 	 *
+	 * @param string $form_type A flag that tell the system whether to send email to the single person, selected peoples or all.
+	 *               Values are: "single", "selected", "all". The second parameter is required is the first parameter values is "single".
+	 * @param int    $order_id The woocommerce order id. This parameter is required is the first parameter value is "single".
 	 * @return void
 	 */
-	public function rcon_unregistered_attendee_reminder_form() {
-		?>
+	public function rcon_unregistered_attendee_reminder_form( $form_type, $order_id = null ) {
+		if ( 'single' === $form_type && is_null( $order_id ) ) :
+			?>
+		<div class="error">
+			<p>Oops! Something went wrong. Please contact the developer.</p>
+		</div>
+		<?php endif; ?>
+
 		<div class="rcon-unregistered-attendee-reminder-form">
 			<div class="header">
 				<strong>Email Reminder</strong>
@@ -734,6 +743,14 @@ class Rcn_Admin {
 				</p>
 			</div>
 			<form class="body">
+				<input type="hidden" name="form-type" value="<?php echo esc_attr( $form_type ); ?>">
+				<?php
+				if ( 'single' === $form_type && ! is_null( $order_id ) ) :
+					?>
+					<input type="hidden" name="order-id", value="<?php echo esc_html( $order_id ); ?>">
+					<?php
+					endif;
+				?>
 				<p>
 					<label for="email-subject">Subject</label><br />
 					<input type="text" name="email-subject" id="email-subject">
@@ -743,28 +760,22 @@ class Rcn_Admin {
 					<textarea name="email-body" id="email-body"></textarea>
 				</p>
 				<p>
-					<a href="#" onclick="rconAttendeeRegisterReminderHandler()"  class="button button-secondary">Send Reminder</a>
+					<a href="#" type="submit" onclick="rconUnregisteredAttendeeReminder(jQuery)"  class="button button-secondary">Send Reminder</a>
 				</p>
 				<div class="notifications">
-					<div class="loading">
+					<div class="rcn-loading">
 						<p>Sending email. Please Wait</p>
 					</div>
 
-					<div class="success">
+					<div class="rcn-success">
 						<p>Reminder sent successfully</p>
 					</div>
 
-					<div class="error">
+					<div class="rcn-error">
 						<p>Oops! Looks like, something went wrong. Not to worry but to contact becca</p>
 					</div>
 				</div>
 			</form>
-			<div class="footer">
-				<a href="<?php echo esc_url( '' ); ?>">
-					<small>Click on the arrow if you want to send reminder to the selected orders only</small>
-					<span class="dashicons dashicons-arrow-right-alt2"></span>
-				</a>
-			</div>
 		</div>
 		<?php
 	}

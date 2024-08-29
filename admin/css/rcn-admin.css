@@ -256,9 +256,9 @@
     height: 130px;
 }
 
-.rcon-unregistered-attendee-reminder-form .notifications .loading,
-.rcon-unregistered-attendee-reminder-form .notifications .success,
-.rcon-unregistered-attendee-reminder-form .notifications .error {
+.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading,
+.rcon-unregistered-attendee-reminder-form .notifications .rcn-success,
+.rcon-unregistered-attendee-reminder-form .notifications .rcn-error {
     display: none;
 }
 

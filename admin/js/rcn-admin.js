@@ -144,15 +144,25 @@ function rconSelectedUnregisteredAttendeeReminderToRegister($) {
         });
 
         const selectedOrders = selectedOrderData.length;
-        let emailCountMessage = 'The reminder will be sent to <strong>'+ selectedOrders +'</strong> email';
+        let emailCountMessage =
+            'The reminder will be sent to <strong>' +
+            selectedOrders +
+            '</strong> email';
 
         if (selectedOrders === 0) {
-            emailCountMessage = '<span style="color: red;"><strong>NO ORDER SELECTED.</strong> Please select at least 1 order to continue</span>';
-            $('.rcon-selected-order-reminder-email-form a.button').attr('disabled', true);
+            emailCountMessage =
+                '<span style="color: red;"><strong>NO ORDER SELECTED.</strong> Please select at least 1 order to continue</span>';
+            $('.rcon-selected-order-reminder-email-form a.button').attr(
+                'disabled',
+                true
+            );
         }
 
         if (selectedOrders !== 0) {
-            $('.rcon-selected-order-reminder-email-form a.button').attr('disabled', false);
+            $('.rcon-selected-order-reminder-email-form a.button').attr(
+                'disabled',
+                false
+            );
         }
 
         $('.rcon-selected-order-reminder-email-instruction .email-count').html(
@@ -173,8 +183,12 @@ function rconSelectedUnregisteredAttendeeReminderToRegister($) {
     $('.rcon-selected-order-reminder-email-form a.button').on(
         'click',
         function () {
-            $('.rcon-selected-order-reminder-email-form .notification .sent').fadeOut('fast')
-            $('.rcon-selected-order-reminder-email-form .notification .sending').fadeIn('slow');
+            $(
+                '.rcon-selected-order-reminder-email-form .notification .sent'
+            ).fadeOut('fast');
+            $(
+                '.rcon-selected-order-reminder-email-form .notification .sending'
+            ).fadeIn('slow');
 
             var subject = $(
                 '.rcon-selected-order-reminder-email-form input'
@@ -259,11 +273,52 @@ function sendReminderToSelectedOrders(
         },
         success: function (res) {
             console.log(res);
-            $('.rcon-selected-order-reminder-email-form .notification .sending').fadeOut('fast')
-            $('.rcon-selected-order-reminder-email-form .notification .sent').fadeIn('slow')
+            $(
+                '.rcon-selected-order-reminder-email-form .notification .sending'
+            ).fadeOut('fast');
+            $(
+                '.rcon-selected-order-reminder-email-form .notification .sent'
+            ).fadeIn('slow');
         },
         error: function (xhr, status, status) {
             console.log(status);
+        },
+    });
+}
+
+function rconUnregisteredAttendeeReminder($) {
+    var formType;
+    var orderId;
+    var emailSubject;
+    var emailBody;
+
+    $('.rcon-unregistered-attendee-reminder-form').each(function () {
+        formType = $(this).find('input[name="form-type"]').val();
+        orderId = $(this).find('input[name="order-id"]').val();
+        emailSubject = $(this).find('input[name="email-subject"]').val();
+        emailBody = $(this).find('textarea[name="email-body"]').val();
+    });
+
+    var data = {
+        formType,
+        orderIds: [orderId, '<pa>Hello</p>'],
+        emailSubject,
+        emailBody
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: wp_ajax.url,
+        data: {
+            action: 'unregistered_attendee_reminder',
+            nonce: wp_ajax.nonce,
+            data: data
+        },
+        success: function (res) {
+            console.log(res);
+        },
+        error: function (xhr, status, error) {
+            console.log(xhr);
         },
     });
 }

@@ -727,38 +727,45 @@ class Rcn_Utility {
 	/**
 	 * R-CON dashboard callback.
 	 *
+	 * @param array $order_ids The order ids.
 	 * @return array
 	 */
-	public function rcon_dashboard() {
-
+	public function rcon_orders_with_available_attendee_slots( $order_ids = null ) {
 		$all_orders                       = wc_get_orders( array( 'limit' => -1 ) );
 		$unregistered_attendees_num       = 0;
 		$unregistered_attendee_order_data = array();
 
-		foreach ( $all_orders as $key => $order ) {
-			$order_id               = $order->get_id();
-			$total_ticket_purchased = intval( get_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', true ) );
-
-			if ( ! isset( $total_ticket_purchased ) ) {
-				continue;
-			}
-
-			$registered_virtual_attendee        = intval( get_post_meta( $order_id, 'registered_virtual_attendees', true ) );
-			$registered_conference_attendee     = intval( get_post_meta( $order_id, 'registered_conference_attendees', true ) );
-			$registered_vip_attendees           = intval( get_post_meta( $order_id, 'registered_vip_attendees', true ) );
-			$unregistered_attendee_of_the_order = ( $registered_virtual_attendee + $registered_conference_attendee + $registered_vip_attendees );
-
-			$unregistered_attendees_num += $total_ticket_purchased - $unregistered_attendee_of_the_order;
-
-			/**
-			 * Number of attendees yet to register in this order
-			 */
-			$unregistered_attendees_num_of_order = $total_ticket_purchased - $unregistered_attendee_of_the_order;
-
-			if ( $unregistered_attendees_num_of_order > 0 ) {
+		if ( ! is_null( $order_ids ) ) :
+			foreach ( $order_ids as $order_id ) :
+				$order = wc_get_order( $order_id );
 				array_push( $unregistered_attendee_order_data, $order );
+			endforeach;
+		else :
+			foreach ( $all_orders as $key => $order ) {
+				$order_id               = $order->get_id();
+				$total_ticket_purchased = intval( get_post_meta( $order_id, 'rcn_ar_total_allowed_tickets', true ) );
+
+				if ( ! isset( $total_ticket_purchased ) ) {
+					continue;
+				}
+
+				$registered_virtual_attendee        = intval( get_post_meta( $order_id, 'registered_virtual_attendees', true ) );
+				$registered_conference_attendee     = intval( get_post_meta( $order_id, 'registered_conference_attendees', true ) );
+				$registered_vip_attendees           = intval( get_post_meta( $order_id, 'registered_vip_attendees', true ) );
+				$unregistered_attendee_of_the_order = ( $registered_virtual_attendee + $registered_conference_attendee + $registered_vip_attendees );
+
+				$unregistered_attendees_num += $total_ticket_purchased - $unregistered_attendee_of_the_order;
+
+				/**
+				 * Number of attendees yet to register in this order
+				 */
+				$unregistered_attendees_num_of_order = $total_ticket_purchased - $unregistered_attendee_of_the_order;
+
+				if ( $unregistered_attendees_num_of_order > 0 ) {
+					array_push( $unregistered_attendee_order_data, $order );
+				}
 			}
-		}
+		endif;
 
 		return array(
 			'num_of_unregistered_attendees'    => $unregistered_attendees_num,
