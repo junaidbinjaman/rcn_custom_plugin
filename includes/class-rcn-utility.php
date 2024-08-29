@@ -725,7 +725,13 @@ class Rcn_Utility {
 	}
 
 	/**
-	 * R-CON dashboard callback.
+	 * The function return order objects that has yet available R-CON attendee slots to register.
+	 * This function take 1 optional argument.
+	 *
+	 * The function parameter is an array that contains order ids. If the parameter is provided,
+	 * the function will return data of the order ids that was in the array.
+	 * Otherwise, it will go through all the orders and check each order whether it has any available R-CON attendee slots or not.
+	 * It will return all the order, that has yet available R-CON attendee slot to register.
 	 *
 	 * @param array $order_ids The order ids.
 	 * @return array
