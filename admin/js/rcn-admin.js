@@ -287,6 +287,10 @@ function sendReminderToSelectedOrders(
 }
 
 function rconUnregisteredAttendeeReminder($) {
+    $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading').show();
+    $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-success').hide();
+    $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-error').hide();
+
     var formType;
     var orderId;
     var emailSubject;
@@ -301,7 +305,7 @@ function rconUnregisteredAttendeeReminder($) {
 
     var data = {
         formType,
-        orderIds: [orderId, '<pa>Hello</p>'],
+        orderIds: [orderId],
         emailSubject,
         emailBody
     }
@@ -316,9 +320,15 @@ function rconUnregisteredAttendeeReminder($) {
         },
         success: function (res) {
             console.log(res);
+            $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading').hide();
+            $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-success').show();
+            $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-error').hide();
         },
         error: function (xhr, status, error) {
             console.log(xhr);
+            $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading').hide();
+            $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-success').hide();
+            $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-error').show();
         },
     });
 }

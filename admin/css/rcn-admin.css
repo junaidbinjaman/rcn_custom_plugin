@@ -262,6 +262,18 @@
     display: none;
 }
 
+.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading {
+    color: #FFA500;
+}
+
+.rcon-unregistered-attendee-reminder-form .notifications .rcn-success {
+    color: #28A745;
+}
+
+.rcon-unregistered-attendee-reminder-form .notifications .rcn-error {
+    color: #DC3545;
+}
+
 .rcon-attendee-ticket-data-container {
     display: flex;
     gap: 20px;

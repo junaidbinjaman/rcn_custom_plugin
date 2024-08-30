@@ -257,7 +257,7 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	public function order_listings_with_available_slots() {
-		$unregistered_attendee_data = $this->rcn_utility->rcon_dashboard();
+		$unregistered_attendee_data = $this->rcn_utility->rcon_orders_with_available_attendee_slots();
 		$unregistered_attendee_no   = $unregistered_attendee_data['unregistered_attendee_order_data'];
 		?>
 		<div class="rcon-dashboard-wrapper-detail">
@@ -381,7 +381,7 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	private function rcon_dashboard_total_unregistered_attendees_widget() {
-		$unregistered_attendee_data               = $this->rcn_utility->rcon_dashboard();
+		$unregistered_attendee_data               = $this->rcn_utility->rcon_orders_with_available_attendee_slots();
 		$orders_with_available_slots_listing_page = admin_url( 'index.php?page=order-listings' );
 		?>
 		<div class="r-con-dashboard-unregistered-attendee">
@@ -457,7 +457,7 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	private function rcon_dashboard_total_attendees_widget() {
-		$unregistered_attendee_data = $this->rcn_utility->rcon_dashboard();
+		$unregistered_attendee_data = $this->rcn_utility->rcon_orders_with_available_attendee_slots();
 		$registered_attendee_no     = intval( $this->found_registered_attendees_num() );
 		$unregistered_attendee_no   = intval( $unregistered_attendee_data['num_of_unregistered_attendees'] );
 
@@ -489,7 +489,7 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	private function rcon_dashboard_unregistered_attendee_reminder_widget() {
-		$unregistered_attendee_data = $this->rcn_utility->rcon_dashboard();
+		$unregistered_attendee_data = $this->rcn_utility->rcon_orders_with_available_attendee_slots();
 		$unregistered_attendee_no   = $unregistered_attendee_data['unregistered_attendee_order_data'];
 
 		$order_listing_page_url = admin_url( '/index.php?page=order-listings' );
@@ -760,7 +760,7 @@ class Rcn_Admin {
 					<textarea name="email-body" id="email-body"></textarea>
 				</p>
 				<p>
-					<a href="#" type="submit" onclick="rconUnregisteredAttendeeReminder(jQuery)"  class="button button-secondary">Send Reminder</a>
+					<a type="submit" onclick="rconUnregisteredAttendeeReminder(jQuery)"  class="button button-secondary">Send Reminder</a>
 				</p>
 				<div class="notifications">
 					<div class="rcn-loading">
@@ -778,5 +778,60 @@ class Rcn_Admin {
 			</form>
 		</div>
 		<?php
+	}
+
+	/**
+	 * Undocumented function
+	 *
+	 * @return void
+	 */
+	public function unregistered_attendee_reminder() {
+		check_ajax_referer( 'rcn_admin_nonce', 'nonce' );
+
+		$data                = isset( $_POST['data'] ) ? $_POST['data'] : array(); // phpcs:ignore
+		$sanitized_order_ids = array();
+
+		$form_type     = isset( $data['formType'] ) ? sanitize_text_field( wp_unslash( $data['formType'] ) ) : null;
+		$email_subject = isset( $data['emailSubject'] ) ? sanitize_text_field( wp_unslash( $data['emailSubject'] ) ) : null;
+		$email_body    = isset( $data['emailBody'] ) ? sanitize_text_field( wp_unslash( $data['emailBody'] ) ) : null;
+		$order_ids     = ( isset( $data['orderIds'] ) && is_array( $data['orderIds'] ) ) ? $data['orderIds'] : null;
+
+		if ( ! is_array( $order_ids ) && 'all' !== $form_type ) :
+			wp_send_json_error( 'Something went wrong. Please contact admin.' );
+		endif;
+
+		if ( 'all' !== $form_type ) :
+			foreach ( $order_ids as $order_id ) :
+				$sanitized_order_id = sanitize_text_field( wp_unslash( $order_id ) );
+				array_push( $sanitized_order_ids, $sanitized_order_id );
+			endforeach;
+		endif;
+
+		$unregistered_attendee_order_data = $this->rcn_utility->rcon_orders_with_available_attendee_slots( $sanitized_order_ids );
+		$unregistered_attendee_order_data = $unregistered_attendee_order_data['unregistered_attendee_order_data'];
+
+		foreach ( $unregistered_attendee_order_data as $order ) {
+			$order_id           = $order->get_ID();
+			$billing_email      = $order->get_billing_email();
+			$billing_first_name = $order->get_billing_first_name();
+			$billing_last_name  = $order->get_billing_last_name();
+			$line_break         = '<br />';
+
+			$order_id_pattern   = '/\{order_id\}/';
+			$first_name_pattern = '/\{first_name\}/';
+			$last_name_pattern  = '/\{last_name\}/';
+			$email_pattern      = '/\{email_address\}/';
+			$line_break_pattern = '/\{br\}/';
+
+			$patterns     = array( $order_id_pattern, $first_name_pattern, $last_name_pattern, $email_pattern, $line_break_pattern );
+			$replacements = array( $order_id, $billing_first_name, $billing_last_name, $billing_email, $line_break );
+
+			$email_subject = preg_replace( $patterns, $replacements, $email_subject );
+			$email_body    = preg_replace( $patterns, $replacements, $email_body );
+
+			wp_mail( $billing_email, $email_subject, $email_body, array( 'Content-Type: text/html; charset=UTF-8' ) );
+		}
+
+		wp_send_json_success();
 	}
 }
