@@ -270,37 +270,9 @@ class Rcn_Admin {
 				<span class="dashicons dashicons-edit"></span>
 			</div>
 			<div class="modal">
-				<span class="dashicons dashicons-no-alt rcon-close-modal-btn"></span>
-				<div class="rcon-selected-order-reminder-email-instruction">
-					<h2>Email Reminder</h2>
-					<p>Send an email reminder to all billing email addresses for orders with available slots for attendee registration.</p>
-					<p class="email-count"></p>
-					<p class="shortcode_guides">
-						<strong>Short codes</strong> <br />
-						<code>{order_id}</code>: Order ID. <br />
-						<code>{first_name}</code>: Billing first name. <br />
-						<code>{last_name}</code>: Billing last name. <br />
-						<code>{email_address}</code>: Billing email address. <br />
-						<code>{br}</code>: The line break. <br />
-					</p>
-				</div>
-				<form class="rcon-selected-order-reminder-email-form">
-					<p>
-						<label for="email-subject">Subject</label><br />
-						<input type="text" name="email-subject" id="email-subject">
-					</p>
-					<p>
-						<label for="email-body">Email Body</label><br />
-						<textarea name="email-body" id="email-body"></textarea>
-					</p>
-					<p>
-						<a href="#" class="button button-secondary">Send Reminder</a>
-					</p>
-					<div class="notification">
-						<p class="sending">Sending emails. Please wait...</p>
-						<p class="sent">Emails are sent successfully</p>
-					</div>
-				</form>
+				<!-- Modal close btn -->
+				<span class="dashicons dashicons-no-alt rcon-close-modal-btn"></span> 
+				<?php $this->rcon_unregistered_attendee_reminder_form( 'selected' ); ?>
 			</div>
 			<div class="overlay"></div>
 		</div>
@@ -489,140 +461,12 @@ class Rcn_Admin {
 	 * @return void
 	 */
 	private function rcon_dashboard_unregistered_attendee_reminder_widget() {
-		$unregistered_attendee_data = $this->rcn_utility->rcon_orders_with_available_attendee_slots();
-		$unregistered_attendee_no   = $unregistered_attendee_data['unregistered_attendee_order_data'];
-
-		$order_listing_page_url = admin_url( '/index.php?page=order-listings' );
 		?>
 		<div class="rcon-dashboard-unregistered-attendee-email-reminder">
-			<div class="header">
-				<h2>Email Reminder</h2>
-				<p>Send an email reminder to all billing email addresses for orders with available slots for attendee registration.</p>
-				<p>The reminder will be sent to <?php echo esc_html( count( $unregistered_attendee_no ) ); ?> email</p>
-				<p class="shortcode_guides">
-					<strong>Short codes</strong> <br />
-					<code>{order_id}</code>: Order ID. <br />
-					<code>{first_name}</code>: Billing first name. <br />
-					<code>{last_name}</code>: Billing last name. <br />
-					<code>{email_address}</code>: Billing email address. <br />
-					<code>{br}</code>: The line break. <br />
-				</p>
-			</div>
-			<form class="body">
-				<p>
-					<label for="email-subject">Subject</label><br />
-					<input type="text" name="email-subject" id="email-subject">
-				</p>
-				<p>
-					<label for="email-body">Email Body</label><br />
-					<textarea name="email-body" id="email-body"></textarea>
-				</p>
-				<p>
-					<a href="#" onclick="rconAttendeeRegisterReminderHandler()"  class="button button-secondary">Send Reminder</a>
-				</p>
-				<div class="rcon-dashboard-notification">
-					<img src="<?php echo esc_url( get_admin_url() . 'images/spinner-2x.gif' ); ?>" />
-				</div>
-			</form>
-			<div class="footer">
-				<a href="<?php echo esc_url( $order_listing_page_url ); ?>">
-					<small>Click on the arrow if you want to send reminder to the selected orders only</small>
-					<span class="dashicons dashicons-arrow-right-alt2"></span>
-				</a>
-			</div>
+			<?php $this->rcon_unregistered_attendee_reminder_form( 'all' ); ?>
 		</div>
 		
 		<?php
-	}
-
-	/**
-	 * Send reminder email to all the orders that has yet available slots
-	 * to register new attendees
-	 *
-	 * @return void
-	 */
-	public function foobar() {
-		$unregistered_attendee_data  = $this->rcn_utility->rcon_orders_with_available_attendee_slots();
-		$orders_with_available_slots = $unregistered_attendee_data['unregistered_attendee_order_data'];
-
-		check_ajax_referer( 'rcn_admin_nonce', 'nonce' );
-
-		$email_subject = isset( $_POST['emailSubject'] ) ? sanitize_text_field( wp_unslash( $_POST['emailSubject'] ) ) : false;
-		$email_body    = isset( $_POST['emailBody'] ) ? sanitize_text_field( wp_unslash( $_POST['emailBody'] ) ) : false;
-
-		foreach ( $orders_with_available_slots as $order ) {
-			$order_id           = $order->get_ID();
-			$billing_email      = $order->get_billing_email();
-			$billing_first_name = $order->get_billing_first_name();
-			$billing_last_name  = $order->get_billing_last_name();
-			$line_break         = '<br />';
-
-			$order_id_pattern   = '/\{order_id\}/';
-			$first_name_pattern = '/\{first_name\}/';
-			$last_name_pattern  = '/\{last_name\}/';
-			$email_pattern      = '/\{email_address\}/';
-			$line_break_pattern = '/\{br\}/';
-
-			$patterns     = array( $order_id_pattern, $first_name_pattern, $last_name_pattern, $email_pattern, $line_break_pattern );
-			$replacements = array( $order_id, $billing_first_name, $billing_last_name, $billing_email, $line_break );
-
-			$email_subject = preg_replace( $patterns, $replacements, $email_subject );
-			$email_body    = preg_replace( $patterns, $replacements, $email_body );
-
-			wp_mail( $billing_email, $email_subject, $email_body, array( 'Content-Type: text/html; charset=UTF-8' ) );
-			break;
-		}
-
-		wp_send_json_success( 'The emails are sent successfully', 200 );
-	}
-
-	/**
-	 * Send the attendee registration reminder email to the selected orders
-	 * that has yet available attendee slots to register
-	 *
-	 * @return void
-	 */
-	public function send_reminder_to_selected_order() {
-		check_ajax_referer( 'rcn_admin_nonce', 'nonce' );
-
-		$email_subject  = isset( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : null;
-		$email_body     = isset( $_POST['emailBody'] ) ? sanitize_text_field( wp_unslash( $_POST['emailBody'] ) ) : null;
-		$sanitized_data = array();
-
-		if ( isset( $_POST['selectedOrderData'] ) && is_array( $_POST['selectedOrderData'] ) ) {
-			foreach( $_POST['selectedOrderData'] as $order_data ) { //phpcs:ignore
-				$sanitized_order_data = array();
-
-				$sanitized_order_data['order_id'] = sanitize_text_field( wp_unslash( $order_data['orderId'] ) );
-				$sanitized_order_data['email']    = sanitize_text_field( wp_unslash( $order_data['email'] ) );
-
-				$sanitized_data[] = $sanitized_order_data;
-			}
-		}
-
-		foreach ( $sanitized_data as $order_data ) {
-			$order              = wc_get_order( $order_data['order_id'] );
-			$order_id           = $order->get_ID();
-			$billing_email      = $order->get_billing_email();
-			$billing_first_name = $order->get_billing_first_name();
-			$billing_last_name  = $order->get_billing_last_name();
-			$line_break         = '<br />';
-
-			$order_id_pattern   = '/\{order_id\}/';
-			$first_name_pattern = '/\{first_name\}/';
-			$last_name_pattern  = '/\{last_name\}/';
-			$email_pattern      = '/\{email_address\}/';
-			$line_break_pattern = '/\{br\}/';
-
-			$patterns     = array( $order_id_pattern, $first_name_pattern, $last_name_pattern, $email_pattern, $line_break_pattern );
-			$replacements = array( $order_id, $billing_first_name, $billing_last_name, $billing_email, $line_break );
-
-			$email_subject = preg_replace( $patterns, $replacements, $email_subject );
-			$email_body    = preg_replace( $patterns, $replacements, $email_body );
-			wp_mail( $order_data['email'], $email_subject, $email_body, array( 'Content-Type: text/html; charset=UTF-8' ) );
-		}
-
-		wp_send_json_success( 'Data logged successfully.' );
 	}
 
 	/**
@@ -708,8 +552,14 @@ class Rcn_Admin {
 			</div>
 		</div>
 
-		<?php $this->rcon_unregistered_attendee_reminder_form( 'single', $order_id ); ?>
 		<?php
+		$notifications = array(
+			'loading' => 'Sending the email...',
+			'success' => 'The email is sent successfully.',
+			'error'   => 'Something went wrong.',
+		);
+
+		$this->rcon_unregistered_attendee_reminder_form( 'single', $order_id, $notifications );
 	}
 
 	/**
@@ -718,15 +568,27 @@ class Rcn_Admin {
 	 * @param string $form_type A flag that tell the system whether to send email to the single person, selected peoples or all.
 	 *               Values are: "single", "selected", "all". The second parameter is required is the first parameter values is "single".
 	 * @param int    $order_id The woocommerce order id. This parameter is required is the first parameter value is "single".
+	 * @param array  $notifications The email sending status notification.
 	 * @return void
 	 */
-	public function rcon_unregistered_attendee_reminder_form( $form_type, $order_id = null ) {
+	public function rcon_unregistered_attendee_reminder_form( $form_type, $order_id = null, $notifications = array() ) {
 		if ( 'single' === $form_type && is_null( $order_id ) ) :
 			?>
 		<div class="error">
 			<p>Oops! Something went wrong. Please contact the developer.</p>
 		</div>
-		<?php endif; ?>
+			<?php
+		endif;
+
+		if ( empty( $notifications ) ) :
+			$notifications = array(
+				'loading' => 'Sending...',
+				'success' => 'Successful.',
+				'error'   => 'Oops! Looks like, something went wrong.',
+			);
+		endif;
+
+		?>
 
 		<div class="rcon-unregistered-attendee-reminder-form">
 			<div class="header">
@@ -764,15 +626,15 @@ class Rcn_Admin {
 				</p>
 				<div class="notifications">
 					<div class="rcn-loading">
-						<p>Sending email. Please Wait</p>
+						<p><?php echo esc_html( $notifications['loading'] ); ?></p>
 					</div>
 
 					<div class="rcn-success">
-						<p>Reminder sent successfully</p>
+						<p><?php echo esc_html( $notifications['success'] ); ?></p>
 					</div>
 
 					<div class="rcn-error">
-						<p>Oops! Looks like, something went wrong. Not to worry but to contact becca</p>
+						<p><?php echo esc_html( $notifications['error'] ); ?></p>
 					</div>
 				</div>
 			</form>
@@ -781,7 +643,14 @@ class Rcn_Admin {
 	}
 
 	/**
-	 * Undocumented function
+	 * AJAX callback for the `rconUnregisteredAttendeeReminder` JavaScript function.
+	 *
+	 * This function sends reminder emails to unregistered R-CON attendees. It can target a single attendee, a selected group,
+	 * or all unregistered attendees based on the provided `$order_ids`.
+	 *
+	 * - If `$order_ids` contains specific order IDs, emails will be sent to the billing email addresses associated with those orders.
+	 * - If `$order_ids` is empty, the function will iterate through all orders to identify those with available attendee slots.
+	 *   For each such order, it will send a reminder email to the order's billing email address.
 	 *
 	 * @return void
 	 */
@@ -805,6 +674,10 @@ class Rcn_Admin {
 				$sanitized_order_id = sanitize_text_field( wp_unslash( $order_id ) );
 				array_push( $sanitized_order_ids, $sanitized_order_id );
 			endforeach;
+		endif;
+
+		if ( empty( $sanitized_order_ids ) ) :
+			$sanitized_order_ids = null;
 		endif;
 
 		$unregistered_attendee_order_data = $this->rcn_utility->rcon_orders_with_available_attendee_slots( $sanitized_order_ids );

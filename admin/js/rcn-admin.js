@@ -129,46 +129,8 @@ function rcn_arNotificationHandler($, status, message) {
 }
 
 function rconSelectedUnregisteredAttendeeReminderToRegister($) {
-    var selectedOrderData = [];
-
+    
     $('.rcon-unregistered-attendee-reminder').on('click', function () {
-        selectedOrderData.length = 0;
-
-        $(
-            '.r-con-dashboard-unregistered-attendee-list .checkbox-wrapper input:checked'
-        ).each(function () {
-            var orderId = $(this).attr('data-order-id');
-            var email = $(this).attr('data-billing-email');
-
-            selectedOrderData.push({orderId, email});
-        });
-
-        const selectedOrders = selectedOrderData.length;
-        let emailCountMessage =
-            'The reminder will be sent to <strong>' +
-            selectedOrders +
-            '</strong> email';
-
-        if (selectedOrders === 0) {
-            emailCountMessage =
-                '<span style="color: red;"><strong>NO ORDER SELECTED.</strong> Please select at least 1 order to continue</span>';
-            $('.rcon-selected-order-reminder-email-form a.button').attr(
-                'disabled',
-                true
-            );
-        }
-
-        if (selectedOrders !== 0) {
-            $('.rcon-selected-order-reminder-email-form a.button').attr(
-                'disabled',
-                false
-            );
-        }
-
-        $('.rcon-selected-order-reminder-email-instruction .email-count').html(
-            emailCountMessage
-        );
-
         $(this).find('.dashicons-edit').fadeOut('fast');
         $('.modal').fadeIn('fast');
         $('.overlay').fadeIn('fast');
@@ -179,117 +141,18 @@ function rconSelectedUnregisteredAttendeeReminderToRegister($) {
         $('.modal').fadeOut('fast');
         $('.overlay').fadeOut('fast');
     });
-
-    $('.rcon-selected-order-reminder-email-form a.button').on(
-        'click',
-        function () {
-            $(
-                '.rcon-selected-order-reminder-email-form .notification .sent'
-            ).fadeOut('fast');
-            $(
-                '.rcon-selected-order-reminder-email-form .notification .sending'
-            ).fadeIn('slow');
-
-            var subject = $(
-                '.rcon-selected-order-reminder-email-form input'
-            ).val();
-            var emailBody = $(
-                '.rcon-selected-order-reminder-email-form textarea'
-            ).val();
-
-            console.log(
-                'Subject: ',
-                subject,
-                'Email: ',
-                emailBody,
-                selectedOrderData
-            );
-            sendReminderToSelectedOrders(
-                $,
-                subject,
-                emailBody,
-                selectedOrderData
-            );
-        }
-    );
-}
-
-/**
- * The function calls a backend function to send reminder to all the emails of the order
- * where there are still available slots
- */
-function rconAttendeeRegisterReminderHandler() {
-    let $ = jQuery;
-    jQuery('.rcon-dashboard-notification').show();
-    jQuery('.rcon-dashboard-notification').css('display', 'flex');
-
-    var emailSubject = jQuery(
-        '.rcon-dashboard-unregistered-attendee-email-reminder #email-subject'
-    ).val();
-    var emailBody = jQuery(
-        '.rcon-dashboard-unregistered-attendee-email-reminder #email-body'
-    ).val();
-
-    $.ajax({
-        type: 'post',
-        url: wp_ajax.url,
-        data: {
-            action: 'foobar',
-            nonce: wp_ajax.nonce,
-            emailSubject,
-            emailBody,
-        },
-        success: function (response) {
-            console.log(response);
-            jQuery('.rcon-dashboard-notification').find('img').hide();
-            jQuery('.rcon-dashboard-notification').html(
-                '<h1 style="color: green"> All reminders are sent successfully</h1>'
-            );
-        },
-        error: function (xhr, status, error) {
-            console.log(error);
-            jQuery('.rcon-dashboard-notification').html(
-                '<h1 style="color: red">Something went wrong</h1>'
-            );
-        },
-    });
-}
-
-function sendReminderToSelectedOrders(
-    $,
-    subject,
-    emailBody,
-    selectedOrderData
-) {
-    $.ajax({
-        type: 'POST',
-        url: wp_ajax.url,
-        data: {
-            action: 'attendee_reg_reminder',
-            nonce: wp_ajax.nonce,
-            subject: subject,
-            emailBody: emailBody,
-            selectedOrderData: selectedOrderData,
-        },
-        success: function (res) {
-            console.log(res);
-            $(
-                '.rcon-selected-order-reminder-email-form .notification .sending'
-            ).fadeOut('fast');
-            $(
-                '.rcon-selected-order-reminder-email-form .notification .sent'
-            ).fadeIn('slow');
-        },
-        error: function (xhr, status, status) {
-            console.log(status);
-        },
-    });
 }
 
 function rconUnregisteredAttendeeReminder($) {
-    $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading').show();
-    $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-success').hide();
-    $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-error').hide();
+    $(
+        '.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading'
+    ).show();
+    $(
+        '.rcon-unregistered-attendee-reminder-form .notifications .rcn-success'
+    ).hide();
+    $(
+        '.rcon-unregistered-attendee-reminder-form .notifications .rcn-error'
+    ).hide();
 
     var formType;
     var orderId;
@@ -305,9 +168,19 @@ function rconUnregisteredAttendeeReminder($) {
 
     var data = {
         formType,
-        orderIds: [orderId],
+        orderIds: [(orderId ? orderId : [])],
         emailSubject,
-        emailBody
+        emailBody,
+    };
+
+    if (formType === 'selected') {
+        $(
+            '.r-con-dashboard-unregistered-attendee-list .checkbox-wrapper input:checked'
+        ).each(function () {
+            var orderId = $(this).attr('data-order-id');
+
+            data.orderIds.push(orderId);
+        });
     }
 
     $.ajax({
@@ -316,19 +189,31 @@ function rconUnregisteredAttendeeReminder($) {
         data: {
             action: 'unregistered_attendee_reminder',
             nonce: wp_ajax.nonce,
-            data: data
+            data: data,
         },
         success: function (res) {
             console.log(res);
-            $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading').hide();
-            $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-success').show();
-            $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-error').hide();
+            $(
+                '.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading'
+            ).hide();
+            $(
+                '.rcon-unregistered-attendee-reminder-form .notifications .rcn-success'
+            ).show();
+            $(
+                '.rcon-unregistered-attendee-reminder-form .notifications .rcn-error'
+            ).hide();
         },
         error: function (xhr, status, error) {
             console.log(xhr);
-            $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading').hide();
-            $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-success').hide();
-            $('.rcon-unregistered-attendee-reminder-form .notifications .rcn-error').show();
+            $(
+                '.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading'
+            ).hide();
+            $(
+                '.rcon-unregistered-attendee-reminder-form .notifications .rcn-success'
+            ).hide();
+            $(
+                '.rcon-unregistered-attendee-reminder-form .notifications .rcn-error'
+            ).show();
         },
     });
 }

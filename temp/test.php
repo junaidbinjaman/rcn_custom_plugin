@@ -1,12 +1,34 @@
 <?php
+// phpcs:disabled
 
-$obj = array(
-	array(
-		'name'  => 'Junaid Bin Jaman',
-		'email' => 'junaid@allnextver.com',
-	),
-	array(
-		'name'  => 'Ersome Rego',
-		'email' => 'ersome65859@gmail.com',
-	),
-);
+
+interface MyInterface {
+	const CONSTANT_NAME = 1;
+
+	public function methodName();
+}
+
+class MyClass implements MyInterface {
+	public function methodName() {
+
+	}
+}
+
+interface Readable {
+	public function read();
+}
+
+interface Document extends Readable {
+	public function getContents();
+}
+
+class Test implements Document {
+	public function getContents()
+	{
+		//
+	}
+
+	public function read() {
+		//
+	}
+}
