@@ -204,7 +204,7 @@ function rconUnregisteredAttendeeReminder($) {
             ).hide();
         },
         error: function (xhr, status, error) {
-            console.log(xhr);
+            console.log(error);
             $(
                 '.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading'
             ).hide();

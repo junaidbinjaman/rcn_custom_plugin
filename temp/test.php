@@ -1,34 +1,25 @@
 <?php
 // phpcs:disabled
 
+class App {
+	private static $app = null;
 
-interface MyInterface {
-	const CONSTANT_NAME = 1;
+	private function __construct() {
 
-	public function methodName();
-}
+	}
 
-class MyClass implements MyInterface {
-	public function methodName() {
+	public static function get () : App {
+		if (!self::$app) :
+			self::$app = new App();
+		endif;
 
+		return self::$app;
+	}
+
+	public function bootstrap() : void {
+		echo 'Bootstrapping the app';
 	}
 }
 
-interface Readable {
-	public function read();
-}
-
-interface Document extends Readable {
-	public function getContents();
-}
-
-class Test implements Document {
-	public function getContents()
-	{
-		//
-	}
-
-	public function read() {
-		//
-	}
-}
+$app = App::get();
+$app->bootstrap();
