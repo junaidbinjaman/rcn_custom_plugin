@@ -91,3 +91,113 @@ function run_rcn() {
 	$plugin->run();
 }
 run_rcn();
+
+add_action(
+	'init',
+	function () {
+		register_nav_menu(
+			'mobile-header-menu',
+			esc_html__( 'Mobile Header Menu', 'RCN' )
+		);
+
+		add_shortcode(
+			'foobar',
+			function () {
+				$menus   = get_nav_menu_locations();
+				$menu_id = $menus['mobile-header-menu'];
+
+				$menu_items = wp_get_nav_menu_items( $menu_id );
+
+				echo '<div class="rcn-parent-menus"><ul>';
+				foreach ( $menu_items as $item ) {
+					if ( ! $item->menu_item_parent ) {
+						handler( $menu_items, $item );
+					}
+				}
+				?>
+					</ul>
+				</div>
+				<div class="rcn-parent-menus">
+					<ul>
+						<li class="rcn-nav-menu-item">Home</li>
+						<li class="rcn-nav-menu-item">Education Center</li>
+						<li class="rcn-nav-menu-item">
+							<div class="rcn-nav-child-menu-arrow">
+								<a href="#">Community</a>
+								<span class="dashicons dashicons-arrow-down"></span>
+								<span class="dashicons dashicons-arrow-up"></span>
+							</div>
+							<ul class="rcn-nav-child-menu-wrapper">
+								<li class="rcn-nav-menu-item">Committees</li>
+								<li class="rcn-nav-menu-item">RCN Forum</li>
+							</ul>
+						</li>						
+						<li class="rcn-nav-menu-item">
+							<div class="rcn-nav-child-menu-arrow">
+								<a href="#">Events</a>
+								<span class="dashicons dashicons-arrow-down"></span>
+								<span class="dashicons dashicons-arrow-up"></span>
+							</div>
+							<ul class="rcn-nav-child-menu-wrapper">
+								<li class="rcn-nav-menu-item">
+									<div class="rcn-nav-child-menu-arrow">
+										<a href="#">R-CON 2024</a>
+										<span class="dashicons dashicons-arrow-down"></span>
+										<span class="dashicons dashicons-arrow-up"></span>
+									</div>
+									<ul class="rcn-nav-child-menu-wrapper">
+										<li class="rcn-nav-menu-item">Option 1</li>
+										<li class="rcn-nav-menu-item">Option 2</li>
+										<li class="rcn-nav-menu-item">Option 3</li>
+										<li class="rcn-nav-menu-item">Option 4</li>
+									</ul>
+								</li>
+								<li class="rcn-nav-menu-item">Upcoming Events</li>
+								<li class="rcn-nav-menu-item">Past Events</li>
+							</ul>
+						</li>
+						<li class="rcn-nav-menu-item">Podcast</li>
+						<li class="rcn-nav-menu-item">Sponsors</li>
+					</ul>
+				</div>
+				<?php
+			}
+		);
+	}
+);
+
+//phpcs:disabled
+
+function handler($menu_items, $item) {
+	$child_menus = array();
+
+	foreach ( $menu_items as $menu_item ) {
+		if ( $menu_item->menu_item_parent == $item->ID ) {
+			array_push( $child_menus, $menu_item );
+		}
+	}
+
+	if ( empty($child_menus) ) { ?>
+		<li class="rcn-nav-menu-item">
+			<a href="<?php echo esc_url( $item->url ) ?>"><?php echo esc_html( $item->title ); ?></a>
+		</li>
+		<?php
+		return;
+	} ?>
+	<li class="rcn-nav-menu-item">
+		<div class="rcn-nav-child-menu-arrow">
+			<a><?php echo esc_html( $item->title ); ?></a>
+			<span class="dashicons dashicons-arrow-down"></span>
+			<span class="dashicons dashicons-arrow-up"></span>
+		</div>
+		<ul class="rcn-nav-child-menu-wrapper">
+			<?php
+			foreach ($child_menus as $child_menu) {
+				handler($menu_items, $child_menu);
+			}
+			?>
+		</ul>
+	</li>
+	<?php
+}
+

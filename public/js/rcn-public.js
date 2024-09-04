@@ -9,5 +9,19 @@
    */
 
   $(function () {
+
+    
+
+    $('.rcn-nav-child-menu-arrow').on('click', function(e) {
+      $(this).siblings('.rcn-nav-child-menu-wrapper').toggle();
+      $(this).find('.dashicons-arrow-up').toggle();
+      $(this).find('.dashicons-arrow-down').toggle();
+
+      $(this).siblings().css({
+        'borderLeft': 'solid 1px red'
+      });
+
+      e.stopPropagation();
+    });
   });
 })(jQuery);

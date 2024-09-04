@@ -187,7 +187,7 @@ function rconUnregisteredAttendeeReminder($) {
         type: 'POST',
         url: wp_ajax.url,
         data: {
-            action: 'unregistered_attendee_reminder',
+            action: 'handle_unregistered_attendee_reminder_email_sending',
             nonce: wp_ajax.nonce,
             data: data,
         },

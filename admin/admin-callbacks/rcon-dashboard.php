@@ -133,7 +133,7 @@ trait Rcon_Dashboard_Callback {
 	 *
 	 * @return void
 	 */
-	public function unregistered_attendee_reminder() {
+	public function handle_unregistered_attendee_reminder_email_sending(): void {
 		check_ajax_referer( 'rcn_admin_nonce', 'nonce' );
 
 		$data                = isset( $_POST['data'] ) ? $_POST['data'] : array(); // phpcs:ignore
@@ -184,11 +184,78 @@ trait Rcon_Dashboard_Callback {
 
 			$email_subject = preg_replace( $patterns, $replacements, $email_subject );
 			$email_body    = preg_replace( $patterns, $replacements, $email_body );
+			$email_body    = $this->handle_unregistered_attendee_reminder_email_template( $email_body );
 
 			wp_mail( $billing_email, $email_subject, $email_body, array( 'Content-Type: text/html; charset=UTF-8' ) );
 		}
 
 		wp_send_json_success();
+	}
+
+	/**
+	 * The email template of unregistered attendee registration reminder email
+	 *
+	 * @param string $email_body The email body that admin types.
+	 * @return string
+	 */
+	public function handle_unregistered_attendee_reminder_email_template( $email_body ): string {
+		ob_start();
+		?>
+		<center>
+			<div style="background-color: #f5f5f5; padding-top: 25px; padding-bottom: 25px;">
+				<div style="
+				width: 500px;
+				background-color: #ffffff;
+				text-align: center;
+				border-radius: 8px;
+				box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.20);
+				">
+					<img 
+					src="https://realitycapturenetwork.com/wp-content/uploads/2024/07/R-CON-2024_Attendee-Registration-Banner-small.jpg"
+					style="border-top-left-radius: 8px; border-top-right-radius: 8px;"
+					width="100%"
+					alt="Banner">
+
+					<div style="padding: 30px; padding-top: 15px" >
+			
+						<div>
+							<p><?php echo $email_body; //phpcs:ignore; ?></p>
+							<br />
+							<a href="#" style="
+								padding: 15px 20px;
+								background: #006cfa;
+								font-family: 'Montserrat', Helvetica, sans-serif !important;
+								color: white;
+								text-decoration: none;
+								font-family: 'Montserrat';
+								border-radius: 8px;
+								font-weight: 500;
+								letter-spacing: 0.3px;
+								text-transform: uppercase"
+							>Register Attendees</a>
+							<hr  style="border: 0.5px solid #006cfa; margin: 30px auto;" />
+							
+							<!-- Footer data -->
+							<p style="
+								color: #000000;
+								font-size: 11px;
+								font-weight: 400;
+								line-height: 16px;
+								letter-spacing: 0.3px;
+								text-decoration-line: none;
+								font-family: 'Montserrat', sans-serif;
+							">
+								Reality Capture Network<br />
+								3405 E Overland Rd #375, Meridian, ID 83642 <br />
+								If you have any questions, feel free to contact us <br />at team@realitycapturenetwork.com
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</center>
+		<?php
+		return ob_get_clean();
 	}
 
 	/**

@@ -2,3 +2,27 @@
  * All of the CSS for your public-facing functionality should be
  * included in this file.
  */
+
+ .rcn-parent-menus ul {
+    list-style: none;
+    line-height: 30px;
+    font-size: 16px;
+ }
+
+ .rcn-nav-menu-item {
+    border-left: 1px solid black;
+    padding-left: 10px;
+}
+
+.rcn-nav-child-menu-wrapper {
+    display: none;
+}
+
+.rcn-nav-child-menu-arrow .dashicons-arrow-up,
+.rcn-nav-child-menu-arrow .dashicons-arrow-down {
+    cursor: pointer;
+}
+
+.rcn-nav-child-menu-arrow .dashicons-arrow-up {
+    display: none;
+}
