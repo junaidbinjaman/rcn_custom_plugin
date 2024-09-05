@@ -92,6 +92,8 @@ function run_rcn() {
 }
 run_rcn();
 
+//phpcs:disabled
+
 add_action(
 	'init',
 	function () {
@@ -101,7 +103,7 @@ add_action(
 		);
 
 		add_shortcode(
-			'foobar',
+			'advanced_mobile_menu',
 			function () {
 				$menus   = get_nav_menu_locations();
 				$menu_id = $menus['mobile-header-menu'];
@@ -117,56 +119,11 @@ add_action(
 				?>
 					</ul>
 				</div>
-				<div class="rcn-parent-menus">
-					<ul>
-						<li class="rcn-nav-menu-item">Home</li>
-						<li class="rcn-nav-menu-item">Education Center</li>
-						<li class="rcn-nav-menu-item">
-							<div class="rcn-nav-child-menu-arrow">
-								<a href="#">Community</a>
-								<span class="dashicons dashicons-arrow-down"></span>
-								<span class="dashicons dashicons-arrow-up"></span>
-							</div>
-							<ul class="rcn-nav-child-menu-wrapper">
-								<li class="rcn-nav-menu-item">Committees</li>
-								<li class="rcn-nav-menu-item">RCN Forum</li>
-							</ul>
-						</li>						
-						<li class="rcn-nav-menu-item">
-							<div class="rcn-nav-child-menu-arrow">
-								<a href="#">Events</a>
-								<span class="dashicons dashicons-arrow-down"></span>
-								<span class="dashicons dashicons-arrow-up"></span>
-							</div>
-							<ul class="rcn-nav-child-menu-wrapper">
-								<li class="rcn-nav-menu-item">
-									<div class="rcn-nav-child-menu-arrow">
-										<a href="#">R-CON 2024</a>
-										<span class="dashicons dashicons-arrow-down"></span>
-										<span class="dashicons dashicons-arrow-up"></span>
-									</div>
-									<ul class="rcn-nav-child-menu-wrapper">
-										<li class="rcn-nav-menu-item">Option 1</li>
-										<li class="rcn-nav-menu-item">Option 2</li>
-										<li class="rcn-nav-menu-item">Option 3</li>
-										<li class="rcn-nav-menu-item">Option 4</li>
-									</ul>
-								</li>
-								<li class="rcn-nav-menu-item">Upcoming Events</li>
-								<li class="rcn-nav-menu-item">Past Events</li>
-							</ul>
-						</li>
-						<li class="rcn-nav-menu-item">Podcast</li>
-						<li class="rcn-nav-menu-item">Sponsors</li>
-					</ul>
-				</div>
 				<?php
 			}
 		);
 	}
 );
-
-//phpcs:disabled
 
 function handler($menu_items, $item) {
 	$child_menus = array();
@@ -184,11 +141,12 @@ function handler($menu_items, $item) {
 		<?php
 		return;
 	} ?>
+
 	<li class="rcn-nav-menu-item">
 		<div class="rcn-nav-child-menu-arrow">
-			<a><?php echo esc_html( $item->title ); ?></a>
+			<a href="<?php echo esc_url( $item->url ); ?>"><?php echo esc_html( $item->title ); ?></a>
 			<span class="dashicons dashicons-arrow-down"></span>
-			<span class="dashicons dashicons-arrow-up"></span>
+			<span class="dashicons dashicons-arrow-right"></span>
 		</div>
 		<ul class="rcn-nav-child-menu-wrapper">
 			<?php
