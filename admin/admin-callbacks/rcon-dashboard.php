@@ -184,7 +184,7 @@ trait Rcon_Dashboard_Callback {
 
 			$email_subject = preg_replace( $patterns, $replacements, $email_subject );
 			$email_body    = preg_replace( $patterns, $replacements, $email_body );
-			$email_body    = $this->handle_unregistered_attendee_reminder_email_template( $email_body );
+			$email_body    = $this->handle_unregistered_attendee_reminder_email_template( $email_body, $order_id );
 
 			wp_mail( $billing_email, $email_subject, $email_body, array( 'Content-Type: text/html; charset=UTF-8' ) );
 		}
@@ -196,9 +196,11 @@ trait Rcon_Dashboard_Callback {
 	 * The email template of unregistered attendee registration reminder email
 	 *
 	 * @param string $email_body The email body that admin types.
+	 * @param int    $order_id The order id.
 	 * @return string
 	 */
-	public function handle_unregistered_attendee_reminder_email_template( $email_body ): string {
+	public function handle_unregistered_attendee_reminder_email_template( $email_body, $order_id ): string {
+		$rcon_attendee_registration_page_url = home_url( '/attendee-registration/?order-id=' . $order_id );
 		ob_start();
 		?>
 		<center>
@@ -219,9 +221,11 @@ trait Rcon_Dashboard_Callback {
 					<div style="padding: 30px; padding-top: 15px" >
 			
 						<div>
-							<p><?php echo $email_body; //phpcs:ignore; ?></p>
+							<p style="
+							font-family: 'montserrat', sans-serif
+							"><?php echo $email_body; //phpcs:ignore; ?></p>
 							<br />
-							<a href="#" style="
+							<a href="<?php echo esc_url( $rcon_attendee_registration_page_url ); ?>" style="
 								padding: 15px 20px;
 								background: #006cfa;
 								font-family: 'Montserrat', Helvetica, sans-serif !important;
@@ -231,7 +235,9 @@ trait Rcon_Dashboard_Callback {
 								border-radius: 8px;
 								font-weight: 500;
 								letter-spacing: 0.3px;
-								text-transform: uppercase"
+								text-transform: uppercase;
+								cursor: pointer;
+								"
 							>Register Attendees</a>
 							<hr  style="border: 0.5px solid #006cfa; margin: 30px auto;" />
 							

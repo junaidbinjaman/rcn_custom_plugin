@@ -128,14 +128,24 @@ function rcn_arNotificationHandler($, status, message) {
     }
 }
 
+/**
+ * The function handles the popup visibility toggle.
+ *
+ * The popup contains a form that send available attendee registration
+ * email reminder to the billing email address of the selected orders.
+ *
+ * @param {jQuery} $ The jQuery reference.
+ */
 function rconSelectedUnregisteredAttendeeReminderToRegister($) {
     
+    // Show the popup
     $('.rcon-unregistered-attendee-reminder').on('click', function () {
         $(this).find('.dashicons-edit').fadeOut('fast');
         $('.modal').fadeIn('fast');
         $('.overlay').fadeIn('fast');
     });
 
+    // Hide the popup
     $('.rcon-close-modal-btn').on('click', function () {
         $('.rcon-unregistered-attendee-reminder .dashicons-edit').fadeIn();
         $('.modal').fadeOut('fast');
@@ -143,7 +153,14 @@ function rconSelectedUnregisteredAttendeeReminderToRegister($) {
     });
 }
 
+/**
+ * Retrieves the form values for unregistered attendee reminders and sends them 
+ * to a PHP function via AJAX to dispatch the email reminder.
+ *
+ * @param {jQuery} $ - The jQuery reference.
+ */
 function rconUnregisteredAttendeeReminder($) {
+    // Sending status notification
     $(
         '.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading'
     ).show();
@@ -192,7 +209,7 @@ function rconUnregisteredAttendeeReminder($) {
             data: data,
         },
         success: function (res) {
-            console.log(res);
+            // Sending status notification
             $(
                 '.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading'
             ).hide();
@@ -204,7 +221,7 @@ function rconUnregisteredAttendeeReminder($) {
             ).hide();
         },
         error: function (xhr, status, error) {
-            console.log(error);
+            // Sending status notification
             $(
                 '.rcon-unregistered-attendee-reminder-form .notifications .rcn-loading'
             ).hide();
