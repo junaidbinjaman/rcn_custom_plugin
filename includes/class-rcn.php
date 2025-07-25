@@ -150,13 +150,18 @@ class Rcn {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Rcn_Admin( $this->get_plugin_name(), $this->get_version() );
+		$rcn_utility  = new Rcn_Utility();
+		$plugin_admin = new Rcn_Admin( $this->get_plugin_name(), $this->get_version(), $rcn_utility );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'elementor_pro/forms/actions/register', $plugin_admin, 'register_elementor_form_custom_actions' );
 		$this->loader->add_action( 'wp_dashboard_setup', $plugin_admin, 'ar_admin_dashboard_widgets_handler' );
 		$this->loader->add_action( 'wp_ajax_ar_admin_url_generator', $plugin_admin, 'ar_admin_url_generator' );
+		$this->loader->add_action( 'admin_menu', $plugin_admin, 'admin_menu_init' );
+		$this->loader->add_action( 'add_meta_boxes', $plugin_admin, 'custom_meta_boxes_init' );
+		$this->loader->add_action( 'wp_ajax_handle_unregistered_attendee_reminder_email_sending', $plugin_admin, 'handle_unregistered_attendee_reminder_email_sending' );
+		$this->loader->add_action( 'wp_ajax_nopiv_handle_unregistered_attendee_reminder_email_sending', $plugin_admin, 'handle_unregistered_attendee_reminder_email_sending' );
 	}
 
 	/**

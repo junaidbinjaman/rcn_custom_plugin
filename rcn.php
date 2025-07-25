@@ -15,7 +15,7 @@
  * Plugin Name:       RCN Custom Plugin
  * Plugin URI:        https://realitycapturenetwork.com
  * Description:       Introducing the RCN-exclusive plugin, meticulously crafted with tailored RCN custom codes and specialized functions to enhance your experience uniquely. Designed exclusively for RCN, this plugin brings a world of customized possibilities to your fingertips.
- * Version:           1.2.2
+ * Version:           2.0.0
  * Author:            Junaid Bin Jaman
  * Author URI:        https://junaidbinjaman.com/
  * License:           GPL-2.0+
@@ -91,3 +91,71 @@ function run_rcn() {
 	$plugin->run();
 }
 run_rcn();
+
+//phpcs:disabled
+
+add_action(
+	'init',
+	function () {
+		register_nav_menu(
+			'mobile-header-menu',
+			esc_html__( 'Mobile Header Menu', 'RCN' )
+		);
+
+		add_shortcode(
+			'advanced_mobile_menu',
+			function () {
+				$menus   = get_nav_menu_locations();
+				$menu_id = $menus['mobile-header-menu'];
+
+				$menu_items = wp_get_nav_menu_items( $menu_id );
+
+				echo '<div class="rcn-parent-menus"><ul>';
+				foreach ( $menu_items as $item ) {
+					if ( ! $item->menu_item_parent ) {
+						handler( $menu_items, $item );
+					}
+				}
+				?>
+					</ul>
+				</div>
+				<?php
+			}
+		);
+	}
+);
+
+function handler($menu_items, $item) {
+	$child_menus = array();
+
+	foreach ( $menu_items as $menu_item ) {
+		if ( $menu_item->menu_item_parent == $item->ID ) {
+			array_push( $child_menus, $menu_item );
+		}
+	}
+
+	if ( empty($child_menus) ) { ?>
+		<li class="rcn-nav-menu-item">
+			<a href="<?php echo esc_url( $item->url ) ?>"><?php echo esc_html( $item->title ); ?></a>
+		</li>
+		<?php
+		return;
+	} ?>
+
+	<li class="rcn-nav-menu-item">
+		<div class="rcn-nav-child-menu-arrow">
+			<a href="<?php echo esc_url( $item->url ); ?>"><?php echo esc_html( $item->title ); ?></a>
+			<span class="dashicons dashicons-arrow-down"></span>
+			<span class="dashicons dashicons-arrow-right"></span>
+		</div>
+		<ul class="rcn-nav-child-menu-wrapper">
+			<?php
+			foreach ($child_menus as $child_menu) {
+				handler($menu_items, $child_menu);
+			}
+			?>
+		</ul>
+	</li>
+	<?php
+}
+

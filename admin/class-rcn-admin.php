@@ -9,6 +9,9 @@
  * @subpackage Rcn/admin
  */
 
+use ElementorPro\Modules\Forms\Fields\Number;
+require_once plugin_dir_path( __DIR__ ) . 'admin/admin-callbacks/rcon-dashboard.php';
+
 /**
  * The admin-specific functionality of the plugin.
  *
@@ -20,6 +23,7 @@
  * @author     Junaid Bin Jaman <me@junaidbinjaman.com>
  */
 class Rcn_Admin {
+	use Rcon_Dashboard_Callback;
 
 	/**
 	 * The ID of this plugin.
@@ -40,16 +44,25 @@ class Rcn_Admin {
 	private $version;
 
 	/**
+	 * Initializes the RCN Utility function.
+	 *
+	 * @var object
+	 */
+	private $rcn_utility;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
 	 * @param      string $plugin_name       The name of this plugin.
 	 * @param      string $version    The version of this plugin.
+	 * @param      object $rcn_utility The rcn utility class initializer.
 	 */
-	public function __construct( $plugin_name, $version ) {
+	public function __construct( $plugin_name, $version, $rcn_utility ) {
 
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
+		$this->rcn_utility = $rcn_utility;
 	}
 
 	/**
@@ -184,8 +197,7 @@ class Rcn_Admin {
 
 		$all_options = get_option( 'options', array() );
 
-		$rcn_utility             = new Rcn_Utility();
-		$result                  = $rcn_utility->register_attendee_slots( $order_id );
+		$result                  = $this->rcn_utility->register_attendee_slots( $order_id );
 		$ar_registration_page_id = isset( $all_options['registration-page'] ) ? $all_options['registration-page'] : false;
 
 		if ( false === $result['status'] ) {
@@ -206,6 +218,70 @@ class Rcn_Admin {
 				)
 			);
 			exit;
+		}
+	}
+
+	/**
+	 * The function initializes the admin menu/submenu.
+	 *
+	 * @return void
+	 */
+	public function admin_menu_init() {
+		/**
+		 * R-CON Dashboard for admin.
+		 */
+		add_submenu_page(
+			'index.php',
+			__( 'R-CON Dashboard', 'rcn' ),
+			__( 'R-CON Dashboard', 'rcn' ),
+			'manage_options',
+			'r-con-dashboard',
+			array( $this, 'rcon_dashboard__callback' ),
+		);
+
+		/**
+		 * This admin menu page contains a list of all the order
+		 * That has yet available attendee slots to register.
+		 */
+
+		add_menu_page(
+			__( 'Order List', 'rcn' ),
+			'',
+			'manage_options',
+			'order-listings',
+			array( $this, 'order_listings_with_available_slots' )
+		);
+	}
+
+	/**
+	 * Callback to initialize custom meta boxes.
+	 *
+	 * This callback is responsible for adding custom meta boxes across all relevant screens
+	 * in the admin interface. It ensures that the necessary meta boxes are registered
+	 * and ready for use on the specified admin pages.
+	 *
+	 * @return void
+	 */
+	public function custom_meta_boxes_init() {
+		$current_screen = get_current_screen()->id;
+
+		/**
+		* Adds custom meta boxes to the Shop Order edit page.
+		*
+		* This meta box displays R-CON attendee data associated with the current order
+		* and includes a form to send an R-CON attendee registration reminder to the billing email.
+		*
+		* @return void
+		*/
+		if ( 'shop_order' === $current_screen && 'woocommerce_shop_wc-order' ) {
+			add_meta_box(
+				'rcon-attendee-data',
+				'R-CON Attendee Data',
+				array( $this, 'rcon_attendee_data_on_shop_order_edit_page' ),
+				$current_screen,
+				'normal',
+				'high'
+			);
 		}
 	}
 }
